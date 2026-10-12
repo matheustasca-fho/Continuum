@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil do Doador — CONTINUUM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+
+<body>
+  <!-- Thread trail (cursor craft) -->
+  <div class="thread-trail" id="threadTrail"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMsg">Alterações salvas com sucesso!</span>
+  </div>
+
+  <!-- Mobile toggle -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="doador" data-active="perfil"></div>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-header__title">Meu Perfil</h1>
+          <p class="page-header__subtitle">Gerencie as informações da sua confecção e dados para coleta de materiais.</p>
+        </div>
+        <!-- Etiqueta Animada -->
+        <div class="header-tag-container" aria-label="Perfil Designer">
+          <!-- Alfinete -->
+          <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+            <!-- Sombra do alfinete -->
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="rgba(0,0,0,0.15)" transform="translate(0, 3)" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            <circle cx="102" cy="18" r="6" stroke="rgba(0,0,0,0.15)" stroke-width="3" fill="none" transform="translate(0, 3)" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            
+            <!-- Alfinete real -->
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="#4a4a4a" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+            <circle cx="102" cy="18" r="6" stroke="#4a4a4a" stroke-width="3" fill="none" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <!-- Tag de papel -->
+          <div class="clothing-tag">
+            <div class="clothing-tag__hole"></div>
+            <div class="clothing-tag__content">
+              <div class="clothing-tag__title">CONTINUUM</div>
+              <div class="clothing-tag__subtitle">Perfil Doador</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+              <div class="profile-card">
+          <h2 class="profile-card__section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="3" width="14" height="3" rx="1"></rect><rect x="5" y="18" width="14" height="3" rx="1"></rect>
+              <line x1="7" y1="6" x2="7" y2="18"></line><line x1="17" y1="6" x2="17" y2="18"></line>
+              <line x1="7" y1="9" x2="17" y2="9"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="15" x2="17" y2="15"></line>
+            </svg>
+            Dados da Confecção & Endereço
+          </h2>
+
+          <div class="profile-card__avatar">
+            <div class="avatar">
+              <div class="avatar__frame"></div>
+              <div class="avatar__circle">
+                <svg class="avatar__placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <button type="button" class="avatar__edit" aria-label="Alterar logo da confecção" title="Alterar logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
+            </div>
+            <span class="avatar__hint">Formatos aceitos: JPG, PNG. Max 2MB</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nomeConfeccao" class="form-label">Nome da Confecção / Fábrica</label>
+              <input type="text" id="nomeConfeccao" class="form-input" value="Tecelagem União" placeholder="Nome Fantasia" />
+            </div>
+            <div class="form-group">
+              <label for="razaoSocial" class="form-label">Razão Social</label>
+              <input type="text" id="razaoSocial" class="form-input" value="Tecelagem União Ltda" />
+            </div>
+            <div class="form-group">
+              <label for="cnpj" class="form-label">CNPJ</label>
+              <input type="text" id="cnpj" class="form-input" value="12.345.678/0001-90" disabled />
+              <span class="form-hint">Documento não pode ser alterado após o cadastro.</span>
+            </div>
+            <div class="form-group">
+              <label for="telefone" class="form-label">Telefone Corporativo / WhatsApp</label>
+              <input type="tel" id="telefone" class="form-input" value="(11) 3234-5678" placeholder="(00) 0000-0000" />
+            </div>
+            <div class="form-group form-group--full">
+              <label for="email" class="form-label">E-mail de Contato (Gestor Ambiental)</label>
+              <input type="email" id="email" class="form-input" value="sustentabilidade@tecelagemuniao.com.br" placeholder="seu@email.com" />
+            </div>
+          </div>
+
+          <hr class="form-section-divider" />
+
+          <h3 class="form-section-label">Endereço de Coleta</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="cep" class="form-label">CEP</label>
+              <input type="text" id="cep" class="form-input" value="03001-000" placeholder="00000-000" />
+            </div>
+            <div class="form-group">
+              <label for="cidadeEstado" class="form-label">Cidade / Estado</label>
+              <input type="text" id="cidadeEstado" class="form-input" value="São Paulo / SP" placeholder="Cidade / UF" />
+            </div>
+            <div class="form-group form-group--full">
+              <label for="logradouro" class="form-label">Logradouro, Número e Complemento (Doca/Portão)</label>
+              <input type="text" id="logradouro" class="form-input" value="Rua das Indústrias, 500 - Doca 3" placeholder="Rua, Av, Número, Portão" />
+            </div>
+          </div>
+
+          <hr class="form-section-divider" />
+
+          <h3 class="form-section-label">Detalhes Operacionais</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="frequencia" class="form-label">Frequência de Disponibilidade de Lotes</label>
+              <select id="frequencia" class="form-input">
+                <option value="" disabled>Selecione...</option>
+                <option value="diaria">Diária</option>
+                <option value="semanal" selected>Semanal</option>
+                <option value="quinzenal">Quinzenal</option>
+                <option value="mensal">Mensal</option>
+                <option value="sobDemanda">Sob demanda (Variável)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="volumeEstimado" class="form-label">Volume Mensal Estimado (KG)</label>
+              <input type="number" id="volumeEstimado" class="form-input" value="500" placeholder="Ex: 200" min="0" />
+              <span class="form-hint">Média total aproximada gerada por mês.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Salvar Alterações
+          </button>
+          <button type="button" class="btn btn--stitched" id="btnLogout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sair da Conta
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
+

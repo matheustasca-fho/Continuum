@@ -1,0 +1,487 @@
+/* ==========================================================================
+   CONTINUUM - css/global.css (UNIFICADO)
+   Fusão de frontend/css, frontend2/css e frontend3/css.
+   Regra de conflito: valores do frontend2 prevalecem. Ver RELATORIO-INTEGRACAO.md
+   para a lista de conflitos resolvidos.
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ==========================================================================
+   CONTINUUM — global.css
+   Tokens do Design System "CONTINUUM Craft", reset, tipografia e
+   componentes base (BEM) compartilhados entre as telas.
+
+   Nota sobre unidades: o guia define tokens em vw/vh. Aqui eles são
+   envolvidos em clamp(min, vw/vh, max) para manter a fluidez proporcional
+   sem ficar ilegível no celular nem gigante em monitores ultrawide.
+   ========================================================================== */
+
+:root {
+  /* Cores Principais do Ateliê */
+  --color-primary: #782736;
+  --color-primary-hover: #5e1e2a;
+  --color-primary-light: #FDF2F4;
+
+  /* Neutros e Fundo Craft */
+  --color-sand-offwhite: #F5F2EB;
+  --color-sand-deep: #ECE7DC;
+  --color-white: #FFFFFF;
+  --color-charcoal-text: #2D3748;
+  --color-muted-text: #718096;
+  --color-border: #E2E8F0;
+  --color-border-dark: #2D2D2D;
+
+  /* Estados e Feedbacks */
+  --color-error: #D32F2F;
+  --color-error-bg: #FDEDED;
+  --color-success: #2E7D32;
+  --color-success-bg: #E8F5E9;
+  --color-warning: #ED6C02;
+  --color-warning-bg: #FFF4E5;
+
+  /* Geometria e Bordas (fluídas) */
+  --radius-sm: clamp(3px, 0.25vw, 5px);
+  --radius-md: clamp(6px, 0.5vw, 10px);
+  --radius-lg: clamp(10px, 0.75vw, 16px);
+  --radius-pill: 999px;
+  --border-stitch: 2px dashed var(--color-primary);
+
+  /* Tipografia */
+  --font-title: 'Anton', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-detail: 'Space Mono', monospace;
+
+  --fs-display: clamp(1.75rem, 2.25vw + 0.5rem, 2.85rem);
+  --fs-subtitle: clamp(1.125rem, 1.5vw, 1.75rem);
+  --fs-body: clamp(0.875rem, 0.95vw, 1.0625rem);
+  --fs-small: clamp(0.8125rem, 0.85vw, 0.9375rem);
+  --fs-detail: clamp(0.6875rem, 0.8vw, 0.8125rem);
+
+  /* Escala de Espaçamento (fluída em vh/vw) */
+  --space-2xs: clamp(2px, 0.25vh, 4px);
+  --space-xs: clamp(4px, 0.5vh + 0.1vw, 8px);
+  --space-sm: clamp(8px, 0.75vh + 0.2vw, 12px);
+  --space-md: clamp(12px, 1vh + 0.4vw, 18px);
+  --space-lg: clamp(16px, 1.5vh + 0.5vw, 28px);
+  --space-xl: clamp(20px, 2vh + 0.8vw, 36px);
+  --space-2xl: clamp(28px, 3vh + 1vw, 56px);
+
+  /* Sombras e movimento */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 12px 32px rgba(120, 39, 54, 0.12);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --sidebar-width: clamp(232px, 15vw, 280px);
+
+  /* Tokens extras (frontend1 / frontend3) */
+  --color-sand-lighter: #F7F7F2;
+  --dur-fast: 160ms;
+  --dur-base: 260ms;
+}
+
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--color-charcoal-text);
+  background-color: var(--color-sand-offwhite);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Textura de trama de tecido, bem sutil */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.025;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 14px, var(--color-charcoal-text) 14px 15px),
+    repeating-linear-gradient(90deg, transparent 0 14px, var(--color-charcoal-text) 14px 15px);
+}
+
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-md);
+  z-index: 2000;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: var(--space-md); }
+
+/* ==========================================================================
+   TIPOGRAFIA
+   ========================================================================== */
+h1, .text-display {
+  font-family: var(--font-title);
+  font-size: var(--fs-display);
+  font-weight: 400;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-charcoal-text);
+}
+
+h2, .text-subtitle {
+  font-family: var(--font-title);
+  font-size: var(--fs-subtitle);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-charcoal-text);
+}
+
+.text-detail, .meta-info {
+  font-family: var(--font-detail);
+  font-size: var(--fs-detail);
+  color: var(--color-muted-text);
+}
+
+/* ==========================================================================
+   LAYOUT DA APLICAÇÃO
+   ========================================================================== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-2xl) clamp(20px, 3vw, 56px);
+}
+
+/* ==========================================================================
+   BOTÕES (.btn)
+   ========================================================================== */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: clamp(10px, 1vh + 2px, 14px) clamp(18px, 1.25vw + 4px, 28px);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s,
+              transform 0.3s var(--ease-spring), box-shadow 0.3s;
+}
+.btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.btn--primary { background-color: var(--color-primary); color: var(--color-white); }
+.btn--primary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(120, 39, 54, 0.25);
+}
+.btn--primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+}
+.btn--primary:hover::after { animation: shimmer 0.8s forwards; }
+@keyframes shimmer { to { left: 100%; } }
+
+.btn--stitched {
+  background-color: transparent;
+  color: var(--color-charcoal-text);
+  border: var(--border-stitch);
+}
+.btn--stitched:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-muted-text);
+  border-color: var(--color-border);
+}
+.btn--ghost:hover { color: var(--color-primary); border-color: var(--color-primary); }
+
+.btn--sm { padding: 6px 12px; font-size: 0.75rem; }
+.btn--full { width: 100%; }
+
+/* ==========================================================================
+   BADGES (.badge)
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-family: var(--font-detail);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+}
+.badge__icon { width: 12px; height: 12px; flex-shrink: 0; }
+.badge--success { background: var(--color-success-bg); color: var(--color-success); }
+.badge--warning { background: var(--color-warning-bg); color: #B25000; }
+.badge--neutral { background: var(--color-sand-deep); color: var(--color-muted-text); }
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast {
+  position: fixed;
+  right: clamp(16px, 2vw, 32px);
+  bottom: clamp(16px, 2vw, 32px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 14px 22px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-white);
+  background-color: var(--color-charcoal-text);
+  border-left: 4px solid var(--color-success);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  transform: translateY(24px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s var(--ease-spring), opacity 0.3s;
+}
+.toast--visible { transform: translateY(0); opacity: 1; }
+.toast svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ==========================================================================
+   ACESSIBILIDADE — movimento reduzido
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   COMPLEMENTOS DE COMPONENTES BASE (frontend1 / frontend3)
+   ========================================================================== */
+.btn:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.btn--secondary { background-color: var(--color-sand-offwhite); color: var(--color-muted-text); border: 1px solid var(--color-border); }
+.btn--secondary:hover { background-color: var(--color-border); color: var(--color-charcoal-text); }
+
+.badge--finalizado { background-color: var(--color-border); color: var(--color-charcoal-text); }
+.badge--andamento { background-color: #F6E0D5; color: #9B4A22; }
+.badge--excedido { background-color: var(--color-error-bg); color: var(--color-error); }
+.badge--reservado { background-color: var(--color-warning-bg); color: var(--color-warning); }
+
+/* Radio card (frontend1 - fluxo de cadastro) */
+.radio-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-xl) 1vw;
+  font-family: var(--font-body);
+  font-size: 0.9vw;
+  font-weight: 600;
+  color: var(--color-charcoal-text);
+  background-color: var(--color-sand-offwhite);
+  border: 0.1vw solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.radio-card:hover { border-color: var(--color-primary); background-color: var(--color-primary-light); }
+.radio-card:has(input:checked) { border-color: var(--color-primary); background-color: var(--color-primary-light); color: var(--color-primary); }
+.radio-card:has(input:focus-visible) { outline: 0.15vw solid var(--color-primary); outline-offset: 0.2vw; }
+
+/* Layout com rolagem interna (frontend3): aplicado via <body class="layout-app-scroll">
+   Escopado para não alterar o body das demais telas. */
+.layout-app-scroll { display: flex; overflow: hidden; position: relative; }
+.layout-app-scroll::after {
+  content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
+}
+.layout-app-scroll .app-layout { width: 100vw; height: 100vh; overflow: hidden; }
+.layout-app-scroll .main-content {
+  height: 100vh; max-width: none; overflow-y: auto; overflow-x: hidden; position: relative;
+  scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+}
+.layout-app-scroll .main-content::-webkit-scrollbar { width: 6px; }
+.layout-app-scroll .main-content::-webkit-scrollbar-track { background: transparent; }
+.layout-app-scroll .main-content::-webkit-scrollbar-thumb { background-color: var(--color-border); border-radius: 4px; }
+
+/* Toast do frontend3 (.toast-container / .toast-region) - neutraliza o .toast fixo do frontend2 */
+.toast-container .toast, .toast-region .toast {
+  position: static; right: auto; bottom: auto; opacity: 1; transform: none; pointer-events: auto;
+  border-left: 0;
+}
+
+/* Modal de Formulário (Padrão) */
+.modal-form {
+  margin: auto; padding: 32px; border: none; border-radius: 12px; background: var(--color-white);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15); width: 90vw; max-width: 520px;
+  text-align: left; opacity: 0; transform: scale(0.96); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.modal-form[open] { opacity: 1; transform: scale(1); }
+.modal-form::backdrop { background: rgba(35, 42, 53, 0.62); backdrop-filter: blur(2px); }
+.modal-form__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-form__title { font-family: var(--font-title); font-size: 24px; color: var(--color-charcoal-text); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
+.modal-form__close { font-size: 20px; color: var(--color-charcoal-text); cursor: pointer; border: none; background: transparent; font-weight: bold; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--color-charcoal-text); margin-bottom: 8px; }
+.form-control {
+  width: 100%; background-color: #F8F6F0; border: 1px solid var(--color-border); border-radius: 6px;
+  padding: 12px 14px; font-family: var(--font-body); font-size: 13px; color: var(--color-charcoal-text);
+  outline: none; transition: border-color var(--dur-fast);
+}
+.form-control:focus { border-color: var(--color-primary); }
+.form-control:disabled, .form-control[readonly] { opacity: 0.9; cursor: default; }
+.form-helper { display: block; font-size: 11px; color: var(--color-muted-text); margin-top: 6px; }
+
+.modal-form__footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+.modal-form__footer-right { display: flex; gap: 12px; }
+.btn-form-danger { background: #FDE8E8; color: #D32F2F; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.btn-form-cancel { background: white; color: var(--color-charcoal-text); border: 1px solid var(--color-border); padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.btn-form-submit { background: var(--color-primary); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s; }
+.btn-form-submit:hover { background: var(--color-primary-hover); }
+
+/* Componentes de Tela (Page Header) */
+.projects-page__header {
+  position:relative; margin-bottom:44px; padding:28px 30px 30px; border:1px solid rgba(120,39,54,.1);
+  border-radius:18px; background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(253,242,244,.48));
+  box-shadow:0 16px 38px rgba(45,55,72,.06); overflow:hidden;
+}
+.projects-page__eyebrow { font-family: var(--font-title); font-size: max(12px, 0.8vw); color: var(--color-primary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5vh; margin-top: 0; }
+.projects-page__title { font-family: var(--font-title); font-size: max(32px, 2.25vw); color: var(--color-charcoal-text); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; line-height: 1; }
+
+/* Busca Retrátil (Lupa expansível) */
+.search-expandable {
+  position: relative; width: 44px; height: 44px;
+  background: white; border: 1px solid var(--color-border); border-radius: 22px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+  overflow: hidden; display: flex; align-items: center; box-sizing: border-box;
+}
+.search-expandable:hover, .search-expandable:focus-within {
+  width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.search-expandable svg {
+  flex-shrink: 0; color: var(--color-charcoal-text); margin-left: 13px; transition: color 0.3s ease;
+}
+.search-expandable:hover svg, .search-expandable:focus-within svg { color: var(--color-primary); }
+.search-expandable input {
+  border: none; outline: none; background: transparent; width: calc(100% - 44px);
+  font-family: var(--font-body); font-size: 13px; color: var(--color-charcoal-text);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease; margin-left: 10px;
+}
+.search-expandable:hover input, .search-expandable:focus-within input {
+  opacity: 1; pointer-events: auto;
+}
+
+/* Modal Antigo */
+.modal {
+  margin: auto; padding: 0; border: none; border-radius: max(8px, var(--radius-md)); background: var(--color-white); box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 90vw; max-width: 420px; border-bottom: 4px solid var(--color-primary); text-align: center; opacity: 0; transform: scale(0.96); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.modal[open] { opacity: 1; transform: scale(1); }
+.modal::backdrop { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(2px); }
+.modal__header { padding: 4vh 2vw 1vh; }
+.modal__logo { font-family: var(--font-title); font-size: max(24px, 1.5vw); color: var(--color-primary); letter-spacing: 0.02em; margin-bottom: 2vh; }
+.modal__title { font-family: var(--font-body); font-size: max(20px, 1.3vw); font-weight: 700; color: var(--color-charcoal-text); }
+.modal__body { padding: 1vh 3vw 4vh; }
+.modal__text { font-size: max(14px, 0.95vw); color: var(--color-muted-text); line-height: 1.5; }
+.modal__footer { padding: 0 3vw 4vh; display: flex; gap: 1vw; justify-content: center; }
+
+/* ==========================================================================
+   COMPONENTES EXTRAS (Designer Flow)
+   ========================================================================== */
+
+/* Drawer (Painel Lateral) */
+.drawer { position: fixed; top: 0; right: 0; width: 100%; max-width: 440px; height: 100vh; background: var(--color-white); box-shadow: -4px 0 24px rgba(0,0,0,0.05); transform: translateX(100%); transition: transform var(--dur-base) var(--ease-out); z-index: 100; display: flex; flex-direction: column; }
+.drawer--open { transform: translateX(0); }
+.drawer__header { padding: 30px; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
+.drawer__body { padding: 30px; flex: 1; overflow-y: auto; }
+.drawer__footer { padding: 20px 30px; border-top: 1px solid var(--color-border); background: var(--color-sand-offwhite); position: sticky; bottom: 0; display: flex; flex-direction: column; gap: 10px; }
+.drawer__close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--color-muted-text); }
+
+/* Chips (Filtros e Lojas) */
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--color-white); border: 1px solid var(--color-border); border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all var(--dur-fast); }
+.chip:hover { border-color: var(--color-primary); }
+.chip--active { background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); }
+
+/* Toast (Notificações) */
+.toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--color-charcoal-text); color: var(--color-white); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: toastIn var(--dur-base) var(--ease-out); }
+@keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Skeleton Loading */
+.skeleton { background: linear-gradient(90deg, #E2E8F0 25%, #F7FAFC 50%, #E2E8F0 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite; border-radius: 4px; }
+@keyframes skeletonShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Radio Card (variante com __content) */
+.radio-card__content { padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all var(--dur-fast); }
+.radio-card input:checked + .radio-card__content { border-color: var(--color-primary); background: var(--color-primary-light); }

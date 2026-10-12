@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Perfil — CONTINUUM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+
+<body>
+  <!-- Thread trail (cursor craft) -->
+  <div class="thread-trail" id="threadTrail"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMsg">Alterações salvas com sucesso!</span>
+  </div>
+
+  <!-- Mobile toggle -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="designer" data-active="perfil"></div>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-header__title">Meu Perfil</h1>
+          <p class="page-header__subtitle">Gerencie seus dados pessoais e monte sua vitrine criativa.</p>
+        </div>
+        <!-- Etiqueta Animada -->
+        <div class="header-tag-container" aria-label="Perfil Designer">
+          <!-- Alfinete -->
+          <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+            <!-- Sombra do alfinete -->
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="rgba(0,0,0,0.15)" transform="translate(0, 3)" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            <circle cx="102" cy="18" r="6" stroke="rgba(0,0,0,0.15)" stroke-width="3" fill="none" transform="translate(0, 3)" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            
+            <!-- Alfinete real -->
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="#4a4a4a" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+            <circle cx="102" cy="18" r="6" stroke="#4a4a4a" stroke-width="3" fill="none" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <!-- Tag de papel -->
+          <div class="clothing-tag">
+            <div class="clothing-tag__hole"></div>
+            <div class="clothing-tag__content">
+              <div class="clothing-tag__title">CONTINUUM</div>
+              <div class="clothing-tag__subtitle">Perfil Designer</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <nav aria-label="Seções do perfil">
+          <ul class="tabs__nav" role="tablist">
+            <li role="presentation">
+              <button class="tabs__btn tabs__btn--active" role="tab" aria-selected="true" aria-controls="tab-dados" id="btn-dados" type="button">
+                <svg class="tabs__btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="3" width="14" height="3" rx="1"></rect><rect x="5" y="18" width="14" height="3" rx="1"></rect>
+                  <line x1="7" y1="6" x2="7" y2="18"></line><line x1="17" y1="6" x2="17" y2="18"></line>
+                  <line x1="7" y1="9" x2="17" y2="9"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="15" x2="17" y2="15"></line>
+                </svg>
+                <span class="tabs__btn-label">Meus Dados</span>
+              </button>
+            </li>
+            <li role="presentation">
+              <button class="tabs__btn" role="tab" aria-selected="false" aria-controls="tab-vitrine" id="btn-vitrine" type="button">
+                <svg class="tabs__btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 4L11 13"></path>
+                  <ellipse cx="20.5" cy="3.5" rx="1.5" ry="1.5" transform="rotate(-45 20.5 3.5)"></ellipse>
+                  <path d="M11 13C8 16 6 13 4 16C2 19 5 21 8 19"></path>
+                </svg>
+                <span class="tabs__btn-label">Minha Vitrine</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <form id="profileForm" novalidate>
+        <!-- TAB 1: MEUS DADOS -->
+        <section class="tabs__panel tabs__panel--active" id="tab-dados" role="tabpanel" aria-labelledby="btn-dados">
+          <div class="profile-card">
+            <h2 class="profile-card__section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="3" width="14" height="3" rx="1"></rect><rect x="5" y="18" width="14" height="3" rx="1"></rect>
+                <line x1="7" y1="6" x2="7" y2="18"></line><line x1="17" y1="6" x2="17" y2="18"></line>
+                <line x1="7" y1="9" x2="17" y2="9"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="15" x2="17" y2="15"></line>
+              </svg>
+              Meus Dados & Endereço
+              <span class="profile-card__section-badge">Informações privadas</span>
+            </h2>
+
+            <div class="profile-card__avatar">
+              <div class="avatar">
+                <div class="avatar__frame"></div>
+                <div class="avatar__circle">
+                  <svg class="avatar__placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <button type="button" class="avatar__edit" aria-label="Alterar foto de perfil" title="Alterar foto">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                </button>
+              </div>
+              <span class="avatar__hint">Formatos aceitos: JPG, PNG. Max 2MB</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="apelido" class="form-label">Apelido / Nome do Ateliê</label>
+                <input type="text" id="apelido" class="form-input" value="Ana Silva Costuras" placeholder="Ex: Ateliê da Ana" />
+              </div>
+              <div class="form-group">
+                <label for="nomeCompleto" class="form-label">Nome Completo / Razão Social</label>
+                <input type="text" id="nomeCompleto" class="form-input" value="Ana Paula da Silva" />
+              </div>
+              <div class="form-group">
+                <label for="documento" class="form-label">CPF / CNPJ</label>
+                <input type="text" id="documento" class="form-input" value="123.456.789-00" disabled />
+                <span class="form-hint">Documento não pode ser alterado após o cadastro.</span>
+              </div>
+              <div class="form-group">
+                <label for="telefone" class="form-label">Telefone / WhatsApp</label>
+                <input type="tel" id="telefone" class="form-input" value="(11) 98765-4321" placeholder="(00) 00000-0000" />
+              </div>
+              <div class="form-group form-group--full">
+                <label for="email" class="form-label">E-mail de Contato (Usuário)</label>
+                <input type="email" id="email" class="form-input" value="ana.costuras@email.com" placeholder="seu@email.com" />
+              </div>
+              <div class="form-group">
+                <label for="dataNascimento" class="form-label">Data de Nascimento / Fundação</label>
+                <input type="date" id="dataNascimento" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="genero" class="form-label">Gênero com o qual se identifica</label>
+                <select id="genero" class="form-input">
+                  <option value="" disabled selected>Selecione...</option>
+                  <option value="mulher_cis">Mulher Cisgênero</option>
+                  <option value="homem_cis">Homem Cisgênero</option>
+                  <option value="mulher_trans">Mulher Transgênero</option>
+                  <option value="homem_trans">Homem Transgênero</option>
+                  <option value="nao_binario">Não-binário</option>
+                  <option value="outro">Outro / Prefiro não informar</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="form-section-divider" />
+
+            <h3 class="form-section-label">Endereço de Retirada / Envio</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="cep" class="form-label">CEP</label>
+                <input type="text" id="cep" class="form-input" value="01001-000" placeholder="00000-000" />
+              </div>
+              <div class="form-group">
+                <label for="cidadeEstado" class="form-label">Cidade / Estado</label>
+                <input type="text" id="cidadeEstado" class="form-input" value="São Paulo / SP" placeholder="Cidade / UF" />
+              </div>
+              <div class="form-group form-group--full">
+                <label for="logradouro" class="form-label">Logradouro, Número e Complemento</label>
+                <input type="text" id="logradouro" class="form-input" value="Praça da Sé, 100 - Apto 3B" placeholder="Rua, Av, Número, Sala/Apto" />
+              </div>
+            </div>
+
+            <hr class="form-section-divider" />
+
+            <h3 class="form-section-label">Detalhes Técnicos & Capacidade</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="experiencia" class="form-label">Tempo de Experiência na Costura</label>
+                <select id="experiencia" class="form-input">
+                  <option value="" disabled>Selecione...</option>
+                  <option value="iniciante">Menos de 1 ano (Iniciante)</option>
+                  <option value="1a3anos">1 a 3 anos</option>
+                  <option value="3a5anos" selected>3 a 5 anos</option>
+                  <option value="5a10anos">5 a 10 anos</option>
+                  <option value="mais10anos">Mais de 10 anos (Mestre)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="capacidade" class="form-label">Capacidade de Produção (Mês)</label>
+                <input type="number" id="capacidade" class="form-input" value="50" placeholder="Ex: 50" min="0" />
+                <span class="form-hint">Quantidade estimada de peças/mês.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: MINHA VITRINE -->
+        <section class="tabs__panel" id="tab-vitrine" role="tabpanel" aria-labelledby="btn-vitrine">
+          <div class="profile-card">
+            <h2 class="profile-card__section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 4L11 13"></path>
+                <ellipse cx="20.5" cy="3.5" rx="1.5" ry="1.5" transform="rotate(-45 20.5 3.5)"></ellipse>
+                <path d="M11 13C8 16 6 13 4 16C2 19 5 21 8 19"></path>
+              </svg>
+              Minha Vitrine
+              <span class="profile-card__section-badge">Perfil público</span>
+            </h2>
+
+            <div class="form-group" style="margin-bottom: var(--space-lg);">
+              <label for="manifesto" class="form-label">Manifesto do Ateliê</label>
+              <textarea id="manifesto" class="form-textarea" maxlength="500" placeholder="Descreva sua história, processo criativo e sua relação com a moda circular...">Transformo retalhos industriais em peças únicas e atemporais. Cada corte carrega uma história de ressignificação. Moda circular não é tendência, é responsabilidade.</textarea>
+              <span class="form-char-count" id="manifestoCount">155 / 500</span>
+            </div>
+
+            <div class="form-grid" style="margin-bottom: var(--space-lg);">
+              <div class="form-group">
+                <label for="instagram" class="form-label">Instagram / TikTok</label>
+                <div class="form-input-group">
+                  <span class="form-input-group__prefix">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="4"></circle>
+                      <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+                    </svg>
+                  </span>
+                  <input type="text" id="instagram" class="form-input" value="@anasilvacosturas" placeholder="@seu.perfil" />
+                </div>
+                <span class="form-hint form-hint--muted">Exibido na Tag de rastreabilidade do produto.</span>
+              </div>
+              <div class="form-group">
+                <label for="website" class="form-label">Site / Portfólio</label>
+                <div class="form-input-group">
+                  <span class="form-input-group__prefix">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                  </span>
+                  <input type="url" id="website" class="form-input" value="anasilvacosturas.com.br" placeholder="www.seusite.com.br" />
+                </div>
+                <span class="form-hint form-hint--muted">Consumidores podem acessar ao escanear a Tag.</span>
+              </div>
+            </div>
+
+            <div class="tag-selector">
+              <span class="tag-selector__label">Especialidades Têxteis</span>
+              <div class="tag-selector__grid">
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-patchwork" name="especialidades" value="patchwork" checked /><label class="tag-chip__label" for="tag-patchwork"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Patchwork</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-bordado" name="especialidades" value="bordado" checked /><label class="tag-chip__label" for="tag-bordado"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Bordado Manual</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-alfaiataria" name="especialidades" value="alfaiataria" /><label class="tag-chip__label" for="tag-alfaiataria"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Alfaiataria</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-tingimento" name="especialidades" value="tingimento" checked /><label class="tag-chip__label" for="tag-tingimento"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Tingimento Natural</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-couro" name="especialidades" value="couro" /><label class="tag-chip__label" for="tag-couro"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Couro</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-croche" name="especialidades" value="croche" /><label class="tag-chip__label" for="tag-croche"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Crochê / Tricô</label></div>
+                <div class="tag-chip"><input type="checkbox" class="tag-chip__input" id="tag-upcycling" name="especialidades" value="upcycling" /><label class="tag-chip__label" for="tag-upcycling"><svg class="tag-chip__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Upcycling</label></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Botões -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Salvar Alterações
+          </button>
+          <button type="button" class="btn btn--stitched" id="btnLogout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sair da Conta
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>

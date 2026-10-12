@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Inicial - Doador | CONTINUUM</title>
+
+  <!-- Tipografia -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Estilos Globais e Específicos -->
+  <link rel="stylesheet" href="../../../css/global.css" />
+  <link rel="stylesheet" href="../../../css/responsive.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+<body>
+  
+  <!-- Mobile toggle button -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="doador" data-active="painel"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <header class="page-header animate-slide-up">
+        <div>
+          <span class="text-detail" style="color: var(--color-primary); font-weight: 700; margin-bottom: 8px; display: block;">PAINEL DO DOADOR</span>
+          <h1 class="page-header__title text-display">OLÁ, JULIANA SILVA</h1>
+          <p class="page-header__subtitle text-body">Bem-vindo ao seu painel. Acompanhe seus lotes, impacto e benefícios.</p>
+        </div>
+        
+        <!-- Etiqueta Animada -->
+        <div class="header-tag-container" aria-label="Perfil Doador">
+          <!-- Alfinete -->
+          <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="rgba(0,0,0,0.15)" transform="translate(0, 3)" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            <circle cx="102" cy="18" r="6" stroke="rgba(0,0,0,0.15)" stroke-width="3" fill="none" transform="translate(0, 3)" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="#4a4a4a" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+            <circle cx="102" cy="18" r="6" stroke="#4a4a4a" stroke-width="3" fill="none" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <!-- Tag -->
+          <div class="clothing-tag">
+            <div class="clothing-tag__hole"></div>
+            <div class="clothing-tag__content">
+              <div class="clothing-tag__title">CONTINUUM</div>
+              <div class="clothing-tag__subtitle">Perfil Doador</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CARD DOAÇÕES E DESCONTOS (Do mock enviado pelo usuário) -->
+      <section class="donations-card animate-slide-up delay-1">
+        <header class="donations-card__header">
+          <span class="donations-card__brand">CONTINUUM</span>
+          <h2 class="donations-card__title">Doações</h2>
+        </header>
+        
+        <div class="donations-card__body">
+          <!-- Coluna Esquerda: Minhas Doações -->
+          <div class="donations-card__col">
+            <h3 class="donations-card__subtitle">MINHAS DOAÇÕES</h3>
+            <p class="donations-card__question">O que são minhas doações?</p>
+            <p class="donations-card__text">Cada peça ou lote doado acumula pontos no seu perfil e gera cupons exclusivos de descontos na nossa rede parceira.</p>
+            
+            <div class="donations-progress">
+              <span class="donations-progress__label">Doações — 20%</span>
+              <div class="donations-progress__dots">
+                <div class="dot dot--active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+              <p class="donations-progress__hint">Faltam 4 doações para liberar seu próximo cupom de desconto</p>
+            </div>
+          </div>
+          
+          <!-- Divisor Vertical -->
+          <div class="donations-card__divider"></div>
+          
+          <!-- Coluna Direita: Meus Descontos -->
+          <div class="donations-card__col">
+            <h3 class="donations-card__subtitle">MEUS DESCONTOS</h3>
+            
+            <div class="discounts-table">
+              <div class="discounts-table__header">
+                <span>Código</span>
+                <span class="text-center">Status</span>
+                <span class="text-right">Validade</span>
+              </div>
+              
+              <!-- Row 1 -->
+              <div class="discounts-table__row">
+                <span class="discount-code">
+                  <span class="discount-brand">C&A</span> C70A01A
+                </span>
+                <span class="status-icon text-center">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect width="20" height="20" rx="4" fill="var(--color-success)"/>
+                    <path d="M5 10L8.5 13.5L15 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="discount-validity text-right">27/09/2026</span>
+              </div>
+              
+              <!-- Row 2 -->
+              <div class="discounts-table__row">
+                <span class="discount-code">
+                  <span class="discount-brand">LACOSTE</span> L76A07A
+                </span>
+                <span class="status-icon text-center">
+                  <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                    <rect width="24" height="16" rx="8" fill="#F1C40F"/>
+                    <circle cx="8" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                    <circle cx="12" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                    <circle cx="16" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                  </svg>
+                </span>
+                <span class="discount-validity text-right">Indefinido</span>
+              </div>
+              
+              <!-- Row 3 -->
+              <div class="discounts-table__row">
+                <span class="discount-code">
+                  <span class="discount-brand">RENNER</span> R77A05A
+                </span>
+                <span class="status-icon text-center">
+                  <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                    <rect width="24" height="16" rx="8" fill="#F1C40F"/>
+                    <circle cx="8" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                    <circle cx="12" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                    <circle cx="16" cy="8" r="1.5" fill="black" opacity="0.6"/>
+                  </svg>
+                </span>
+                <span class="discount-validity text-right">Em processamento</span>
+              </div>
+              
+              <!-- Row 4 (Empty) -->
+              <div class="discounts-table__row discounts-table__row--empty">
+                <span class="discount-code">Disponível</span>
+                <span class="status-icon text-center"></span>
+                <span class="discount-validity text-right"></span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- CARDS DE MÉTRICAS OPERACIONAIS -->
+      <section class="dash-cards animate-slide-up delay-2">
+        <div class="dash-card">
+          <div class="dash-card__number counter" data-target="15">0</div>
+          <div class="dash-card__label">LOTES DOADOS</div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dash-card__number counter" data-target="120">0</div>
+          <div class="dash-card__label">KG REAPROVEITADOS</div>
+        </div>
+      </section>
+
+      <!-- IMPACTO AMBIENTAL (Doador) -->
+      <section class="impact-banner animate-slide-up delay-3">
+        <div style="position: relative; z-index: 2;">
+          <h3 class="text-detail" style="color: var(--color-primary-light); font-weight: 700; margin-bottom: 8px;">O IMPACTO DAS SUAS DOAÇÕES</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; opacity: 0.9; margin-bottom: 24px; max-width: 600px; color: #fff;">
+            Ao destinar suas roupas e tecidos para designers independentes, você promoveu ativamente a economia circular este ano:
+          </p>
+          
+          <div class="impact-metrics">
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number counter" data-target="120" style="color: #fff;">0</span>
+                <span class="impact-unit">KG</span>
+              </div>
+              <span class="impact-label">Resíduos Salvos</span>
+            </div>
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number counter" data-target="8" style="color: #fff;">0</span>
+                <span class="impact-unit">DESIGNERS</span>
+              </div>
+              <span class="impact-label">Apoiados</span>
+            </div>
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number counter" data-target="950" style="color: #fff;">0</span>
+                <span class="impact-unit">LITROS</span>
+              </div>
+              <span class="impact-label">Água Poupada Estimada</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botão de Ação -->
+        <div style="margin-top: 16px; position: relative; z-index: 2;">
+          <a href="#" class="btn btn--stitched" style="color: #fff; border-color: rgba(255,255,255,0.3); background-color: rgba(0,0,0,0.15);">
+            Doar novo lote
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
