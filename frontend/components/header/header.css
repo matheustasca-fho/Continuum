@@ -1,0 +1,29 @@
+/* CONTINUUM - componente Header (navbar lateral fixa) */
+:root{--color-primary:#782736;--color-primary-light:#fdf2f4;--color-white:#fff;--color-border:#dfe3e8;--color-sand-offwhite:#f5f2eb;--color-charcoal-text:#2d3748;--font-title:'Anton',sans-serif;--font-body:'Inter',sans-serif;--font-detail:'Space Mono',monospace}
+.sidebar{position:fixed;inset:0 auto 0 0;z-index:30;width:276px;height:100vh;padding:28px 20px 22px;background:var(--color-white);border-right:1px solid var(--color-border);display:flex;flex-direction:column;justify-content:flex-start;overflow-y:auto;transition:transform .3s ease}
+.sidebar::after{content:none}
+.sidebar__brand{display:flex;align-items:center;gap:12px;min-height:74px;margin-bottom:0}
+.sidebar__logo-image{width:64px;height:64px;object-fit:cover;border-radius:14px;background:#080607}
+.sidebar__logo{display:block;color:var(--color-primary);font:1.85rem/.95 var(--font-title);white-space:nowrap}
+.sidebar__sublogo{display:block;margin-top:6px;color:var(--color-primary);font:10px var(--font-detail)}
+.sidebar__toggle,.sidebar-restore{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--color-border);border-radius:10px;background:#fff;color:var(--color-primary);cursor:pointer;font-size:22px}
+.sidebar__toggle{position:absolute;top:34px;right:14px}
+.sidebar__nav{display:grid;gap:7px;margin-top:48px;align-content:start}
+.sidebar__link{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:11px;color:var(--color-charcoal-text);text-decoration:none;font:500 14px var(--font-body);transition:.2s}
+.sidebar__link:hover{background:var(--color-sand-offwhite);transform:translateX(2px)}
+.sidebar__link[aria-current=page]{background:var(--color-primary-light);color:var(--color-primary);font-weight:700;box-shadow:inset 3px 0 var(--color-primary)}
+.sidebar__link:focus-visible,.sidebar__logout:focus-visible,.sidebar__toggle:focus-visible,.sidebar-restore:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.sidebar__icon{width:19px;height:19px;flex:0 0 19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sidebar__badge{margin-left:auto;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--color-primary);color:#fff;font:700 11px var(--font-detail);text-align:center}
+.sidebar__footer{margin-top:auto;padding:16px 8px 0;border-top:1px solid var(--color-border);background:none;border-radius:0;text-align:left;color:#536074;font:10px/1.8 var(--font-detail)}
+.sidebar__footer::before{content:none}
+.sidebar__footer p{margin:0}
+.sidebar__logout{display:inline-block;margin-top:6px;color:var(--color-primary);font:700 10px var(--font-detail);text-transform:uppercase;letter-spacing:.06em}
+.sidebar-restore{position:fixed;z-index:29;top:50%;left:12px;opacity:0;pointer-events:none}
+.app-layout{--sidebar-width:276px}
+.main-content{margin-left:var(--sidebar-width);transition:margin-left .3s ease}
+.app-layout.sidebar-collapsed .sidebar{transform:translateX(-100%)}
+.app-layout.sidebar-collapsed .main-content{margin-left:0}
+.app-layout.sidebar-collapsed .sidebar-restore{opacity:1;pointer-events:auto}
+@media(max-width:640px){.sidebar{inset:0 0 auto;width:100%;height:auto;padding:12px 16px 10px}.sidebar__logo-image{width:42px;height:42px}.sidebar__toggle{top:16px;right:16px}.sidebar__nav{display:flex;overflow:auto;margin-top:8px}.sidebar__link{white-space:nowrap;padding:9px 11px}.sidebar__footer{display:none}.main-content{margin-left:0;padding-top:152px}.app-layout.sidebar-collapsed .sidebar{transform:translateY(-105%)}.app-layout.sidebar-collapsed .main-content{padding-top:24px}}
+

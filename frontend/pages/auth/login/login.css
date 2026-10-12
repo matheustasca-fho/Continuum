@@ -1,0 +1,75 @@
+/* Acesso de usuário — identidade CONTINUUM CRAFT */
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background-color: var(--color-sand-offwhite);
+  background-image:
+    radial-gradient(ellipse at 12% 88%, rgba(189, 43, 33, .075), transparent 32%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='.1'/%3E%3C/svg%3E");
+}
+.login-page__main { width: min(100%, 470px); }
+.login-card {
+  position: relative;
+  padding: clamp(2rem, 6vw, 3.1rem) clamp(1.5rem, 7vw, 3.5rem) 2rem;
+  overflow: hidden;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(45,55,72,.08);
+  border-radius: 10px 10px 3px 10px;
+  box-shadow: 0 18px 50px rgba(45,55,72,.09), 0 2px 8px rgba(45,55,72,.04);
+  animation: login-card-enter .5s cubic-bezier(.2,.8,.2,1) both;
+}
+.login-card::before { position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--color-primary); content: ""; }
+@keyframes login-card-enter { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.login-card__header { text-align: center; }
+.login-card__brand { display: inline-flex; align-items: center; flex-direction: column; color: var(--color-primary); }
+.login-card__brand-name { font: 1.85rem/.95 var(--font-title); letter-spacing: .07em; }
+.login-card__brand-tagline { margin-top: .4rem; color: var(--color-muted-text); font: .48rem var(--font-detail); letter-spacing: .07em; }
+.login-card__seam { display: block; width: 2.5rem; margin: 1.15rem auto .8rem; border-top: 1px dashed var(--color-primary); }
+.login-card__title { margin: 0; color: var(--color-charcoal-text); font: 1.35rem/1.1 var(--font-title); letter-spacing: .06em; text-transform: uppercase; }
+
+.login-switch { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 3px; margin: 1.1rem 0 1.25rem; padding: 3px; border-radius: 5px; background: #e9e9e2; }
+.login-switch__option { min-width: 0; min-height: 38px; padding: .45rem .35rem; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--color-muted-text); font: .72rem var(--font-body); cursor: pointer; transition: color .2s, background .2s, box-shadow .2s; }
+.login-switch__option:hover { color: var(--color-primary); }
+.login-switch__option[aria-pressed="true"] { background: var(--color-white); color: var(--color-charcoal-text); font-weight: 700; box-shadow: 0 1px 4px rgba(45,55,72,.09); }
+.login-switch__option:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.login-form__field { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+.login-form__label { color: var(--color-charcoal-text); font-size: .75rem; font-weight: 600; }
+.login-form__input.form-input { min-height: 44px; padding: .7rem .8rem; border: 1px solid #dfe2dc; border-radius: 4px; background: #fdfdfb; font-size: .78rem; transition: border-color .2s, background .2s, box-shadow .2s; }
+.login-form__input.form-input::placeholder { color: #a0a59d; }
+.login-form__input.form-input:hover { border-color: #b8bdb5; }
+.login-form__input.form-input:focus { border-color: var(--color-primary); background: var(--color-white); box-shadow: 0 0 0 3px rgba(189,43,33,.11); }
+.login-form__password-wrap { position: relative; }
+.login-form__password-wrap .login-form__input { padding-right: 4.7rem; }
+.login-form__password-toggle { position: absolute; top: 50%; right: .75rem; padding: .25rem 0; border: 0; background: transparent; color: var(--color-primary); font: .58rem var(--font-detail); cursor: pointer; transform: translateY(-50%); }
+.login-form__password-toggle:hover { text-decoration: underline; text-underline-offset: .2em; }
+.login-form__password-toggle:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 2px; }
+.login-form__submit { display: flex; min-height: 46px; margin-top: .2rem; border-radius: 4px; font-size: .8rem; }
+.login-form__status { min-height: 1.1rem; margin: .45rem 0 0; color: var(--color-primary); font: .57rem var(--font-detail); text-align: center; }
+
+.login-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .5rem; }
+.login-card__forgot { padding: .2rem 0; border: 0; background: transparent; color: var(--color-muted-text); font: .62rem var(--font-detail); cursor: pointer; }
+.login-card__forgot:hover { color: var(--color-primary); text-decoration: underline; text-underline-offset: .2em; }
+.login-card__forgot:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.login-card__help-wrap { position: relative; }
+.login-card__help { width: 1.65rem; height: 1.65rem; border: 1px solid #dfe2dc; border-radius: 50%; background: #fff; color: var(--color-muted-text); font: .75rem var(--font-body); cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+.login-card__help:hover, .login-card__help[aria-expanded="true"] { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+.login-card__help:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.login-card__help-message { position: absolute; z-index: 2; right: 0; bottom: calc(100% + .6rem); width: max-content; max-width: min(250px, 75vw); padding: .65rem .8rem; border: 1px solid #e4e5de; border-radius: 4px; background: #fff; box-shadow: 0 6px 18px rgba(45,55,72,.12); color: var(--color-charcoal-text); font-size: .68rem; line-height: 1.45; }
+.login-card__signup { margin: 1rem 0 0; padding-top: .85rem; border-top: 1px solid #eceee8; color: var(--color-muted-text); font-size: .72rem; text-align: center; }
+.login-card__signup a { margin-left: .2rem; color: var(--color-primary); font-weight: 700; text-decoration: none; }
+.login-card__signup a:hover { color: var(--color-primary-hover); text-decoration: underline; text-underline-offset: .2em; }
+.login-card__signup a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 2px; }
+
+@media (max-width: 480px) {
+  .login-page { padding: 1rem; }
+  .login-card { padding: 2rem 1.25rem 1.6rem; }
+  .login-switch__option { font-size: .68rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-card { animation-duration: .01ms; }
+  .login-switch__option, .login-form__input.form-input, .login-card__help { transition-duration: .01ms; }
+}

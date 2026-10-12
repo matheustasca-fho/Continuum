@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM - Meus Projetos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <link rel="stylesheet" href="../status-projetos/style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+<body>
+  <div class="app-layout">
+    <div id="appHeader" data-role="designer" data-active="meus-projetos"></div>
+    <main class="main-content">
+      <section class="projects-page" aria-labelledby="projectsTitle">
+        <header class="projects-page__header">
+          <p class="projects-page__eyebrow">PROJETOS</p>
+          <h1 id="projectsTitle" class="projects-page__title">Meus projetos</h1>
+          <p class="projects-page__subtitle">Transforma&ccedil;&otilde;es em andamento e finalizadas</p>
+        </header>
+
+        <section class="projects-board" aria-label="CatÃ¡logo de projetos">
+          <div class="projects-tabs" role="tablist" aria-label="Filtrar projetos">
+            <button class="projects-tabs__tab projects-tabs__tab--active" type="button" role="tab" aria-selected="true" data-filter="todos">Todos</button>
+            <button class="projects-tabs__tab" type="button" role="tab" aria-selected="false" data-filter="andamento">Em andamento</button>
+            <button class="projects-tabs__tab" type="button" role="tab" aria-selected="false" data-filter="finalizado">Finalizados</button>
+            <button class="projects-tabs__tab" type="button" role="tab" aria-selected="false" data-filter="atrasado">Atrasados</button>
+          </div>
+          <div class="projects-list" id="projectsList" aria-live="polite"></div>
+          <div class="projects-empty" id="projectsEmpty" hidden>
+            <strong>Nenhum projeto encontrado</strong>
+            <span>NÃ£o hÃ¡ projetos nesta categoria no momento.</span>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="project-dialog" id="projectDialog" aria-hidden="true">
+    <section class="project-dialog__window" role="dialog" aria-modal="true" aria-labelledby="statusTitle">
+      <button class="project-dialog__close" id="closeProjectDialog" type="button" aria-label="Fechar detalhes">&times;</button>
+      <main class="status-page" aria-labelledby="statusTitle">
+        <header class="status-page__header"><p class="status-page__eyebrow">PROJETO</p><h1 id="statusTitle" class="status-page__title"></h1><p class="status-page__subtitle" id="projectOrigin"></p></header>
+        <section class="status-layout" aria-label="Detalhes do projeto e do lote">
+          <article class="project-summary"><p class="project-summary__label">DESCRI&Ccedil;&Atilde;O</p><p class="project-summary__copy" id="projectDescription"></p><dl class="project-summary__data"><div><dt>PRAZO</dt><dd id="projectDeadline"></dd></div><div><dt>C&Oacute;DIGO DO LOTE</dt><dd id="projectLotCode"></dd></div></dl><button class="status-page__finish" type="button" id="finishProject">Finalizar projeto</button></article>
+          <aside class="lot-tracking" aria-labelledby="trackingTitle"><p id="trackingTitle" class="lot-tracking__label">RASTREIO DO LOTE</p><ol class="lot-tracking__steps"><li class="lot-tracking__step lot-tracking__step--complete"><span class="lot-tracking__dot"></span><div><strong>Lote reservado</strong><small>05/07/2026</small></div></li><li class="lot-tracking__step lot-tracking__step--complete"><span class="lot-tracking__dot"></span><div><strong>Lote recebido</strong><small>20/07/2026</small></div></li><li class="lot-tracking__step lot-tracking__step--current"><span class="lot-tracking__dot"></span><div><strong>Em produ&ccedil;&atilde;o</strong><small>Atual</small></div></li><li class="lot-tracking__step"><span class="lot-tracking__dot"></span><div><strong>Finalizado</strong><small>Pendente</small></div></li></ol></aside>
+        </section>
+      </main>
+    </section>
+    <div class="consent-dialog" id="consentDialog" aria-hidden="true"><section class="consent-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="consentTitle" aria-describedby="consentDescription"><span class="consent-dialog__brand">CONTINUUM</span><span class="consent-dialog__mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><p class="consent-dialog__eyebrow">CONFIRMA&Ccedil;&Atilde;O DO DESIGNER</p><h2 id="consentTitle">Finalizar este projeto?</h2><p id="consentDescription">Ao confirmar, o projeto ser&aacute; marcado como conclu&iacute;do e o rastreio do lote ser&aacute; atualizado.</p><div class="consent-dialog__actions"><button type="button" class="consent-dialog__cancel" id="consentCancel">Revisar projeto</button><button type="button" class="consent-dialog__confirm" id="consentConfirm">Confirmar finaliza&ccedil;&atilde;o</button></div></section></div>
+  </div>
+  <script src="index.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
+

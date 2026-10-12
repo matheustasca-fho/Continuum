@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM - Meus Lotes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+<body>
+<div class="app-layout">
+  <div id="appHeader" data-role="empresa" data-active="lotes"></div>
+  <main class="main-content">
+    <header class="page-header">
+      <div class="lots-page-heading">
+        <p class="page-eyebrow">GEST&Atilde;O DE LOTES T&Ecirc;XTEIS</p>
+        <h1 class="text-display">MEUS LOTES</h1>
+      </div>
+    </header>
+    <section class="lots-container">
+      <div class="filter-wrapper">
+        <button type="button" class="search-toggle" id="searchToggle" aria-label="Abrir pesquisa" title="Pesquisar lotes" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m16.5 16.5 4 4"/></svg></button>
+        <div class="filter-trigger" id="filterTrigger" hidden>
+          <svg viewBox="0 0 24 24" width="1.1vw" height="1.1vw" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="filterSearchInput" class="filter-search-input" placeholder="Buscar por cÃ³digo ou descriÃ§Ã£o" autocomplete="off" aria-label="Pesquisar lotes">
+        </div>
+        <div class="filter-dropdown hidden" id="filterDropdown" aria-hidden="true">
+          <button type="button" class="filter-option" data-filter="DISPONIVEL">DisponÃ­veis</button>
+          <button type="button" class="filter-option" data-filter="EM ANDAMENTO">Em andamento</button>
+          <button type="button" class="filter-option" data-filter="RESERVADO">Reservados</button>
+        </div>
+        <select id="statusFilter" class="status-filter" aria-label="Filtrar por status">
+          <option value="ALL">Todos os status</option>
+          <option value="DISPONÃVEL">DisponÃ­vel</option>
+          <option value="RESERVADO">Reservado</option>
+          <option value="EM PRODUÃ‡ÃƒO">Em ProduÃ§Ã£o</option>
+          <option value="ENVIADO">Enviado</option>
+          <option value="FINALIZADO">Finalizado</option>
+        </select>
+      </div>
+      <div class="lots-grid" id="lotsGrid"></div>
+      <div class="bottom-actions">
+        <button class="btn-fab" id="btnAddLote" type="button" title="Adicionar novo lote" aria-label="Adicionar novo lote">
+          <span class="btn-fab__ring"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span class="btn-fab__label">Novo Lote</span>
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
+<input type="file" id="imageUploadInput" accept="image/*" style="display:none;" aria-hidden="true">
+<div class="modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="modalFormTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="text-subtitle" id="modalFormTitle">Novo Lote T&#234;xtil</h2>
+      <button class="modal-close-btn" id="addModalClose" type="button" aria-label="Fechar">&times;</button>
+    </div>
+    <form id="addLotForm" novalidate>
+      <input type="hidden" id="lotIdInput">
+      <div class="form-group">
+        <label for="lotCode" class="form-label">C&#243;digo do Lote</label>
+        <input type="text" id="lotCode" class="form-input" required autocomplete="off" readonly aria-describedby="lotCodeHint">
+        <span class="field-hint" id="lotCodeHint">Gerado automaticamente pelo sistema.</span>
+      </div>
+      <div class="form-group">
+        <label for="lotDesc" class="form-label">Descri&#231;&#227;o do Lote</label>
+        <textarea id="lotDesc" class="form-input" rows="3" placeholder="Descreva o lote..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Imagem do Lote</label>
+        <div class="img-upload-area" id="modalImgUploadArea" role="button" tabindex="0" aria-label="Clique para adicionar imagem">
+          <div class="img-upload-area__placeholder" id="modalImgPlaceholder">
+            <svg viewBox="0 0 24 24" width="2vw" height="2vw" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Clique para adicionar imagem</span>
+          </div>
+          <img id="modalImgPreview" class="img-upload-area__preview hidden" alt="Preview">
+        </div>
+        <input type="file" id="modalImageInput" accept="image/*" style="display:none;">
+      </div>
+      <div class="form-group" id="statusField">
+        <label class="form-label">Status</label>
+        <select id="lotStatusSelect" class="form-input">
+          <option value="DISPONÃVEL">DisponÃ­vel</option><option value="RESERVADO">Reservado</option><option value="EM PRODUÃ‡ÃƒO">Em ProduÃ§Ã£o</option><option value="ENVIADO">Enviado</option><option value="FINALIZADO">Finalizado</option>
+        </select>
+        <div class="form-group" id="quantityField">
+          <label for="lotQuantity" class="form-label">Quantidade de lotes</label>
+          <input type="number" id="lotQuantity" class="form-input" value="1" min="1" max="100" step="1" inputmode="numeric">
+          <span class="field-hint">Os lotes terÃ£o as mesmas informaÃ§Ãµes.</span>
+        </div>
+        <div class="status-radio-group hidden">
+          <label class="radio-card">
+            <input type="radio" name="lotStatus" value="DISPON&#205;VEL" checked>
+            <span class="radio-card__face badge--disp">DISPON&#205;VEL</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="lotStatus" value="EM ANDAMENTO">
+            <span class="radio-card__face badge--and">EM ANDAMENTO</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="lotStatus" value="RESERVADO">
+            <span class="radio-card__face badge--res">RESERVADO</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <div class="modal-actions-left">
+          <button type="button" class="btn btn--danger" id="btnDeleteLot" style="display:none;">Excluir Lote</button>
+        </div>
+        <button type="button" class="btn btn--stitched" id="addModalCancel">Cancelar</button>
+        <button type="submit" class="btn btn--primary">Salvar Lote</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="modal-overlay" id="consentNoticeModal" role="dialog" aria-modal="true" aria-labelledby="consentNoticeTitle"><div class="modal-box modal-box--notice"><div class="notice-brand">CONTINUUM</div><h2 id="consentNoticeTitle" class="notice-title">Confirmar cadastro do lote</h2><p class="notice-copy">Deseja confirmar o cadastro deste lote? ApÃ³s a confirmaÃ§Ã£o, serÃ¡ solicitada a autorizaÃ§Ã£o da empresa.</p><div class="notice-actions"><button class="notice-confirm" id="consentNoticeConfirm" type="button">Confirmar</button><button class="notice-cancel" id="consentNoticeCancel" type="button">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="consentModal" role="dialog" aria-modal="true" aria-labelledby="consentTitle"><div class="modal-box modal-box--consent"><div class="modal-header"><h2 id="consentTitle" class="text-subtitle">AutorizaÃ§Ã£o da empresa</h2><button class="modal-close-btn" id="consentClose" type="button" aria-label="Fechar">&times;</button></div><p class="consent-copy">Informe a senha de autorizaÃ§Ã£o para concluir o cadastro dos lotes.</p><form id="consentForm"><div class="form-group"><label for="adminPassword" class="form-label">Senha de autorizaÃ§Ã£o</label><div class="password-field"><input type="password" id="adminPassword" class="form-input" required><button type="button" class="password-toggle" id="passwordToggle">Exibir</button></div><span class="form-message" id="passwordMessage"></span></div><label class="consent-check"><input type="checkbox" id="consentCheck" required> Confirmo que tenho autorizaÃ§Ã£o para cadastrar este lote.</label><div class="modal-actions"><button type="button" class="btn btn--stitched" id="consentCancel">Cancelar</button><button class="btn btn--primary">Continuar</button></div></form></div></div>
+<div class="modal-overlay" id="statusConfirmModal" role="dialog" aria-modal="true"><div class="modal-box modal-box--consent"><div class="modal-header"><h2 class="text-subtitle">Confirmar alteraÃ§Ã£o</h2><button class="modal-close-btn" id="statusConfirmClose" type="button" aria-label="Fechar">&times;</button></div><p class="consent-copy" id="statusConfirmCopy"></p><div class="modal-actions"><button class="btn btn--stitched" id="statusConfirmCancel" type="button">Cancelar</button><button class="btn btn--primary" id="statusConfirmAccept" type="button">Confirmar</button></div></div></div>
+<script src="index.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
+

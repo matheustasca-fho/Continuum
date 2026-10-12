@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM — Empresa Projetos</title>
+  
+  <!-- Fontes Oficiais -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Estilos (Arquitetura Modular) -->
+  <link rel="stylesheet" href="../../../css/global.css">
+  <link rel="stylesheet" href="projetos.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+<body class="layout-app-scroll">
+  <div class="app-layout">
+    <!-- SIDEBAR PADRÃO NOVO DESIGN -->
+    <div id="appHeader" data-role="empresa" data-active="projetos"></div>
+    
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content" style="flex:1;">
+      
+      <div class="projects-page__header">
+        <p class="projects-page__eyebrow">GESTÃO DE DESIGN</p>
+        <h1 class="projects-page__title">PROJETOS</h1>
+      </div>
+
+      <!-- Retângulo de Fundo Branco -->
+      <div class="board-container">
+        
+        <!-- HEADER DO BOARD COM A BUSCA E FILTRO -->
+        <div class="actions-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <!-- Busca Retrátil Estilo Original -->
+          <div class="search-expandable">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Buscar loja ou responsável...">
+          </div>
+
+          <!-- Filtro Estilo Colega -->
+          <div class="filter-dropdown-container" style="position: relative;">
+            <button id="filtro-btn" class="btn btn--outline" style="background: white; border: 1px solid var(--color-border); color: var(--color-charcoal-text); display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-md);">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+              <span id="filtro-texto">Todos os status</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            
+            <div class="dropdown-menu dropdown-menu--filter" id="dropdown-menu-box" style="display: none; position: absolute; top: 110%; right: 0; background: white; border: 1px solid var(--color-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 220px; z-index: 10;">
+              <div style="font-size: 10px; font-weight: bold; letter-spacing: 0.1em; color: var(--color-muted-text); padding: 12px 16px 8px; text-transform: uppercase;">Filtrar por Status</div>
+              <ul id="filter-menu" style="list-style: none; padding: 0 0 8px 0; margin: 0;">
+                <li class="dropdown-item dropdown-item--active" data-status="TODOS">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+                  Todos os status
+                </li>
+                <li class="dropdown-item" data-status="EM_PRODUCAO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D4A017" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  Em Andamento
+                </li>
+                <li class="dropdown-item" data-status="EXCEDIDO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--color-error)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Prazo Excedido
+                </li>
+                <li class="dropdown-item" data-status="FINALIZADO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Finalizado
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade -->
+        <div class="proj-grid" id="projetos-grid" aria-live="polite">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+    </main>
+
+  </div> <!-- Fechamento do app-layout -->
+
+  <!-- ================= MODAL DETALHE DO PROJETO (Substitui Drawer) ================= -->
+  <dialog class="modal-form" id="drawer-detalhe">
+    <div class="modal-form__header">
+      <h2 class="modal-form__title" id="drawer-title">GERENCIAR PROJETO</h2>
+      <button class="modal-form__close" id="btn-close-drawer" aria-label="Fechar">&times;</button>
+    </div>
+    <div id="drawer-body">
+      <!-- Injetado via JS -->
+    </div>
+    <div class="modal-form__footer" id="drawer-footer">
+      <!-- Injetado via JS -->
+    </div>
+  </dialog>
+
+  <!-- ================= MODAL ================= -->
+  <dialog class="modal" id="modal-acao" aria-labelledby="modal-title">
+    <div class="modal__header">
+      <div class="modal__logo">CONTINUUM</div>
+      <h2 class="modal__title" id="modal-title" style="font-family: var(--font-body); font-size: 20px; font-weight: bold;">Finalizar projeto</h2>
+    </div>
+    <div class="modal__body">
+      <p class="modal__text" id="modal-desc" style="color: var(--color-muted-text); font-size: 14px; line-height: 1.5;">
+        Deseja finalizar o projeto? Após confirmar, o QR code será enviado para impressão.
+      </p>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary" id="btn-confirmar-modal">Confirmar e enviar</button>
+      <button class="btn btn--secondary" id="btn-cancelar-modal">Cancelar</button>
+    </div>
+  </dialog>
+
+  <!-- Script (Modular ES6) -->
+  <script type="module" src="projetos.js"></script>
+
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil da Empresa | CONTINUUM</title>
+
+  <!-- Tipografia -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Estilos Globais -->
+  <link rel="stylesheet" href="../../../css/global.css" />
+  <link rel="stylesheet" href="../../../css/responsive.css" />
+  <link rel="stylesheet" href="style.css">
+
+  
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+<body>
+  
+  <!-- Mobile toggle button -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="empresa" data-active="perfil"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="profile-container">
+        
+        <header class="page-header animate-slide-up">
+          <div>
+            <span class="text-detail" style="color: var(--color-primary); font-weight: 700; margin-bottom: 8px; display: block;">CONFIGURAÇÕES</span>
+            <h1 class="page-header__title text-display">PERFIL DA EMPRESA</h1>
+            <p class="page-header__subtitle text-body">Gerencie as informações corporativas e dados de contato da sua marca.</p>
+          </div>
+          
+          <!-- Etiqueta Animada da Empresa (Cor #2D3748) -->
+          <div class="header-tag-container" aria-label="Perfil Empresa">
+            <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+              <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="rgba(0,0,0,0.15)" transform="translate(0, 3)" />
+              <line x1="30" y1="12" x2="100" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+              <circle cx="102" cy="18" r="6" stroke="rgba(0,0,0,0.15)" stroke-width="3" fill="none" transform="translate(0, 3)" />
+              <line x1="100" y1="24" x2="35" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+              
+              <!-- Alfinete em cinza escuro/preto para manter o contraste do metal -->
+              <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="#4a4a4a" />
+              <line x1="30" y1="12" x2="100" y2="12" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+              <circle cx="102" cy="18" r="6" stroke="#4a4a4a" stroke-width="3" fill="none" />
+              <line x1="100" y1="24" x2="35" y2="20" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+            </svg>
+
+            <div class="clothing-tag--empresa">
+              <div class="clothing-tag__hole"></div>
+              <div class="clothing-tag__content">
+                <div class="clothing-tag__title">CONTINUUM</div>
+                <div class="clothing-tag__subtitle">Perfil Empresa</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Profile Card Principal -->
+        <section class="profile-card animate-slide-up" style="animation-delay: 0.1s;">
+          
+          <div class="avatar-wrapper">
+            <div class="avatar">
+              <span class="avatar__initials">ET</span>
+              <div class="avatar__edit" title="Alterar Logotipo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h2 style="font-family: var(--font-title); font-size: 1.5rem; color: var(--color-charcoal-text); letter-spacing: 0.02em;">EMPRESA TESTE LTDA</h2>
+              <p style="color: var(--color-muted-text); font-size: 0.9rem;">Membro desde setembro de 2026</p>
+            </div>
+          </div>
+
+          <h3 class="profile-card__section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Dados Corporativos
+          </h3>
+
+          <form action="#" method="POST">
+            <div class="form-grid">
+              
+              <div class="form-group form-group--full">
+                <label class="form-label" for="razaoSocial">Razão Social</label>
+                <input type="text" id="razaoSocial" class="form-input" value="Empresa Teste de Vestuário LTDA" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="nomeFantasia">Nome Fantasia</label>
+                <input type="text" id="nomeFantasia" class="form-input" value="Empresa Teste" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cnpj">CNPJ</label>
+                <input type="text" id="cnpj" class="form-input" value="00.000.000/0001-00" disabled title="Para alterar o CNPJ, entre em contato com o suporte." />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="segmento">Segmento / Setor</label>
+                <input type="text" id="segmento" class="form-input" value="Varejo de Moda" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="inscricaoEstadual">Inscrição Estadual</label>
+                <input type="text" id="inscricaoEstadual" class="form-input" value="Isento" />
+              </div>
+
+              <h3 class="profile-card__section-title form-group--full" style="margin-top: var(--space-xl);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Contato e Endereço
+              </h3>
+
+              <div class="form-group">
+                <label class="form-label" for="email">E-mail Corporativo</label>
+                <input type="email" id="email" class="form-input" value="contato@empresateste.com.br" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="telefone">Telefone Comercial / WhatsApp</label>
+                <input type="tel" id="telefone" class="form-input" value="(11) 99999-9999" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cep">CEP</label>
+                <input type="text" id="cep" class="form-input" value="01000-000" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cidade">Cidade / UF</label>
+                <input type="text" id="cidade" class="form-input" value="São Paulo - SP" />
+              </div>
+
+              <div class="form-group form-group--full">
+                <label class="form-label" for="endereco">Endereço Completo</label>
+                <input type="text" id="endereco" class="form-input" value="Av. Paulista, 1000 - Bela Vista" />
+              </div>
+
+            </div>
+
+            <div class="profile-actions">
+              <button type="button" class="btn btn--ghost" style="color: var(--color-charcoal-text); border-color: var(--color-border);">Cancelar</button>
+              <button type="submit" class="btn btn--primary" style="background-color: #2D3748; border-color: #2D3748;">Salvar Alterações</button>
+            </div>
+          </form>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>

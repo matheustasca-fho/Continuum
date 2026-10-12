@@ -1,0 +1,1168 @@
+/*!
+ * Sites Incríveis — estilos do motor
+ * © 2026 Enzo Barbatto — Sparo Automações. Uso conforme LICENCA.md.
+ *
+ * Só o necessário para os efeitos funcionarem. A identidade visual do site
+ * (fontes, cores, espaçamentos) vive no CSS da própria página.
+ */
+
+/* ---------- estados iniciais das revelações ---------- */
+
+[data-fx="surgir"],
+[data-fx="subir"],
+[data-fx="esquerda"],
+[data-fx="direita"],
+[data-fx="crescer"] {
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+[data-fx="subir"]    { transform: translateY(36px); }
+[data-fx="esquerda"] { transform: translateX(-48px); }
+[data-fx="direita"]  { transform: translateX(48px); }
+[data-fx="crescer"]  { transform: scale(0.92); }
+
+[data-fx].fx-em-cena {
+  opacity: 1;
+  transform: none;
+}
+
+/* palavras: cada palavra sobe individualmente quando o pai entra em cena */
+[data-fx="palavras"] .fx-palavra {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  transition: opacity 0.55s ease-out, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-fx="palavras"].fx-em-cena .fx-palavra {
+  opacity: 1;
+  transform: none;
+}
+[data-fx="palavras"] { opacity: 1; }
+
+/* digitar: cursor enquanto escreve */
+[data-fx="digitar"] { opacity: 1; }
+.fx-digitando::after {
+  content: "";
+  display: inline-block;
+  width: 0.08em;
+  height: 1em;
+  margin-left: 0.06em;
+  background: currentColor;
+  vertical-align: -0.12em;
+  animation: fx-cursor 0.8s steps(2, jump-none) infinite;
+}
+@keyframes fx-cursor { 50% { opacity: 0; } }
+
+[data-fx="contar"] {
+  opacity: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- cenas fixas ---------- */
+
+[data-fx-fixa] {
+  position: relative;
+}
+
+.fx-palco {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-fx="trilho"] {
+  display: flex;
+  flex-wrap: nowrap;
+  will-change: transform;
+}
+
+[data-fx="rolar-video"] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* etapas: por padrão, cada .fx-etapa aparece na sua vez.
+   A página pode sobrescrever livremente com [data-etapa="n"]. */
+[data-fx-etapas] .fx-etapa {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+[data-fx-etapas="2"][data-etapa="1"] .fx-etapa:nth-of-type(1),
+[data-fx-etapas="2"][data-etapa="2"] .fx-etapa:nth-of-type(2),
+[data-fx-etapas="3"][data-etapa="1"] .fx-etapa:nth-of-type(1),
+[data-fx-etapas="3"][data-etapa="2"] .fx-etapa:nth-of-type(2),
+[data-fx-etapas="3"][data-etapa="3"] .fx-etapa:nth-of-type(3),
+[data-fx-etapas="4"][data-etapa="1"] .fx-etapa:nth-of-type(1),
+[data-fx-etapas="4"][data-etapa="2"] .fx-etapa:nth-of-type(2),
+[data-fx-etapas="4"][data-etapa="3"] .fx-etapa:nth-of-type(3),
+[data-fx-etapas="4"][data-etapa="4"] .fx-etapa:nth-of-type(4),
+[data-fx-etapas="5"][data-etapa="1"] .fx-etapa:nth-of-type(1),
+[data-fx-etapas="5"][data-etapa="2"] .fx-etapa:nth-of-type(2),
+[data-fx-etapas="5"][data-etapa="3"] .fx-etapa:nth-of-type(3),
+[data-fx-etapas="5"][data-etapa="4"] .fx-etapa:nth-of-type(4),
+[data-fx-etapas="5"][data-etapa="5"] .fx-etapa:nth-of-type(5) {
+  opacity: 1;
+}
+
+/* ---------- fundo que viaja ---------- */
+
+.fx-fundo-ativo body {
+  background: var(--fx-fundo, inherit);
+  color: var(--fx-tinta, inherit);
+  transition: background 0.7s ease, color 0.7s ease;
+}
+
+/* ---------- suavidade geral ---------- */
+
+[data-fx-paralaxe],
+[data-fx-mouse],
+[data-fx-x], [data-fx-y], [data-fx-escala], [data-fx-giro], [data-fx-opacidade] {
+  will-change: transform;
+}
+
+[data-fx-mouse] {
+  transition: transform 0.25s ease-out;
+}
+
+/* ---------- movimento reduzido: tudo visível, nada se mexe ---------- */
+
+.fx-reduzido [data-fx] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+.fx-reduzido [data-fx="palavras"] .fx-palavra {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.fx-reduzido .fx-palco {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+.fx-reduzido [data-fx-etapas] .fx-etapa {
+  opacity: 1;
+  position: static !important;
+  grid-area: auto !important; /* etapas sobrepostas viram lista, uma sob a outra */
+  margin: 24px 0;
+}
+.fx-reduzido [data-fx="trilho"] {
+  flex-wrap: wrap;
+  transform: none !important;
+}
+
+
+/* ============================================================
+   TOKENS CONTINUUM
+   ============================================================ */
+:root {
+  --fundo:        #F5F2EB;
+  --fundo-escuro: #1A1612;
+  --tinta:        #2D3748;
+  --tinta-suave:  #718096;
+  --tinta-clara:  #F5F2EB;
+  --acento:       #782736;
+  --acento-hover: #5e1e2a;
+  --acento-leve:  #FDF2F4;
+  --borda:        #E2E8F0;
+  --branco:       #FFFFFF;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--tinta);
+  background-color: var(--fundo);
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* ============================================================
+   TEXTURA DE TECIDO — Fundo sutil global
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 18px,
+      var(--tinta) 18px, var(--tinta) 19px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 18px,
+      var(--tinta) 18px, var(--tinta) 19px
+    );
+}
+
+/* ============================================================
+   NAVEGAÇÃO FIXA
+   ============================================================ */
+.nav-topo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 6vw;
+  transition: background 0.4s, box-shadow 0.4s, padding 0.4s;
+}
+
+.nav-topo.nav--rolou {
+  background: rgba(245, 242, 235, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  padding: 14px 6vw;
+}
+
+.nav__marca {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  color: var(--acento);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav__links a {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tinta);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.25s;
+}
+
+.nav__links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: var(--acento);
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav__links a:hover { color: var(--acento); }
+.nav__links a:hover::after { width: 100%; }
+
+.nav__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--acento);
+  color: var(--branco) !important;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.25s;
+  border: none;
+  cursor: pointer;
+}
+
+.nav__cta:hover {
+  background: var(--acento-hover);
+  transform: translateY(-1px);
+}
+
+.nav__cta::after { display: none !important; }
+
+/* Menu mobile */
+.nav__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav__hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--tinta);
+  margin: 5px 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* ============================================================
+   LINHA-ASSINATURA SVG (o fio que costura as seções)
+   ============================================================ */
+.fio-continuum-container {
+  position: fixed;
+  top: 0;
+  right: 2vw;
+  width: 30px;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.fio-continuum {
+  width: 100%;
+  height: 100%;
+}
+
+.fio-continuum path {
+  fill: none;
+  stroke: var(--acento);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: var(--fio-total, 3000);
+  stroke-dashoffset: var(--fio-offset, 3000);
+  opacity: 0.6;
+}
+
+.fio-agulha {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 20px;
+  height: 20px;
+  color: var(--acento);
+  transform: translateY(var(--agulha-y, 0px));
+  transition: transform 0.05s linear;
+}
+
+/* ============================================================
+   CENA 1 — HERO / ABERTURA
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 8vw;
+  padding-top: 12vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__rotulo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(52px, 9vw, 120px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  color: var(--tinta);
+  margin-bottom: 28px;
+  max-width: 14ch;
+}
+
+.hero__subtitulo {
+  font-size: 18px;
+  color: var(--tinta-suave);
+  max-width: 48ch;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.hero__acoes {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  background: var(--acento);
+  color: var(--branco);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-principal:hover {
+  background: var(--acento-hover);
+  transform: translateY(-2px);
+}
+
+.btn-secundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: transparent;
+  color: var(--tinta);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  border: 2px dashed var(--acento);
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+
+.btn-secundario:hover {
+  background: var(--acento-leve);
+  color: var(--acento);
+}
+
+/* Decoração Hero — Colagem Animada */
+.hero__collage {
+  position: absolute;
+  right: 2vw;
+  top: 45%;
+  transform: translateY(-50%);
+  width: clamp(300px, 40vw, 550px);
+  height: 600px;
+  pointer-events: none;
+}
+
+.hero__collage-img {
+  position: absolute;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  background: white;
+  padding: 8px;
+  padding-bottom: 24px; /* polaroid style */
+}
+
+.hero__collage-img--1 {
+  width: 45%;
+  top: 10%;
+  left: 5%;
+  transform: rotate(-8deg);
+  z-index: 2;
+}
+
+.hero__collage-img--2 {
+  width: 55%;
+  top: 30%;
+  right: 5%;
+  transform: rotate(5deg);
+  z-index: 3;
+}
+
+.hero__collage-img--3 {
+  width: 40%;
+  bottom: 5%;
+  left: 20%;
+  transform: rotate(-4deg);
+  z-index: 4;
+}
+
+.hero__collage-tape {
+  position: absolute;
+  background: rgba(255,255,255,0.7);
+  width: 60px;
+  height: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+.hero__deco-tag {
+  position: absolute;
+  bottom: 40px;
+  right: -20px;
+  background: var(--branco);
+  padding: 14px 20px;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+}
+
+.hero__deco-tag-icone {
+  width: 36px;
+  height: 36px;
+  background: var(--acento-leve);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero__deco-tag-icone svg {
+  width: 18px;
+  height: 18px;
+  color: var(--acento);
+}
+
+.hero__deco-tag-texto {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.hero__deco-tag-sub {
+  font-size: 11px;
+  color: var(--tinta-suave);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ============================================================
+   CENA 2 — QUEM SOMOS / PROPÓSITO
+   ============================================================ */
+.proposito {
+  padding: 16vh 8vw 12vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8vw;
+  align-items: start;
+}
+
+.proposito__esquerda {
+  position: relative;
+}
+
+.proposito__rotulo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.proposito__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 4vw, 56px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--tinta);
+  margin-bottom: 28px;
+}
+
+.proposito__texto {
+  font-size: 17px;
+  color: var(--tinta-suave);
+  max-width: 52ch;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.proposito__citacao {
+  border-left: 3px solid var(--acento);
+  padding-left: 24px;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--tinta);
+  line-height: 1.6;
+  max-width: 44ch;
+}
+
+.proposito__citacao-autor {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+  font-family: 'Space Mono', monospace;
+  color: var(--tinta-suave);
+  margin-top: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.proposito__imagem-box {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.proposito__imagem {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.proposito__imagem-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(26,22,18,0.82);
+  backdrop-filter: blur(8px);
+  color: var(--tinta-clara);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   CENA 3 — COMO FUNCIONA (PICO) — cena fixa com etapas
+   ============================================================ */
+.ciclo-palco {
+  text-align: center;
+  padding: 0 8vw;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ciclo__rotulo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.ciclo__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.ciclo__subtitulo {
+  font-size: 17px;
+  color: var(--tinta-suave);
+  max-width: 52ch;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+}
+
+.ciclo-etapa {
+  display: grid;
+  grid-area: 1/1;
+  place-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 40px;
+}
+
+.ciclo-etapa__icone {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.ciclo-etapa__icone svg {
+  width: 36px;
+  height: 36px;
+}
+
+.ciclo-etapa__numero {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.ciclo-etapa__nome {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+}
+
+.ciclo-etapa__desc {
+  font-size: 17px;
+  max-width: 42ch;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Barra de progresso do ciclo */
+.ciclo-progresso {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.ciclo-progresso__ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--borda);
+  transition: background 0.4s, transform 0.4s;
+}
+
+[data-etapa="1"] .ciclo-progresso__ponto:nth-child(1),
+[data-etapa="2"] .ciclo-progresso__ponto:nth-child(2),
+[data-etapa="3"] .ciclo-progresso__ponto:nth-child(3) {
+  background: var(--acento);
+  transform: scale(1.3);
+}
+
+/* ============================================================
+   CENA 4 — OS ATORES
+   ============================================================ */
+.atores {
+  padding: 14vh 8vw;
+}
+
+.atores__rotulo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.atores__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 4vw, 56px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--tinta);
+  margin-bottom: 48px;
+}
+
+.atores-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.ator-cartao {
+  background: var(--branco);
+  border-radius: 12px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ator-cartao::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--acento);
+}
+
+.ator-cartao__icone {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background: var(--acento-leve);
+}
+
+.ator-cartao__icone svg {
+  width: 24px;
+  height: 24px;
+}
+
+.ator-cartao__tipo {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--acento);
+  margin-bottom: 8px;
+}
+
+.ator-cartao__nome {
+  font-family: 'Anton', sans-serif;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tinta);
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.ator-cartao__desc {
+  font-size: 14px;
+  color: var(--tinta-suave);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  flex-grow: 1;
+}
+
+.ator-cartao__acao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acento);
+  text-decoration: none;
+  transition: gap 0.3s;
+}
+
+.ator-cartao__acao:hover {
+  gap: 14px;
+}
+
+/* ============================================================
+   CENA 5 — IMPACTO EM SÃO PAULO
+   ============================================================ */
+.impacto {
+  padding: 14vh 8vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8vw;
+  align-items: center;
+}
+
+.impacto__esquerda {}
+
+.impacto__rotulo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--acento);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.impacto__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(28px, 3.5vw, 48px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--tinta);
+  margin-bottom: 20px;
+}
+
+.impacto__texto {
+  font-size: 16px;
+  color: var(--tinta-suave);
+  line-height: 1.7;
+  max-width: 48ch;
+  margin-bottom: 32px;
+}
+
+.impacto__local {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--branco);
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--tinta);
+}
+
+.impacto__local svg {
+  width: 16px;
+  height: 16px;
+  color: var(--acento);
+}
+
+.impacto__numeros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.impacto__numero-box {
+  background: var(--branco);
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.impacto__numero-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--acento);
+  opacity: 0.4;
+}
+
+.impacto__valor {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(36px, 4vw, 56px);
+  color: var(--acento);
+  line-height: 1;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.impacto__label {
+  font-size: 13px;
+  color: var(--tinta-suave);
+  line-height: 1.4;
+}
+
+/* ============================================================
+   CENA 6 — CTA / FECHAMENTO
+   ============================================================ */
+.fechamento {
+  text-align: center;
+  padding: 18vh 8vw 14vh;
+}
+
+.fechamento__titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(40px, 6vw, 88px);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+.fechamento__texto {
+  font-size: 18px;
+  max-width: 48ch;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.fechamento__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.btn-principal--grande {
+  padding: 18px 44px;
+  font-size: 16px;
+}
+
+/* Rodapé minimalista */
+.rodape {
+  padding: 40px 8vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.rodape__marca {
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  color: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.rodape__info {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  opacity: 0.5;
+  letter-spacing: 0.04em;
+}
+
+.rodape__links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.rodape__links a {
+  font-size: 13px;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.25s;
+}
+
+.rodape__links a:hover { opacity: 1; }
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 900px) {
+  .proposito {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .proposito__imagem-box { order: -1; }
+
+  .hero__deco { display: none; }
+
+  .hero {
+    align-items: center;
+    text-align: center;
+    padding: 20vh 6vw 10vh;
+  }
+
+  .hero__titulo { max-width: none; }
+
+  .hero__acoes { justify-content: center; }
+
+  .impacto {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .atores-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav__links { display: none; }
+  .nav__hamburger { display: block; }
+
+  .fio-continuum-container { display: none; }
+}
+
+@media (max-width: 600px) {
+  .impacto__numeros {
+    grid-template-columns: 1fr;
+  }
+
+  .fechamento__titulo {
+    font-size: clamp(32px, 10vw, 56px);
+  }
+}
+
+/* ============================================================
+   ANIMAÇÕES EXTRAS (Dribbble Style)
+   ============================================================ */
+/* Reveal de imagem na seção Propósito */
+.reveal-anim-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--fundo);
+  z-index: 2;
+  transform-origin: top;
+  transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.proposito__imagem-box.fx-em-cena .reveal-anim-overlay {
+  transform: scaleY(0);
+}
+
+.img-scale-anim {
+  transform: scale(1.15);
+  transition: transform 1.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.proposito__imagem-box.fx-em-cena .img-scale-anim {
+  transform: scale(1);
+}
+
+/* Efeito magnético suave nos cartões */
+.ator-cartao {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+.ator-cartao:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+/* Efeito de expansão nos botões */
+.btn-principal {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.btn-principal::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  padding-bottom: 150%;
+  background: var(--acento-hover);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: -1;
+}
+.btn-principal:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Flutuação contínua na colagem */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-8px) rotate(var(--rot, 0deg)); }
+  100% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+}
+.hero__collage-img--1 { --rot: -8deg; animation: float 6s ease-in-out infinite; }
+.hero__collage-img--2 { --rot: 5deg; animation: float 7s ease-in-out infinite 1s; }
+.hero__collage-img--3 { --rot: -4deg; animation: float 5s ease-in-out infinite 2s; }

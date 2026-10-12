@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meus Lotes — CONTINUUM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+
+<body>
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMsg">Feito!</span>
+  </div>
+
+  <!-- Mobile toggle -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="designer" data-active="meus-lotes"></div>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <div class="page">
+        <header class="page-header">
+          <div>
+            <span class="text-breadcrumb reveal" style="--d: 0.05">Reservados</span>
+            <h1 class="page-header__title" aria-label="Meus lotes">
+              <span class="word" aria-hidden="true"><span style="--w: 0">Meus</span></span>
+              <span class="word" aria-hidden="true"><span style="--w: 1">lotes</span></span>
+            </h1>
+            <p class="page-header__subtitle reveal" style="--d: 0.4">Lotes que você já reservou — acompanhe a retirada e confirme o recebimento.</p>
+          </div>
+
+          <div class="summary-tag reveal" style="--d: 0.3" aria-live="polite">
+            <span class="summary-tag__label">Total reservado</span>
+            <div class="summary-tag__value">
+              <span id="totalKg">0</span><span class="summary-tag__unit">KG</span>
+            </div>
+            <span class="summary-tag__sub" id="totalSub">—</span>
+          </div>
+        </header>
+
+        <div class="toolbar reveal" style="--d: 0.45">
+          <div class="filters" id="filters" role="tablist" aria-label="Filtrar por status">
+            <span class="filters__indicator" id="filterIndicator" aria-hidden="true"></span>
+            <button class="filter is-active" role="tab" aria-selected="true" data-filter="todos">Todos <span class="filter__count" data-count="todos">0</span></button>
+            <button class="filter" role="tab" aria-selected="false" data-filter="aguardando">Aguardando <span class="filter__count" data-count="aguardando">0</span></button>
+            <button class="filter" role="tab" aria-selected="false" data-filter="recebido">Recebidos <span class="filter__count" data-count="recebido">0</span></button>
+            <button class="filter" role="tab" aria-selected="false" data-filter="nao">Não retirados <span class="filter__count" data-count="nao">0</span></button>
+          </div>
+
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input class="search__input" id="search" type="search" placeholder="Buscar lote ou empresa" aria-label="Buscar lote ou empresa" autocomplete="off" />
+          </label>
+        </div>
+
+        <ul class="lotes" id="lotes" aria-live="polite"></ul>
+
+        <div class="empty" id="empty">
+          <svg viewBox="0 0 72 72" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="18" y="10" width="24" height="6" rx="2"></rect>
+            <rect x="18" y="44" width="24" height="6" rx="2"></rect>
+            <path d="M22 16v28M38 16v28" opacity="0.4"></path>
+            <path d="M22 22h16M22 28h16M22 34h16M22 40h16" opacity="0.6"></path>
+            <path class="thread" d="M42 30 C 52 30, 50 50, 60 54 S 66 64, 58 66"></path>
+          </svg>
+          <h2 class="empty__title">Nenhum lote por aqui</h2>
+          <p class="empty__text">Tente outro filtro ou encontre novos retalhos na vitrine.</p>
+          <a href="../lotes-disponiveis/index.html" class="btn btn--primary">Ver lotes disponíveis</a>
+        </div>
+
+        <p class="footnote reveal" style="--d: 0.9">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Lotes não retirados em até 7 dias voltam automaticamente para a vitrine.
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: confirmar recebimento -->
+  <dialog class="modal" id="confirmModal" aria-labelledby="modalTitle">
+    <div class="modal__stitch" aria-hidden="true"></div>
+    <form method="dialog" class="modal__body">
+      <span class="text-breadcrumb">Confirmar</span>
+      <h2 class="modal__title" id="modalTitle">Recebeu o lote?</h2>
+      <div class="modal__lote">
+        <div class="swatch" id="modalSwatch"></div>
+        <div>
+          <p class="lote__title" id="modalLote">—</p>
+          <p class="lote__meta" id="modalMeta">—</p>
+        </div>
+      </div>
+      <p class="modal__text">Ao confirmar, a empresa doadora é avisada e o material fica disponível para usar nos seus projetos.</p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" value="cancel" type="submit">Cancelar</button>
+        <button class="btn btn--primary" value="confirm" type="submit" id="modalConfirm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Confirmar recebimento
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
+

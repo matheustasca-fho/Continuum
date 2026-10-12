@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Inicial — CONTINUUM</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../components/header/header.css">
+</head>
+
+<body>
+  <!-- Thread trail (cursor craft) -->
+  <div class="thread-trail" id="threadTrail"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMsg">Alterações salvas com sucesso!</span>
+  </div>
+
+  <!-- Mobile toggle -->
+  
+  
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div id="appHeader" data-role="designer" data-active="painel"></div>
+
+    <!-- MAIN -->
+        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <header class="page-header" style="align-items: center;">
+        <div>
+          <span class="text-breadcrumb">PAINEL DO DESIGNER</span>
+          <h1 class="page-header__title">OLÁ, ANA SILVA</h1>
+          <p class="page-header__subtitle">Bem-vinda ao seu ateliê circular. Quinta-feira, 4 de setembro.</p>
+        </div>
+        <!-- Etiqueta Animada -->
+        <div class="header-tag-container" aria-label="Perfil Designer">
+          <!-- Alfinete -->
+          <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="rgba(0,0,0,0.15)" transform="translate(0, 3)" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            <circle cx="102" cy="18" r="6" stroke="rgba(0,0,0,0.15)" stroke-width="3" fill="none" transform="translate(0, 3)" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="3" stroke-linecap="round" transform="translate(0, 3)" />
+            
+            <path d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z" fill="#4a4a4a" />
+            <line x1="30" y1="12" x2="100" y2="12" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+            <circle cx="102" cy="18" r="6" stroke="#4a4a4a" stroke-width="3" fill="none" />
+            <line x1="100" y1="24" x2="35" y2="20" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round" />
+          </svg>
+          <div class="clothing-tag">
+            <div class="clothing-tag__hole"></div>
+            <div class="clothing-tag__content">
+              <div class="clothing-tag__title">CONTINUUM</div>
+              <div class="clothing-tag__subtitle">Perfil Designer</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- IMPACTO AMBIENTAL -->
+      <section class="dashboard-section impact-banner" style="background-image: url('../../../assets/images/tecido-jeans.jpg'); background-size: cover; background-position: center; border: 1px solid var(--color-border); box-shadow: var(--shadow-md);">
+        <div style="position: absolute; inset: 0; background-color: var(--color-primary); opacity: 0.9;"></div>
+        
+        <img src="../../../assets/images/maquina.jpg" alt="Máquina de costura" style="position: absolute; right: 5%; bottom: -20px; height: 130%; object-fit: contain; opacity: 0.2; transform: rotate(5deg); pointer-events: none; mix-blend-mode: multiply;" />
+
+        <div style="position: relative; z-index: 2;">
+          <h3 class="dashboard-section__title" style="color: var(--color-primary-light); margin-bottom: 8px;">SEU IMPACTO CIRCULAR</h3>
+          <p style="font-family: var(--font-body); font-size: 14px; opacity: 0.9; margin-bottom: 24px; max-width: 600px; color: #fff;">Sua dedicação em ressignificar resíduos têxteis está transformando a indústria. Veja seus resultados este ano:</p>
+          
+          <div class="impact-metrics">
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number" style="color: #fff;">142</span>
+                <span class="impact-unit">KG</span>
+              </div>
+              <span class="impact-label">Resíduos Salvos</span>
+            </div>
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number" style="color: #fff;">38</span>
+                <span class="impact-unit">PEÇAS</span>
+              </div>
+              <span class="impact-label">Ressignificadas</span>
+            </div>
+            <div class="impact-item">
+              <div class="impact-number-wrapper">
+                <span class="impact-number" style="color: #fff;">98</span>
+                <span class="impact-unit">%</span>
+              </div>
+              <span class="impact-label">Confiabilidade (SLA)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARDS DE MÉTRICAS OPERACIONAIS -->
+      <section class="dash-cards" style="margin-top: var(--space-xl);">
+        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
+          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-listrado.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
+          <div style="position: relative; z-index: 1;">
+            <div class="dash-card__number">03</div>
+            <div class="dash-card__label">LOTES RESERVADOS</div>
+          </div>
+        </div>
+        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
+          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-jeans.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
+          <div style="position: relative; z-index: 1;">
+            <div class="dash-card__number">02</div>
+            <div class="dash-card__label">EM ANDAMENTO</div>
+          </div>
+        </div>
+        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
+          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-veludo.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
+          <div style="position: relative; z-index: 1;">
+            <div class="dash-card__number">11</div>
+            <div class="dash-card__label">FINALIZADOS</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOTES DISPONÍVEIS (MATCHES) -->
+      <section class="dashboard-section" style="margin-top: var(--space-xl);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-md);">
+          <h3 class="dashboard-section__title" style="margin-bottom: 0;">MATCHES PERFEITOS PARA VOCÊ</h3>
+          <a href="../lotes-disponiveis/index.html" style="font-family: var(--font-detail); font-size: 11px; color: var(--color-primary); text-decoration: none; font-weight: bold; text-transform: uppercase;">Ver todos →</a>
+        </div>
+        
+        <div class="lote-cards">
+          <a href="../lotes-disponiveis/index.html" class="lote-card">
+            <div class="lote-swatch swatch-denim"></div>
+            <div class="lote-info">
+              <span class="lote-id">LOTE #4022</span>
+              <h4 class="lote-title">Retalhos de Denim Premium</h4>
+              <div class="lote-meta">
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  São Paulo, SP (2km)
+                </span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Expira em 2 dias
+                </span>
+              </div>
+            </div>
+          </a>
+
+          <a href="../lotes-disponiveis/index.html" class="lote-card">
+            <div class="lote-swatch swatch-cotton"></div>
+            <div class="lote-info">
+              <span class="lote-id lote-id--urgente">URGENTE</span>
+              <h4 class="lote-title">Algodão Cru Orgânico (Rolos)</h4>
+              <div class="lote-meta">
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  Guarulhos, SP (15km)
+                </span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Expira HOJE
+                </span>
+              </div>
+            </div>
+          </a>
+
+          <a href="../lotes-disponiveis/index.html" class="lote-card">
+            <div class="lote-swatch swatch-leather"></div>
+            <div class="lote-info">
+              <span class="lote-id">LOTE #3980</span>
+              <h4 class="lote-title">Sobra de Couro Sintético (Bolsas)</h4>
+              <div class="lote-meta">
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  Osasco, SP (18km)
+                </span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Expira em 5 dias
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- PENDÊNCIAS -->
+      <section class="dashboard-section" style="margin-top: var(--space-xl);">
+        <h3 class="dashboard-section__title">PENDÊNCIAS</h3>
+        <div class="task-list">
+          <div class="task-item">
+            <span class="task-item__text">Lote de algodão cru aguardando confirmação de recebimento</span>
+            <button class="btn btn--outline btn--sm" style="padding: 6px 16px; font-size: 13px;">Ver</button>
+          </div>
+          <div class="task-item">
+            <span class="task-item__text">Projeto "Jaqueta reversível" com prazo em 3 dias</span>
+            <button class="btn btn--outline btn--sm" style="padding: 6px 16px; font-size: 13px;">Ver</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- AÇÃO RÁPIDA -->
+      <section class="dashboard-section" style="margin-top: var(--space-xl);">
+        <h3 class="dashboard-section__title">AÇÃO RÁPIDA</h3>
+        <button class="btn btn--primary" style="padding: 12px 24px;">Ver lotes disponíveis</button>
+      </section>
+    </main>
+  </div>
+
+    <script src="script.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

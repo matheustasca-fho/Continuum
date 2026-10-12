@@ -1,0 +1,149 @@
+/* ==========================================================================
+   ESTILOS EXCLUSIVOS DO LOGIN INTERATIVO
+   ========================================================================== */
+
+body, html {
+  margin: 0; padding: 0; height: 100%;
+  overflow: hidden; /* Trava o scroll para a experiência fullscreen */
+  /* Profundidade com iluminação central no Bege */
+  background: radial-gradient(circle at center, var(--color-sand-offwhite) 10%, #E2DCCB 100%);
+}
+
+/* Textura Tátil (Grão/Papel/Algodão Cru) sobrepondo toda a tela sutilmente */
+body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 9999; /* Fica acima de tudo, dando textura até para a Fita */
+  pointer-events: none; /* Não bloqueia os cliques */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* O Canvas dos fios têxteis */
+#fabric-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 1;
+  cursor: crosshair;
+  transition: filter 1.5s ease, opacity 1s ease;
+}
+
+/* Fundo desfocado quando o login aparece */
+#fabric-canvas.blurred {
+  filter: blur(3px); /* Desfoque menor para focar nas linhas */
+  opacity: 0.7; /* Mantém a fita geométrica super visível como papel de parede */
+  pointer-events: none;
+}
+
+/* ================= INTRO SCENE ================= */
+.intro-layer {
+  position: absolute;
+  inset: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  padding-left: 10vw;
+  pointer-events: none; /* Deixa o mouse interagir com o canvas atrás */
+  transition: opacity 0.8s ease, transform 1s ease;
+}
+
+.intro-layer.hidden {
+  opacity: 0;
+  transform: translateY(-40px) scale(0.95);
+}
+
+.intro-logo {
+  font-family: var(--font-title);
+  font-size: max(80px, 10vw);
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-shadow: 0 10px 40px rgba(120, 39, 54, 0.15);
+  margin-bottom: 2vh;
+}
+
+.intro-cta {
+  text-align: left;
+  max-width: 500px;
+  animation: floatBreathing 4s ease-in-out infinite;
+}
+
+.cta-text { 
+  font-family: var(--font-body); 
+  font-size: max(16px, 1.2vw); 
+  font-weight: 400; /* Mais leve */
+  color: var(--color-muted-text); /* Tonalidade mais clara e cinza */
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.cta-text.fade-out {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.cta-sub { font-family: var(--font-detail); font-size: max(10px, 0.8vw); color: var(--color-muted-text); margin-top: 1vh; text-transform: uppercase; }
+
+@keyframes floatBreathing {
+  0%, 100% { opacity: 0.6; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-5px); }
+}
+
+/* ================= LOGIN SCENE ================= */
+.login-layer {
+  position: absolute;
+  inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at center, transparent 0%, rgba(245, 242, 235, 0.6) 100%);
+  transition: opacity 0.8s ease;
+}
+
+.login-layer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 5vh 3vw;
+  border-radius: var(--radius-lg);
+  width: 90%; max-width: 420px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 8px solid var(--color-primary); /* Assinatura visual na base */
+  
+  transform: translateY(40px);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-layer.active .login-card {
+  transform: translateY(0);
+}
+
+.login-header { text-align: center; margin-bottom: 4vh; }
+
+.input-group { margin-bottom: 2.5vh; }
+.input-label { display: block; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--color-charcoal-text); margin-bottom: 8px; }
+.input-field {
+  width: 100%;
+  background: var(--color-sand-offwhite);
+  border: 1px solid var(--color-border);
+  padding: 1.5vh 1vw;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-charcoal-text);
+  transition: border-color 0.3s, background 0.3s;
+}
+.input-field:focus { outline: none; border-color: var(--color-primary); background: var(--color-white); }
+
+.login-footer {
+  display: flex; justify-content: space-between;
+  margin-top: 3vh; padding-top: 3vh;
+  border-top: 1px solid var(--color-border);
+}
+
+.login-link {
+  font-family: var(--font-body); font-size: 13px;
+  color: var(--color-muted-text); transition: color 0.2s;
+}
+.login-link:hover { color: var(--color-charcoal-text); }
