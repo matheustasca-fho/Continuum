@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM - Status do Projeto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="status-page" aria-labelledby="statusTitle">
+    <a class="status-page__back" href="../meus-projetos/index.html">← Voltar para projetos</a>
+    <header class="status-page__header">
+      <p class="status-page__eyebrow">PROJETO</p>
+      <h1 id="statusTitle" class="status-page__title">Jaqueta reversível</h1>
+      <p class="status-page__subtitle">LOTE DE ORIGEM: ATELIÊ BOREAL</p>
+    </header>
+    <section class="status-layout" aria-label="Detalhes do projeto e do lote">
+      <article class="project-summary">
+        <p class="project-summary__label">DESCRIÇÃO</p>
+        <p class="project-summary__copy">Transformar os retalhos em jaqueta reversível, com aproveitamento do algodão cru e acabamento interno alinhado.</p>
+        <dl class="project-summary__data">
+          <div><dt>PRAZO</dt><dd>07/10/2026</dd></div>
+          <div><dt>CÓDIGO DO LOTE</dt><dd id="lotCode">L00128092026</dd></div>
+        </dl>
+        <button class="status-page__finish" type="button" id="finishProject">Finalizar projeto</button>
+      </article>
+      <aside class="lot-tracking" aria-labelledby="trackingTitle">
+        <p id="trackingTitle" class="lot-tracking__label">RASTREIO DO LOTE</p>
+        <ol class="lot-tracking__steps">
+          <li class="lot-tracking__step lot-tracking__step--complete"><span class="lot-tracking__dot"></span><div><strong>Lote reservado</strong><small>05/07/2026</small></div></li>
+          <li class="lot-tracking__step lot-tracking__step--complete"><span class="lot-tracking__dot"></span><div><strong>Lote recebido</strong><small>20/07/2026</small></div></li>
+          <li class="lot-tracking__step lot-tracking__step--current"><span class="lot-tracking__dot"></span><div><strong>Em produção</strong><small>Atual</small></div></li>
+          <li class="lot-tracking__step"><span class="lot-tracking__dot"></span><div><strong>Finalizado</strong><small>Pendente</small></div></li>
+        </ol>
+      </aside>
+    </section>
+  </main>
+  <div class="consent-dialog" id="consentDialog" aria-hidden="true">
+    <section class="consent-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="consentTitle" aria-describedby="consentDescription">
+      <span class="consent-dialog__brand">CONTINUUM</span>
+      <h2 id="consentTitle">Confirmar finaliza&ccedil;&atilde;o</h2>
+      <p id="consentDescription">O Designer confirma que este projeto foi conclu&iacute;do? Ap&oacute;s a confirma&ccedil;&atilde;o, o rastreio do lote ser&aacute; atualizado.</p>
+      <div class="consent-dialog__actions">
+        <button type="button" class="consent-dialog__confirm" id="consentConfirm">Confirmar</button>
+        <button type="button" class="consent-dialog__cancel" id="consentCancel">Cancelar</button>
+      </div>
+    </section>
+  </div>
+  <script src="index.js" defer></script>
+</body>
+</html>

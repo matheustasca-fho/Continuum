@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#eff0e8" />
+  <title>Entrar | CONTINUUM</title>
+  <link rel="stylesheet" href="../../../css/global.css" />
+  <link rel="stylesheet" href="../../../css/responsive.css" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body class="login-page">
+  <main class="login-page__main">
+    <section class="login-card" aria-labelledby="login-card-title">
+      <header class="login-card__header">
+        <div class="login-card__brand" aria-label="CONTINUUM">
+          <span class="login-card__brand-name">CONTINUUM</span>
+          <span class="login-card__brand-tagline">ECONOMIA CIRCULAR · UPCYCLING · MODA</span>
+        </div>
+        <span class="login-card__seam" aria-hidden="true"></span>
+        <h1 class="login-card__title" id="login-card-title">Entrar</h1>
+      </header>
+
+      <div class="login-switch" role="group" aria-label="Selecione o perfil para entrar">
+        <button class="login-switch__option" type="button" value="doador" aria-pressed="true">Doador</button>
+        <button class="login-switch__option" type="button" value="designer" aria-pressed="false">Designer</button>
+        <button class="login-switch__option" type="button" value="empresa" aria-pressed="false">Empresa</button>
+      </div>
+
+      <form id="formLogin" class="login-form">
+        <div class="login-form__field">
+          <label class="login-form__label" for="loginIdentificador" id="loginIdentificadorLabel">Nome de usuário</label>
+          <input class="form-input login-form__input" type="text" id="loginIdentificador" name="usuario" placeholder="Digite seu nome de usuário" autocomplete="username" required />
+        </div>
+
+        <div class="login-form__field">
+          <label class="login-form__label" for="loginSenha">Senha</label>
+          <div class="login-form__password-wrap">
+            <input class="form-input login-form__input" type="password" id="loginSenha" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required />
+            <button class="login-form__password-toggle" type="button" aria-controls="loginSenha" aria-pressed="false">Mostrar</button>
+          </div>
+        </div>
+
+        <button class="btn btn--primary btn--full login-form__submit" type="submit">Entrar</button>
+        <p class="login-form__status" id="loginStatus" role="status" aria-live="polite"></p>
+      </form>
+
+      <footer class="login-card__footer">
+        <button class="login-card__forgot" type="button" id="forgotPassword">Esqueci minha senha</button>
+        <div class="login-card__help-wrap">
+          <button class="login-card__help" type="button" id="loginHelp" aria-label="Ajuda sobre os dados de acesso" aria-expanded="false" aria-controls="loginHelpMessage">?</button>
+          <span class="login-card__help-message" id="loginHelpMessage" role="status" hidden>Contas demo: <strong>doador</strong> (doador123), <strong>designer</strong> (designer123), <strong>empresa</strong> (empresa123).</span>
+        </div>
+      </footer>
+
+      <p class="login-card__signup">Não tem usuário? <a href="../cadastro/index.html">Cadastre-se</a></p>
+    </section>
+  </main>
+  <script src="login.js"></script>
+</body>
+</html>

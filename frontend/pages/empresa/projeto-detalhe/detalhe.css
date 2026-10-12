@@ -1,0 +1,82 @@
+/* ==========================================================================
+   1. TOKENS E FUNDAÇÃO
+   ========================================================================== */
+:root{
+  --color-primary: #782736;
+  --color-primary-hover: #5e1e2a;
+  --color-primary-light: #FDF2F4;
+  --color-sand-offwhite: #F5F2EB;
+  --color-white: #FFFFFF;
+  --color-charcoal-text: #2D3748;
+  --color-muted-text: #718096;
+  --color-border: #E2E8F0;
+  --color-success: #2E7D32;
+  --color-warning: #ED6C02;
+  --color-warning-bg: #FFF3E0;
+  --color-info: #1565C0;
+  --color-info-bg: #E3F2FD;
+  --radius-sm: 0.25vw; --radius-md: 0.5vw; --radius-lg: 0.75vw;
+  --font-title: 'Anton', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-detail: 'Space Mono', monospace;
+}
+
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+body{ font-family: var(--font-body); background-color: var(--color-sand-offwhite); color: var(--color-charcoal-text); display: flex; min-height: 100vh; }
+button{ cursor: pointer; font: inherit; background: none; border: none; }
+a{ text-decoration: none; color: inherit; }
+
+/* ==========================================================================
+   2. COMPONENTES (Botões, Badges, Cards)
+   ========================================================================== */
+.btn{ display: inline-flex; align-items: center; justify-content: center; padding: 1vh 1.25vw; font-weight: 600; border-radius: max(6px, var(--radius-md)); border: 1px solid transparent; transition: 0.2s; font-size: max(13px, 0.9vw); }
+.btn--primary{ background-color: var(--color-primary); color: var(--color-white); }
+.btn--primary:hover{ background-color: var(--color-primary-hover); }
+.btn--secondary{ background-color: var(--color-sand-offwhite); color: var(--color-charcoal-text); border-color: var(--color-border); }
+.btn--secondary:hover{ background-color: var(--color-border); }
+
+.badge{ display: inline-flex; padding: 0.4vh 0.8vw; border-radius: 99px; font-family: var(--font-title); font-size: max(10px, 0.7vw); letter-spacing: 0.05em; text-transform: uppercase; }
+.badge--andamento{ background-color: #F6E0D5; color: #9B4A22; }
+.badge--finalizado{ background-color: var(--color-border); color: var(--color-charcoal-text); }
+
+.card{ 
+  background: var(--color-white); 
+  border: 1px solid var(--color-border); 
+  border-radius: var(--radius-md); 
+  padding: 3vh 2vw; 
+  margin-bottom: 3vh; 
+  /* NOVA ASSINATURA VISUAL APLICADA AQUI: */
+  border-bottom: 6px solid var(--color-primary);
+}
+.card__title{ font-family: var(--font-title); font-size: max(16px, 1.1vw); letter-spacing: 0.04em; margin-bottom: 2vh; text-transform: uppercase; border-bottom: 1px solid var(--color-border); padding-bottom: 1vh; }
+
+/* ==========================================================================
+   3. LAYOUT DA PÁGINA P3
+   ========================================================================== */
+.main-content{ flex: 1; padding: 6vh 4vw; max-width: 1300px; display: grid; grid-template-columns: 2fr 1fr; gap: 3vw; align-items: start; }
+
+.header-area{ grid-column: 1 / -1; margin-bottom: 2vh; display: flex; justify-content: space-between; align-items: flex-end; }
+.breadcrumb{ font-family: var(--font-detail); font-size: 12px; color: var(--color-muted-text); margin-bottom: 1vh; text-transform: uppercase; }
+.breadcrumb a:hover{ text-decoration: underline; }
+.page-title{ font-family: var(--font-title); font-size: max(32px, 2.25vw); letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* Timeline */
+.timeline{ border-left: 2px dashed var(--color-border); margin-left: 10px; padding-left: 20px; }
+.tl-item{ position: relative; margin-bottom: 3vh; }
+.tl-item::before{ content: ''; position: absolute; left: -27px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--color-border); }
+.tl-item--done::before{ background: var(--color-charcoal-text); }
+.tl-item--current::before{ background: var(--color-info); box-shadow: 0 0 0 4px var(--color-info-bg); }
+.tl-title{ font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.tl-date{ font-family: var(--font-detail); font-size: 11px; color: var(--color-muted-text); }
+
+/* Info Grids */
+.info-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 2vh 1vw; }
+.info-label{ font-family: var(--font-detail); font-size: 11px; color: var(--color-muted-text); text-transform: uppercase; margin-bottom: 4px; }
+.info-val{ font-size: 14px; font-weight: 500; }
+
+.empty-state{ padding: 4vh; text-align: center; border: 1px dashed var(--color-border); border-radius: 8px; color: var(--color-muted-text); font-size: 14px; }
+
+@media (max-width: 900px) {
+  .main-content{ grid-template-columns: 1fr; }
+  
+}

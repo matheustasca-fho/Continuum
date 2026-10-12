@@ -1,0 +1,458 @@
+/* ==========================================================================
+   CONTINUUM — painel-empresa.css
+   Estilos corporativos para o Painel da Empresa (ESG, Gestão de Lotes)
+   ========================================================================== */
+
+/* Header e Tag Animada */
+.page-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xl);
+}
+
+.page-header__subtitle{
+  font-family: var(--font-body);
+  color: var(--color-muted-text);
+  margin-top: 4px;
+}
+
+.header-tag-container{
+  position: relative;
+  width: 140px;
+  height: 250px;
+  margin-top: -15px;
+  flex-shrink: 0;
+  transform-origin: top center;
+  animation: swingTag 5s ease-in-out infinite;
+  cursor: pointer;
+}
+
+.header-tag-container:hover{
+  animation-play-state: paused;
+  transform: rotate(-3deg) scale(1.05);
+}
+
+@keyframes swingTag {
+  0%, 100% { transform: rotate(4deg); }
+  50% { transform: rotate(-2deg); }
+}
+
+.safety-pin{
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 40px;
+  z-index: 5;
+}
+
+.clothing-tag{
+  position: absolute;
+  top: 30px; left: 50%;
+  transform: translateX(-50%);
+  width: 110px; height: 230px;
+  background-color: var(--color-sand-deep);
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.15), inset 0 0 40px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--color-border);
+}
+
+/* Tag Escura para Empresa */
+.clothing-tag--dark{
+  background-color: var(--color-charcoal-text);
+  color: var(--color-white);
+  border-color: #1a202c;
+}
+.clothing-tag--dark::before{
+  content: '';
+  position: absolute;
+  top: -16px; left: 50%;
+  transform: translateX(-50%);
+  width: 36px; height: 36px;
+  background-color: var(--color-charcoal-text);
+  border-radius: 50%;
+  box-shadow: inset 0 20px 20px rgba(0,0,0,0.2);
+  z-index: -1;
+  border: 1px solid #1a202c;
+  border-bottom: none;
+}
+
+.clothing-tag__hole{
+  width: 12px; height: 12px;
+  background-color: var(--color-sand-offwhite);
+  border-radius: 50%;
+  margin-top: -6px;
+  box-shadow: inset 1px 2px 4px rgba(0,0,0,0.5);
+  z-index: 3;
+  position: relative;
+}
+
+.clothing-tag__content{
+  margin-top: 40px;
+  text-align: center;
+  width: 100%;
+}
+
+.clothing-tag__title{
+  font-family: var(--font-title);
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transform: scaleY(1.3);
+  margin-bottom: 12px;
+  color: var(--color-primary-light);
+}
+
+.clothing-tag__subtitle{
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.8;
+  color: #fff;
+}
+
+
+/* Dash Cards (Métricas Rápidas) */
+.dash-cards{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.dash-card{
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease, transform 0.3s var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-card:hover{
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.dash-card--highlight{
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.dash-card__number{
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.dash-card__label{
+  font-family: var(--font-detail);
+  font-size: 0.6875rem;
+  color: var(--color-muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+
+/* Seção de Gestão (Cards lado a lado) */
+.management-section{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+}
+
+.management-card{
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s;
+}
+
+.management-card:hover{
+  box-shadow: var(--shadow-card-hover);
+}
+
+.management-card__header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-sm);
+}
+
+.management-card__title{
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  color: var(--color-charcoal-text);
+  letter-spacing: 0.05em;
+}
+
+.management-card__link{
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.management-card__link:hover{
+  text-decoration: underline;
+}
+
+/* Lista de Status de Lotes */
+.status-list{
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.status-item{
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-sand-offwhite);
+  transition: transform 0.2s;
+}
+.status-item:hover{
+  transform: translateX(4px);
+  background-color: var(--color-sand-deep);
+}
+
+.status-item__icon{
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.status-item__icon svg{ width: 20px; height: 20px; }
+.status-item__icon--warning{ background: var(--color-warning-bg); color: var(--color-warning); }
+.status-item__icon--info{ background: #E3F2FD; color: #1976D2; }
+.status-item__icon--success{ background: var(--color-success-bg); color: var(--color-success); }
+
+.status-item__content{
+  display: flex;
+  flex-direction: column;
+}
+.status-item__title{
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-charcoal-text);
+}
+.status-item__count{
+  font-size: 0.8rem;
+  color: var(--color-muted-text);
+  font-family: var(--font-detail);
+}
+
+.management-card__action{
+  margin-top: var(--space-xl);
+}
+
+/* Lista de Projetos */
+.projects-list{
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.project-card{
+  display: flex;
+  gap: var(--space-md);
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.project-card:hover{
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.project-card__img{
+  width: 60px; height: 60px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.project-card__info{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+}
+
+.project-card__name{
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-charcoal-text);
+  margin-bottom: 2px;
+}
+.project-card__designer{
+  font-size: 0.75rem;
+  color: var(--color-muted-text);
+  margin-bottom: 8px;
+}
+
+.project-progress__bar{
+  width: 100%;
+  height: 4px;
+  background-color: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.project-progress__fill{
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+}
+.project-progress__text{
+  font-size: 0.7rem;
+  font-family: var(--font-detail);
+  color: var(--color-muted-text);
+}
+
+.summary-stat{
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-md);
+}
+.summary-stat__number{
+  font-family: var(--font-title);
+  font-size: 2rem;
+  color: var(--color-primary);
+  line-height: 1;
+}
+.summary-stat__text{
+  font-size: 0.85rem;
+  color: var(--color-primary-hover);
+  line-height: 1.3;
+}
+.mt-auto{ margin-top: auto; }
+
+
+/* Impact Banner Empresa */
+.impact-banner{
+  background-color: #2d3748; /* Darker charcoal for corporate */
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-top: var(--space-xl);
+}
+
+.impact-banner::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px);
+  pointer-events: none;
+}
+
+.impact-metrics{
+  display: flex;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.impact-metrics--grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-md);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: var(--space-xl);
+}
+
+.impact-item{
+  display: flex;
+  flex-direction: column;
+}
+
+.impact-number-wrapper{
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.impact-number{
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  line-height: 1;
+}
+
+.impact-unit{
+  font-family: var(--font-detail);
+  font-size: 1rem;
+  color: #a0aec0;
+}
+
+.impact-label{
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up{
+  opacity: 0;
+  animation: slideUp 0.6s var(--ease-out) forwards;
+}
+
+.delay-1{ animation-delay: 0.1s; }
+.delay-2{ animation-delay: 0.2s; }
+.delay-3{ animation-delay: 0.3s; }
+
+
+@media (max-width: 900px) {
+  .management-section{
+    grid-template-columns: 1fr;
+  }
+  
+  .page-header{
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+}

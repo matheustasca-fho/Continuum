@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM — Revisão e Finalização</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="revisao.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header-bar">
+    <a href="../projeto-detalhe/index.html" class="btn btn--secondary" style="padding: 0.5vh 1vw;">← Voltar</a>
+    <div class="breadcrumb">Projetos › PRJ-05 › Revisão de Peça</div>
+  </header>
+
+  <!-- GRID DE REVISÃO -->
+  <main class="main-grid">
+    
+    <!-- ESQUERDA: O que foi pedido -->
+    <div>
+      <h2 class="col-title">O que foi pedido (Briefing)</h2>
+      <div class="content-box">
+        <strong>Material Origem</strong>
+        Jeans / Denim lavado (Lote #L-003)
+        
+        <strong>Perfil da Loja</strong>
+        Marca focada em streetwear consciente para público jovem adulto.
+        
+        <strong>Expectativas e Diretrizes</strong>
+        Transformar retalhos de jeans em uma jaqueta unissex estilo oversized com recortes visíveis. Evitar zíperes novos, usar botões reaproveitados.
+      </div>
+    </div>
+
+    <!-- DIREITA: O que foi entregue -->
+    <div>
+      <h2 class="col-title">O que foi entregue</h2>
+      <div class="content-box">
+        <strong>Processo Criativo do Designer (Samuel Pires)</strong>
+        "A jaqueta foi construída utilizando a técnica de moulage para aproveitar 98% dos recortes do lote #L-003. As lavagens diferentes do denim criaram um padrão geométrico natural. Os botões utilizados foram extraídos de peças antigas danificadas que não tinham mais uso."
+      </div>
+
+      <!-- Checklist de Liberação -->
+      <div class="checklist">
+        <h3 style="font-family: var(--font-title); font-size: 20px; text-transform: uppercase; margin-bottom: 2vh; color: var(--color-charcoal-text); letter-spacing: 0.04em;">INSPEÇÃO FÍSICA OBRIGATÓRIA</h3>
+        
+        <label class="check-item">
+          <input type="checkbox" class="chk-inspecao">
+          <span>Peça recebida fisicamente na loja</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" class="chk-inspecao">
+          <span>Costura e acabamentos conferidos</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" class="chk-inspecao">
+          <span>Peça condiz com as expectativas do briefing</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" class="chk-inspecao">
+          <span>História / Processo criativo revisado para a Tag</span>
+        </label>
+
+        <div class="action-bar">
+          <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
+            <button class="btn btn--primary" id="btn-aprovar" disabled>Aprovar e Finalizar</button>
+            <span class="helper-text" id="helper-aprovar" style="margin-top: 4px;">Conclua a inspeção para liberar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL M4: FINALIZAR (Fiel ao Figma 1) -->
+  <dialog class="modal" id="modal-finalizar">
+    <div class="modal__header">
+      <div class="modal__logo">CONTINUUM</div>
+      <h2 class="modal__title">Finalizar projeto</h2>
+    </div>
+    <div class="modal__body">
+      Deseja finalizar o projeto? Após confirmar, o QR code será enviado para impressão.
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary" id="btn-confirma-fim" style="padding: 1.5vh 3vw;">Confirmar e enviar</button>
+      <button class="btn btn--secondary" id="btn-cancela-fim">Cancelar</button>
+    </div>
+  </dialog>
+
+  <script src="revisao.js"></script>
+</body>
+</html>

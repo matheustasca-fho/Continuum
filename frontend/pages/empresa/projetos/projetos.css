@@ -1,0 +1,118 @@
+/* ==========================================================================
+   ESTILOS DA TELA DE PROJETOS (projetos.css)
+   ========================================================================== */
+.main-content{
+  flex: 1; padding: 6vh 4vw; max-width: 1200px;
+}
+
+.projects-page__header{
+  position:relative; margin-bottom:44px; padding:28px 30px 30px; border:1px solid rgba(120,39,54,.1);
+  border-radius:18px; background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(253,242,244,.48));
+  box-shadow:0 16px 38px rgba(45,55,72,.06); overflow:hidden;
+}
+.projects-page__eyebrow{ font-family: var(--font-title); font-size: max(12px, 0.8vw); color: var(--color-primary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5vh; margin-top: 0; }
+.projects-page__title{ font-family: var(--font-title); font-size: max(32px, 2.25vw); color: var(--color-charcoal-text); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; line-height: 1; }
+
+/* Busca Retrátil (Lupa que expande) */
+.search-expandable{
+  position: relative; width: 44px; height: 44px;
+  background: white; border: 1px solid var(--color-border); border-radius: 22px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+  overflow: hidden; display: flex; align-items: center; box-sizing: border-box;
+}
+.search-expandable:hover, .search-expandable:focus-within{
+  width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.search-expandable svg{
+  flex-shrink: 0; color: var(--color-charcoal-text); margin-left: 13px;
+  transition: color 0.3s ease;
+}
+.search-expandable:hover svg, .search-expandable:focus-within svg{
+  color: var(--color-primary);
+}
+.search-expandable input{
+  border: none; outline: none; background: transparent; width: calc(100% - 44px);
+  font-family: var(--font-body); font-size: 13px; color: var(--color-charcoal-text);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease; margin-left: 10px;
+}
+.search-expandable:hover input, .search-expandable:focus-within input{
+  opacity: 1; pointer-events: auto;
+}
+
+/* Retângulo de Fundo (White Board) */
+.board-container{
+  background-color: #EAEAE2; /* Tom mais harmônico escolhido pelo usuário */
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+/* Filtro Estilo Dropdown e Busca */
+.search-trigger input::placeholder{ color: var(--color-muted-text); }
+.search-trigger:focus-within{ border-color: var(--color-primary) !important; box-shadow: 0 0 0 2px var(--color-primary-light); }
+
+.filter-dropdown-container .dropdown-menu{
+  animation: fadeInDown var(--dur-fast) var(--ease-out);
+}
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.dropdown-item{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; cursor: pointer; color: var(--color-charcoal-text);
+  font-size: 13px; font-weight: 500; transition: background var(--dur-fast), color var(--dur-fast);
+  border-radius: 6px; margin: 0 8px;
+}
+.dropdown-item:hover, .dropdown-item--active{
+  background: var(--color-primary-light); color: var(--color-primary);
+}
+
+/* Grade de Projetos */
+.proj-grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+.proj-card{
+  background: var(--color-white); border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--color-border);
+  cursor: pointer; transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+  display: flex; flex-direction: column; animation: fadeInUp 0.5s var(--ease-out) backwards;
+}
+.proj-card:hover{ transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.proj-card__thumb{ height: 140px; border-bottom: 1px solid var(--color-border); background-color: var(--color-sand-offwhite); overflow: hidden; display: block; }
+.proj-card__thumb svg{ display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.proj-card__body{ padding: 20px; flex: 1; display: flex; flex-direction: column; }
+.proj-card__footer{ display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+
+/* Modal de Formulário (Substitui Drawer) */
+.modal-form{
+  margin: auto; padding: 32px; border: none; border-radius: 12px; background: var(--color-white);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15); width: 90vw; max-width: 520px;
+  text-align: left; opacity: 0; transform: scale(0.96); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.modal-form[open]{ opacity: 1; transform: scale(1); }
+.modal-form::backdrop{ background: rgba(35, 42, 53, 0.62); backdrop-filter: blur(2px); }
+.modal-form__header{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-form__title{ font-family: var(--font-title); font-size: 24px; color: var(--color-charcoal-text); letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
+.modal-form__close{ font-size: 20px; color: var(--color-charcoal-text); cursor: pointer; border: none; background: transparent; font-weight: bold; }
+
+.form-group{ margin-bottom: 20px; }
+.form-group label{ display: block; font-size: 13px; font-weight: 700; color: var(--color-charcoal-text); margin-bottom: 8px; }
+.form-control{
+  width: 100%; background-color: #F8F6F0; border: 1px solid var(--color-border); border-radius: 6px;
+  padding: 12px 14px; font-family: var(--font-body); font-size: 13px; color: var(--color-charcoal-text);
+  outline: none; transition: border-color var(--dur-fast);
+}
+.form-control:focus{ border-color: var(--color-primary); }
+.form-control:disabled, .form-control[readonly]{ opacity: 0.9; cursor: default; }
+.form-helper{ display: block; font-size: 11px; color: var(--color-muted-text); margin-top: 6px; }
+
+.modal-form__footer{
+  display: flex; justify-content: space-between; align-items: center; margin-top: 32px;
+}
+.modal-form__footer-right{ display: flex; gap: 12px; }
+
+.btn-form-danger{ background: #FDE8E8; color: #D32F2F; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.btn-form-cancel{ background: white; color: var(--color-charcoal-text); border: 1px solid var(--color-border); padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.btn-form-submit{ background: var(--color-primary); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s; }
+.btn-form-submit:hover{ background: var(--color-primary-hover); }

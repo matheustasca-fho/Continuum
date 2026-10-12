@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTINUUM — Geração de Tags</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="tag.css">
+</head>
+<body>
+
+  <!-- PAINEL DE CONTROLES (Não sai na impressão) -->
+  <aside class="controls-panel">
+    <div class="breadcrumb"><a href="../projetos/index.html">Projetos</a> › PRJ-05</div>
+    <h1 class="page-title">TAG DA PEÇA</h1>
+
+    <div class="form-group">
+      <label class="form-label">Tamanho da Tag</label>
+      <select class="form-select" id="tag-size">
+        <option value="40x80">Pequena (40 x 80 mm)</option>
+        <option value="60x100" selected>Média (60 x 100 mm)</option>
+        <option value="70x120">Grande (70 x 120 mm)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Quantidade para Impressão</label>
+      <input type="number" class="form-input" id="tag-qty" value="1" min="1" max="50">
+    </div>
+
+    <div class="form-group">
+      <label class="form-checkbox">
+        <input type="checkbox" id="tag-show-designer" checked>
+        Mostrar nome do Designer
+      </label>
+    </div>
+
+    <div style="margin-top: auto;">
+      <button class="btn btn--primary" onclick="window.print()">
+        <svg style="margin-right:8px" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Imprimir Tags
+      </button>
+      <a href="../peca-publica/index.html" class="btn btn--secondary" target="_blank" style="margin-bottom: 2vh;">Ver Página do QR Code</a>
+      <a href="../projetos/index.html" class="btn btn--secondary" style="border: none; color: var(--color-muted-text);">← Voltar aos Projetos</a>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE PRÉVIA / IMPRESSÃO -->
+  <main class="preview-canvas" id="canvas-area">
+    <!-- As tags são injetadas aqui pelo JS -->
+  </main>
+
+  <script src="tag.js"></script>
+</body>
+</html>

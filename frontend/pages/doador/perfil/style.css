@@ -1,0 +1,938 @@
+/* ==========================================================
+       TOKENS — Design System CONTINUUM Craft
+       ========================================================== */
+    :root{
+      --color-primary: #782736;
+      --color-primary-hover: #5e1e2a;
+      --color-primary-light: #FDF2F4;
+      --color-sand-offwhite: #F5F2EB;
+      --color-white: #FFFFFF;
+      --color-charcoal-text: #2D3748;
+      --color-muted-text: #718096;
+      --color-border: #E2E8F0;
+      --color-border-dark: #2D2D2D;
+      --color-error: #D32F2F;
+      --color-error-bg: #FDEDED;
+      --color-success: #2E7D32;
+      --color-warning: #ED6C02;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 50%;
+      --border-stitch: 2px dashed var(--color-primary);
+      --font-title: 'Anton', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-detail: 'Space Mono', monospace;
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-card-hover: 0 8px 24px rgba(120,39,54,0.1);
+      --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ==========================================================
+       RESET & BASE
+       ========================================================== */
+    *, *::before, *::after{ margin: 0; padding: 0; box-sizing: border-box; }
+    html{ scroll-behavior: smooth; }
+
+    body{
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--color-charcoal-text);
+      background-color: var(--color-sand-offwhite);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    :focus-visible{
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================
+       TEXTURA DE TECIDO — Background sutil
+       ========================================================== */
+    body::before{
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.025;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 14px,
+          var(--color-charcoal-text) 14px,
+          var(--color-charcoal-text) 15px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 14px,
+          var(--color-charcoal-text) 14px,
+          var(--color-charcoal-text) 15px
+        );
+    }
+
+    /* ==========================================================
+       APP LAYOUT
+       ========================================================== */
+    .app-layout{
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==========================================================
+       SIDEBAR — com costura decorativa
+       ========================================================== */
+    
+
+    /* Borda de costura da sidebar (efeito stitch animado) */
+    
+
+    @keyframes stitchSlide {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 28px; }
+    }
+
+    
+
+    
+
+    
+
+    /* Agulha decorativa ao lado da marca */
+    
+
+    
+
+    /* Separador tipo régua de costura */
+    
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    /* Rodapé sidebar — etiqueta de roupa */
+    
+
+    /* Furo de etiqueta */
+    
+
+    
+
+    /* ==========================================================
+       MAIN CONTENT
+       ========================================================== */
+    .main-content{
+      flex: 1;
+      padding: var(--space-2xl);
+      max-width: 1400px; /* Expansão do preenchimento da página */
+      margin: 0 auto;    /* Centraliza se a tela for muito grande */
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* ---- Page Header com animação de entrada ---- */
+    .page-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-lg);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: slideUp 0.6s 0.1s ease forwards;
+    }
+
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header__title{
+      font-family: var(--font-title);
+      font-size: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-charcoal-text);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .page-header__subtitle{
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-muted-text);
+    }
+
+    /* Etiqueta de perfil Animada (Pure CSS/HTML) */
+    .header-tag-container{
+      position: relative;
+      width: 140px;
+      height: 250px;
+      margin-top: -15px; /* Sobe um pouco para não empurrar muito o header */
+      flex-shrink: 0;
+      transform-origin: top center;
+      animation: swingTag 5s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    .header-tag-container:hover{
+      animation-play-state: paused;
+      transform: rotate(-3deg) scale(1.05);
+    }
+
+    @keyframes swingTag {
+      0%, 100% { transform: rotate(4deg); }
+      50%      { transform: rotate(-2deg); }
+    }
+
+    .safety-pin{
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 40px;
+      z-index: 5;
+    }
+
+    .clothing-tag{
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 230px;
+      background-color: #B93838; /* Vermelho queimado estilo a imagem */
+      box-shadow: 2px 4px 10px rgba(0,0,0,0.15), inset 0 0 40px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Textura sutil de papelão/kraft */
+      background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px),
+        repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px);
+    }
+
+    /* O topo arredondado da tag */
+    .clothing-tag::before{
+      content: '';
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 36px;
+      background-color: #B93838;
+      border-radius: 50%;
+      box-shadow: inset 0 20px 20px rgba(0,0,0,0.05);
+      z-index: -1;
+    }
+
+    /* O furo da tag */
+    .clothing-tag__hole{
+      width: 12px;
+      height: 12px;
+      background-color: var(--color-sand-offwhite);
+      border-radius: 50%;
+      margin-top: -6px; /* Para ficar bem no meio do hump */
+      box-shadow: inset 1px 2px 4px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.2);
+      z-index: 3;
+      position: relative;
+    }
+
+    .clothing-tag__content{
+      margin-top: 40px;
+      text-align: center;
+      color: #F5E6CC; /* Cor de areia/creme */
+      width: 100%;
+    }
+
+    .clothing-tag__title{
+      font-family: var(--font-title);
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      transform: scaleY(1.3); /* Alonga o texto para ficar idêntico à imagem */
+      margin-bottom: 12px;
+    }
+
+    .clothing-tag__subtitle{
+      font-family: var(--font-body);
+      font-size: 11px;
+      opacity: 0.95;
+    }
+
+    /* ==========================================================
+       PROFILE CARD — com efeito de retalho
+       ========================================================== */
+    .profile-card{
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      padding: var(--space-xl);
+      padding-bottom: calc(var(--space-xl) + 24px); /* Espaço extra para fita métrica */
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+      
+      /* Elementos gráficos de moda: Fita métrica no rodapé */
+      background-image: 
+        /* 1. Traços menores da fita métrica */
+        repeating-linear-gradient(to right, #2d2d2d 0, #2d2d2d 1px, transparent 1px, transparent 9px),
+        /* 2. Traços médios (meio cm) */
+        repeating-linear-gradient(to right, transparent 0, transparent 4px, #2d2d2d 4px, #2d2d2d 5px, transparent 5px, transparent 10px),
+        /* 3. Traços maiores (centímetros) */
+        repeating-linear-gradient(to right, #2d2d2d 0, #2d2d2d 2px, transparent 2px, transparent 50px),
+        /* 4. Fundo branco da fita métrica com borda sutil em cima */
+        linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.1) 1px, #ffffff 1px, #ffffff 100%);
+        
+      background-size: 
+        10px 8px,    /* Traços menores */
+        10px 14px,   /* Traços médios */
+        50px 24px,   /* Traços maiores */
+        100% 24px;   /* Fundo */
+        
+      background-position: 
+        bottom left, 
+        bottom left, 
+        bottom left, 
+        bottom left;
+        
+      background-repeat: 
+        repeat-x, 
+        repeat-x, 
+        repeat-x, 
+        no-repeat;
+    }
+
+
+    .profile-card:hover{
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    /* Canto de retalho (patch corner) */
+    .profile-card::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, transparent 50%, var(--color-primary-light) 50%);
+      border-bottom-left-radius: 6px;
+      opacity: 0.6;
+      transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    }
+
+    .profile-card:hover::before{
+      width: 52px;
+      height: 52px;
+      opacity: 1;
+    }
+
+    /* Costura decorativa no topo */
+    .profile-card::after{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: var(--space-xl);
+      right: var(--space-xl);
+      height: 2px;
+      background: repeating-linear-gradient(
+        to right,
+        var(--color-primary) 0px,
+        var(--color-primary) 6px,
+        transparent 6px,
+        transparent 10px
+      );
+      opacity: 0.2;
+    }
+
+    .profile-card__section-title{
+      font-family: var(--font-title);
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-charcoal-text);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .profile-card__section-title svg{
+      width: 18px;
+      height: 18px;
+      color: var(--color-primary);
+      transition: transform 0.4s var(--transition-spring);
+    }
+
+    .profile-card:hover .profile-card__section-title svg{
+      transform: rotate(-12deg);
+    }
+
+    .profile-card__section-badge{
+      font-family: var(--font-detail);
+      font-size: 10px;
+      color: var(--color-muted-text);
+      margin-left: auto;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 400;
+    }
+
+    /* ---- Avatar ---- */
+    .profile-card__avatar{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .avatar{
+      position: relative;
+      width: 170px;
+      height: 120px;
+    }
+
+    /* Borda externa vinho grossa */
+    .avatar__frame{
+      position: absolute;
+      inset: 0;
+      border-radius: 50%; /* Mantém formato oval por causa do width/height */
+      border: 12px solid #8E221E; /* Cor vinho escura da imagem */
+      z-index: 2;
+      pointer-events: none;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.15);
+    }
+
+    /* Pontilhados claros no meio da borda vinho */
+    .avatar__frame::after{
+      content: '';
+      position: absolute;
+      inset: -9px; /* Posiciona os pontos exatamente no centro dos 12px */
+      border-radius: 50%;
+      border: 3.5px dotted #F5F2EB; /* Pontos claros da imagem */
+    }
+
+    .avatar__circle{
+      position: absolute;
+      inset: 4px; /* Conteúdo interno fica protegido pela borda */
+      border-radius: 50%;
+      background-color: var(--color-sand-offwhite);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: transform 0.4s var(--transition-spring);
+    }
+
+    .avatar:hover .avatar__circle{
+      transform: scale(1.05);
+    }
+
+    .avatar__placeholder{
+      width: 44px;
+      height: 44px;
+      color: var(--color-muted-text);
+      transition: color 0.3s;
+    }
+
+    .avatar:hover .avatar__placeholder{
+      color: var(--color-primary);
+    }
+
+    .avatar__edit{
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      border: 2px solid var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.3s var(--transition-spring);
+    }
+
+    .avatar__edit:hover{
+      background-color: var(--color-primary-hover);
+      transform: scale(1.15) rotate(-10deg);
+    }
+
+    .avatar__edit svg{ width: 14px; height: 14px; }
+
+    .avatar__hint{
+      font-family: var(--font-detail);
+      font-size: 11px;
+      color: var(--color-primary);
+      margin-top: 10px;
+      opacity: 0.7;
+    }
+
+    /* ==========================================================
+       FORM COMPONENTS — com interações craft
+       ========================================================== */
+    .form-grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md) var(--space-lg);
+    }
+
+    .form-group{
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xs);
+      position: relative;
+    }
+
+    .form-group--full{ grid-column: 1 / -1; }
+
+    .form-label{
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-charcoal-text);
+      transition: color 0.2s;
+    }
+
+    .form-group:focus-within .form-label{
+      color: var(--color-primary);
+    }
+
+    .form-input,
+    .form-textarea{
+      width: 100%;
+      padding: 11px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-charcoal-text);
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+
+    .form-input:hover,
+    .form-textarea:hover{
+      border-color: #CBD5E0;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus{
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(120, 39, 54, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .form-input:disabled{
+      background-color: #EEEBE4;
+      color: var(--color-muted-text);
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+
+    .form-textarea{
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    .form-hint{
+      font-family: var(--font-detail);
+      font-size: 10px;
+      color: var(--color-primary);
+      margin-top: 2px;
+      opacity: 0.7;
+    }
+
+    .form-hint--muted{ color: var(--color-muted-text); }
+
+    .form-char-count{
+      font-family: var(--font-detail);
+      font-size: 10px;
+      color: var(--color-muted-text);
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    .form-group--error .form-input,
+    .form-group--error .form-textarea{
+      border-color: var(--color-error);
+      background-color: var(--color-error-bg);
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .form-message{
+      font-family: var(--font-detail);
+      font-size: 11px;
+      color: var(--color-error);
+    }
+
+    .form-section-divider{
+      border: none;
+      height: 2px;
+      margin: var(--space-lg) 0;
+      background: repeating-linear-gradient(
+        to right,
+        var(--color-primary) 0px,
+        var(--color-primary) 6px,
+        transparent 6px,
+        transparent 12px
+      );
+      opacity: 0.15;
+    }
+
+    .form-section-label{
+      font-family: var(--font-title);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-charcoal-text);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ==========================================================
+       SOCIAL INPUT PREFIX
+       ========================================================== */
+    .form-input-group{
+      display: flex;
+      align-items: stretch;
+    }
+
+    .form-input-group__prefix{
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      background-color: var(--color-sand-offwhite);
+      border: 1px solid var(--color-border);
+      border-right: none;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      font-family: var(--font-detail);
+      font-size: 12px;
+      color: var(--color-muted-text);
+      white-space: nowrap;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .form-input-group__prefix svg{
+      width: 16px;
+      height: 16px;
+      color: var(--color-muted-text);
+      transition: color 0.3s;
+    }
+
+    .form-input-group:focus-within .form-input-group__prefix{
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .form-input-group:focus-within .form-input-group__prefix svg{
+      color: var(--color-primary);
+    }
+
+    .form-input-group .form-input{
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    /* ==========================================================
+       TAG SELECTOR — com efeito de retalho
+       ========================================================== */
+    .tag-selector{ margin-top: var(--space-md); }
+
+    .tag-selector__label{
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-charcoal-text);
+      margin-bottom: var(--space-sm);
+      display: block;
+    }
+
+    .tag-selector__grid{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag-chip{ position: relative; }
+
+    .tag-chip__input{
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+
+    .tag-chip__label{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-charcoal-text);
+      background-color: var(--color-sand-offwhite);
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s var(--transition-spring);
+      user-select: none;
+    }
+
+    .tag-chip__label:hover{
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(120,39,54,0.1);
+    }
+
+    .tag-chip__check{
+      width: 14px; height: 14px;
+      display: none;
+      color: var(--color-white);
+    }
+
+    .tag-chip__input:checked + .tag-chip__label{
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-white);
+      border-style: dashed;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(120,39,54,0.2);
+    }
+
+    .tag-chip__input:checked + .tag-chip__label .tag-chip__check{
+      display: inline-block;
+    }
+
+    .tag-chip__input:focus-visible + .tag-chip__label{
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================
+       BUTTONS — com efeito de costura
+       ========================================================== */
+    .form-actions{
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: slideUp 0.6s 0.35s ease forwards;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 28px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s var(--transition-spring);
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn svg{ width: 16px; height: 16px; }
+
+    .btn--primary{
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+
+    .btn--primary:hover{
+      background-color: var(--color-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(120,39,54,0.25);
+    }
+
+    .btn--primary:active{
+      transform: translateY(0);
+    }
+
+    /* Efeito shimmer no botão primário */
+    .btn--primary::after{
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.15),
+        transparent
+      );
+      transition: none;
+    }
+
+    .btn--primary:hover::after{
+      animation: shimmer 0.8s forwards;
+    }
+
+    @keyframes shimmer {
+      to { left: 100%; }
+    }
+
+    .btn--stitched{
+      background-color: transparent;
+      color: var(--color-charcoal-text);
+      border: var(--border-stitch);
+    }
+
+    .btn--stitched:hover{
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(120,39,54,0.1);
+    }
+
+    /* ==========================================================
+       THREAD TRAIL — fio decorativo flutuante
+       ========================================================== */
+    .thread-trail{
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    /* ==========================================================
+       TOAST NOTIFICATION
+       ========================================================== */
+    .toast{
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      padding: 14px 24px;
+      background-color: var(--color-charcoal-text);
+      color: var(--color-white);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10000;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.4s var(--transition-spring);
+      border-left: 4px solid var(--color-success);
+    }
+
+    .toast--visible{
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast svg{ width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ==========================================================
+       MOBILE
+       ========================================================== */
+    
+
+    
+
+    
+
+    
+
+    @media (max-width: 1024px) {
+      
+
+      
+
+      
+      .main-content{ padding: 72px 24px 40px; }
+
+      .page-header{ flex-direction: column; gap: 12px; }
+    }
+
+    @media (max-width: 768px) {
+      .main-content{ padding: 68px 16px 32px; }
+      .page-header__title{ font-size: 26px; }
+      .profile-card{ padding: var(--space-lg) var(--space-md); }
+      .form-grid{ grid-template-columns: 1fr; }
+
+      .tabs__btn{
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+
+      .tabs__btn-label{ display: none; }
+      .tabs__btn-icon{ width: 20px; height: 20px; }
+
+      .form-actions{
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn{ justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .main-content{ padding: 62px 12px 24px; }
+      .page-header__title{ font-size: 22px; }
+      .profile-card{ padding: var(--space-md) var(--space-sm); }
+      .avatar{ width: 130px; height: 90px; }
+    }
