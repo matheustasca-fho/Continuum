@@ -1010,3 +1010,12 @@
       .profile-card{ padding: var(--space-md) var(--space-sm); }
       .avatar{ width: 130px; height: 90px; }
     }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.u-mb-lg.u-mb-lg {
+  margin-bottom: var(--space-lg);
+}

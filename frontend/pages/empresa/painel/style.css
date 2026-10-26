@@ -456,3 +456,62 @@
     gap: var(--space-lg);
   }
 }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.eyebrow-label.eyebrow-label {
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.project-card__img--sand.project-card__img--sand {
+  background-color: var(--color-sand-deep);
+}
+
+.project-card__icon.project-card__icon {
+  width: 24px;
+  opacity: 0.5;
+}
+
+.banner-content--full.banner-content--full {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.banner-row.banner-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.banner-title.banner-title {
+  color: var(--color-sand-offwhite);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.banner-copy.banner-copy {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-bottom: 32px;
+  max-width: 600px;
+  color: #fff;
+}
+
+.btn--on-dark.btn--on-dark {
+  background-color: var(--color-white);
+  color: var(--color-charcoal-text);
+}
+
+.impact-number--light.impact-number--light {
+  color: #fff;
+}

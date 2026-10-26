@@ -10,17 +10,18 @@
  *
  * Dispara o evento "header:ready" no document quando a navbar é montada.
  */
-(function () {
+(() => {
   'use strict';
 
-  var script = document.currentScript;
-  var host = document.getElementById('appHeader');
+  const script = document.currentScript;
+  const host = document.getElementById('appHeader');
   if (!host || !script) return;
 
-  var ROOT = new URL('../../', script.src); // raiz do frontend-final/
-  var SESSION_KEY = 'continuum_sessao';
+  const ROOT = new URL('../../', script.src); // raiz do frontend-final/
+  const SESSION_KEY = 'continuum_sessao';
+  const DEFAULT_ROLE = 'designer';
 
-  var ICONS = {
+  const ICONS = {
     pattern: '<path d="M4 4h12c2.2 0 4 1.8 4 4v12H4V4Z"/><path d="M4 12h16M12 4v16" stroke-dasharray="3 2"/>',
     spool: '<rect x="5" y="3" width="14" height="3" rx="1"/><rect x="5" y="18" width="14" height="3" rx="1"/><path d="M7 6v12M17 6v12M7 9h10M7 12h10M7 15h10"/>',
     scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="m8.5 7.5 11.5 11.5M8.5 16.5 20 5"/>',
@@ -28,7 +29,7 @@
     mannequin: '<line x1="12" y1="17" x2="12" y2="22"/><path d="M9 22H15"/><path d="M8 4C8 3 9.5 2 12 2C14.5 2 16 3 16 4C16 7 18 9 17 12C16 14.5 14 17 12 17C10 17 8 14.5 7 12C6 9 8 7 8 4Z"/>'
   };
 
-  var ROLES = {
+  const ROLES = {
     designer: {
       sublogo: 'Designer / Confeccionista',
       links: [
@@ -57,64 +58,94 @@
     }
   };
 
-  function readSession() {
-    try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null; } catch (e) { return null; }
-  }
+  const readSession = () => {
+    try {
+      return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || null;
+    } catch (error) {
+      return null;
+    }
+  };
 
-  var session = readSession();
-  var role = host.dataset.role || (session && session.perfil) || 'designer';
-  var config = ROLES[role] || ROLES.designer;
-  var active = host.dataset.active || '';
+  const session = readSession();
+  const role = host.dataset.role || session?.perfil || DEFAULT_ROLE;
+  const config = ROLES[role] || ROLES[DEFAULT_ROLE];
+  const active = host.dataset.active || '';
 
-  function buildNav(nav) {
-    config.links.forEach(function (item) {
-      var a = document.createElement('a');
-      a.className = 'sidebar__link';
-      a.href = new URL(item.href, ROOT).href;
-      if (item.key === active) a.setAttribute('aria-current', 'page');
-      a.innerHTML = '<svg class="sidebar__icon" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[item.icon] + '</svg>' +
-        '<span>' + item.label + '</span>' +
-        (item.badgeId ? '<span class="sidebar__badge" id="' + item.badgeId + '" style="display:none">0</span>' : '');
-      nav.appendChild(a);
+  const createNavLink = (item) => {
+    const link = document.createElement('a');
+    link.className = 'sidebar__link';
+    link.href = new URL(item.href, ROOT).href;
+    if (item.key === active) link.setAttribute('aria-current', 'page');
+
+    const badge = item.badgeId
+      ? `<span class="sidebar__badge" id="${item.badgeId}" style="display:none">0</span>`
+      : '';
+    link.innerHTML =
+      `<svg class="sidebar__icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[item.icon]}</svg>` +
+      `<span>${item.label}</span>${badge}`;
+    return link;
+  };
+
+  const buildNav = (nav) => {
+    config.links.forEach((item) => nav.appendChild(createNavLink(item)));
+  };
+
+  const setupLogo = () => {
+    const logo = host.querySelector('[data-header-logo]');
+    if (!logo) return;
+
+    if (role === 'empresa') {
+      logo.style.display = 'none';
+      return;
+    }
+    logo.src = new URL('assets/images/logo-circular.png', ROOT).href;
+    logo.style.display = '';
+  };
+
+  const setupLogout = () => {
+    const logout = host.querySelector('[data-header-logout]');
+    if (!logout) return;
+
+    logout.href = new URL('pages/auth/login/index.html', ROOT).href;
+    logout.addEventListener('click', () => {
+      try {
+        sessionStorage.removeItem(SESSION_KEY);
+      } catch (error) { /* ignore */ }
     });
-  }
+  };
 
-  function mount(html) {
+  const setupSidebarToggle = () => {
+    const layout = document.querySelector('.app-layout');
+    const toggle = host.querySelector('#sidebarToggle');
+    const restore = host.querySelector('#sidebarRestore');
+    if (!layout || !toggle || !restore) return;
+
+    toggle.addEventListener('click', () => layout.classList.add('sidebar-collapsed'));
+    restore.addEventListener('click', () => layout.classList.remove('sidebar-collapsed'));
+  };
+
+  const mount = (html) => {
     host.innerHTML = html;
 
-    var logo = host.querySelector('[data-header-logo]');
-    if (logo) logo.src = new URL('assets/images/logo-circular.png', ROOT).href;
+    setupLogo();
 
-    var sub = host.querySelector('[data-header-sublogo]');
-    if (sub) sub.textContent = config.sublogo;
+    const sublogo = host.querySelector('[data-header-sublogo]');
+    if (sublogo) sublogo.textContent = config.sublogo;
 
-    var user = host.querySelector('[data-header-user]');
-    if (user && session && session.nome) user.textContent = session.nome;
+    const user = host.querySelector('[data-header-user]');
+    if (user && session?.nome) user.textContent = session.nome;
 
-    var nav = host.querySelector('[data-header-nav]');
+    const nav = host.querySelector('[data-header-nav]');
     if (nav) buildNav(nav);
 
-    var logout = host.querySelector('[data-header-logout]');
-    if (logout) {
-      logout.href = new URL('pages/auth/login/index.html', ROOT).href;
-      logout.addEventListener('click', function () {
-        try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
-      });
-    }
-
-    var layout = document.querySelector('.app-layout');
-    var toggle = host.querySelector('#sidebarToggle');
-    var restore = host.querySelector('#sidebarRestore');
-    if (layout && toggle && restore) {
-      toggle.addEventListener('click', function () { layout.classList.add('sidebar-collapsed'); });
-      restore.addEventListener('click', function () { layout.classList.remove('sidebar-collapsed'); });
-    }
+    setupLogout();
+    setupSidebarToggle();
 
     document.dispatchEvent(new CustomEvent('header:ready'));
-  }
+  };
 
   fetch(new URL('header.html', script.src))
-    .then(function (res) { return res.text(); })
+    .then((res) => res.text())
     .then(mount)
-    .catch(function () { mount('<p>Navegação indisponível.</p>'); });
+    .catch(() => mount('<p>Navegação indisponível.</p>'));
 })();

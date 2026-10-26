@@ -22,18 +22,18 @@
     
 
     <!-- ================= MAIN ================= -->
-    <main class="main-content" style="flex:1;">
+    <main class="main-content main-content--grow">
       
-      <div class="projects-page__header">
+      <div class="projects-page__header animate-slide-up">
         <p class="projects-page__eyebrow">GESTÃO DE DESIGN</p>
         <h1 class="projects-page__title">PROJETOS</h1>
       </div>
 
       <!-- Retângulo de Fundo Branco -->
-      <div class="board-container">
+      <div class="board-container animate-slide-up delay-1">
         
         <!-- HEADER DO BOARD COM A BUSCA E FILTRO -->
-        <div class="actions-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="actions-header actions-header--spread">
           <!-- Busca Retrátil Estilo Original -->
           <div class="search-expandable">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -41,31 +41,43 @@
           </div>
 
           <!-- Filtro Estilo Colega -->
-          <div class="filter-dropdown-container" style="position: relative;">
-            <button id="filtro-btn" class="btn btn--outline" style="background: white; border: 1px solid var(--color-border); color: var(--color-charcoal-text); display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-md);">
+          <div class="filter-dropdown-container u-relative">
+            <button id="filtro-btn" class="btn btn--outline btn--filter">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
               <span id="filtro-texto">Todos os status</span>
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             
-            <div class="dropdown-menu dropdown-menu--filter" id="dropdown-menu-box" style="display: none; position: absolute; top: 110%; right: 0; background: white; border: 1px solid var(--color-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 220px; z-index: 10;">
-              <div style="font-size: 10px; font-weight: bold; letter-spacing: 0.1em; color: var(--color-muted-text); padding: 12px 16px 8px; text-transform: uppercase;">Filtrar por Status</div>
-              <ul id="filter-menu" style="list-style: none; padding: 0 0 8px 0; margin: 0;">
+            <div class="dropdown-menu dropdown-menu--filter filter-panel" id="dropdown-menu-box" style="display: none;">
+              <div class="filter-panel__heading">Filtrar por Status</div>
+              <ul class="filter-panel__list" id="filter-menu">
                 <li class="dropdown-item dropdown-item--active" data-status="TODOS">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#68758a" stroke-width="2"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>
                   Todos os status
                 </li>
+                <li class="dropdown-item" data-status="DISPONIVEL">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4f8a47" stroke-width="2"><path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg>
+                  Disponível
+                </li>
+                <li class="dropdown-item" data-status="RESERVADO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b95658" stroke-width="2"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z"/></svg>
+                  Reservado
+                </li>
                 <li class="dropdown-item" data-status="EM_PRODUCAO">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D4A017" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                  Em Andamento
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a67b43" stroke-width="2"><path d="M3 21V10l6 5v-5l6 5V8h6v13H3z"/><path d="M18 4h3M7 19h.01M12 19h.01M17 19h.01"/></svg>
+                  Em Produção
+                </li>
+                <li class="dropdown-item" data-status="ENVIADO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#719a45" stroke-width="2"><path d="M3 12h12m-5-5 5 5-5 5"/><path d="M15 5h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"/></svg>
+                  Enviado
+                </li>
+                <li class="dropdown-item" data-status="FINALIZADO">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b4546c" stroke-width="2"><path d="m5 12 4 4L19 6"/><path d="M21 12a9 9 0 1 1-2.64-6.36"/></svg>
+                  Finalizado
                 </li>
                 <li class="dropdown-item" data-status="EXCEDIDO">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--color-error)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   Prazo Excedido
-                </li>
-                <li class="dropdown-item" data-status="FINALIZADO">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  Finalizado
                 </li>
               </ul>
             </div>
@@ -99,10 +111,10 @@
   <dialog class="modal" id="modal-acao" aria-labelledby="modal-title">
     <div class="modal__header">
       <div class="modal__logo">CONTINUUM</div>
-      <h2 class="modal__title" id="modal-title" style="font-family: var(--font-body); font-size: 20px; font-weight: bold;">Finalizar projeto</h2>
+      <h2 class="modal__title modal__title--plain" id="modal-title">Finalizar projeto</h2>
     </div>
     <div class="modal__body">
-      <p class="modal__text" id="modal-desc" style="color: var(--color-muted-text); font-size: 14px; line-height: 1.5;">
+      <p class="modal__text modal__text--muted" id="modal-desc">
         Deseja finalizar o projeto? Após confirmar, o QR code será enviado para impressão.
       </p>
     </div>

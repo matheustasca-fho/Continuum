@@ -485,3 +485,19 @@ h2, .text-subtitle {
 /* Radio Card (variante com __content) */
 .radio-card__content { padding: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md); transition: all var(--dur-fast); }
 .radio-card input:checked + .radio-card__content { border-color: var(--color-primary); background: var(--color-primary-light); }
+
+/* Animações Corporativas de Entrada */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slideUp 0.6s var(--ease-out) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+

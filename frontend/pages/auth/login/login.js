@@ -96,27 +96,69 @@ document.addEventListener('DOMContentLoaded', () => {
     option.addEventListener('click', () => setProfile(option.value));
   });
 
+  const eyeOpenIcon = passwordToggle.querySelector('.icon-eye-open');
+  const eyeClosedIcon = passwordToggle.querySelector('.icon-eye-closed');
+  const helpClose = document.getElementById('loginHelpClose');
+  let helpTimeout = null;
+
+  const closeHelp = () => {
+    if (helpTimeout) {
+      clearTimeout(helpTimeout);
+      helpTimeout = null;
+    }
+    helpButton.setAttribute('aria-expanded', 'false');
+    helpMessage.hidden = true;
+  };
+
+  const openHelp = () => {
+    helpButton.setAttribute('aria-expanded', 'true');
+    helpMessage.hidden = false;
+    if (helpTimeout) clearTimeout(helpTimeout);
+    helpTimeout = setTimeout(() => {
+      closeHelp();
+    }, 5000);
+  };
+
   passwordToggle.addEventListener('click', () => {
     const showPassword = password.type === 'password';
     password.type = showPassword ? 'text' : 'password';
-    passwordToggle.textContent = showPassword ? 'Ocultar' : 'Mostrar';
     passwordToggle.setAttribute('aria-pressed', String(showPassword));
+    if (eyeOpenIcon && eyeClosedIcon) {
+      eyeOpenIcon.style.display = showPassword ? 'none' : 'block';
+      eyeClosedIcon.style.display = showPassword ? 'block' : 'none';
+    }
   });
 
   forgotPassword.addEventListener('click', () => {
     status.textContent = 'A recuperação de senha ainda não está disponível nesta tela.';
   });
 
-  helpButton.addEventListener('click', () => {
+  helpButton.addEventListener('click', (e) => {
+    e.stopPropagation();
     const isExpanded = helpButton.getAttribute('aria-expanded') === 'true';
-    helpButton.setAttribute('aria-expanded', String(!isExpanded));
-    helpMessage.hidden = isExpanded;
+    if (isExpanded) {
+      closeHelp();
+    } else {
+      openHelp();
+    }
+  });
+
+  if (helpClose) {
+    helpClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeHelp();
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!helpButton.contains(e.target) && !helpMessage.contains(e.target)) {
+      closeHelp();
+    }
   });
 
   helpButton.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      helpButton.setAttribute('aria-expanded', 'false');
-      helpMessage.hidden = true;
+      closeHelp();
     }
   });
 

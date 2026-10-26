@@ -19,53 +19,58 @@
           <span class="signup-card__brand-name">CONTINUUM</span>
           <span class="signup-card__brand-tagline">ECONOMIA CIRCULAR · UPCYCLING · MODA</span>
         </a>
-        <span class="signup-card__seam" aria-hidden="true"></span>
-        <p class="signup-card__eyebrow">UM NOVO CICLO COMEÇA AQUI</p>
         <h1 id="signup-card-title" class="signup-card__title">Cadastro Doador</h1>
         <p class="signup-card__description">Crie sua conta e dê um novo destino aos materiais.</p>
       </header>
 
-      <form id="formCadastroConta" class="signup-form">
+      <form id="formCadastroConta" class="signup-form" novalidate>
         <div class="signup-form__field">
-          <label class="signup-form__label" for="cpfDoador">CPF <span class="signup-form__required">Obrigatório</span></label>
-          <input class="form-input signup-form__input" type="text" id="cpfDoador" name="CPF" placeholder="Somente números" inputmode="numeric" autocomplete="off" minlength="11" maxlength="11" pattern="[0-9]{11}" aria-describedby="cpfAjuda" required />
-          <p id="cpfAjuda" class="signup-form__hint" aria-live="polite">Informe os 11 dígitos, sem pontos ou traço.</p>
+          <label class="signup-form__label" for="cpfDoador">CPF <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="text" id="cpfDoador" name="CPF" placeholder="CPF" inputmode="numeric" autocomplete="off" maxlength="14" aria-describedby="cpfAjuda" required />
+          <p id="cpfAjuda" class="signup-form__hint" aria-live="polite" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
-          <label class="signup-form__label" for="cepDoador">CEP <span class="signup-form__required">Obrigatório</span></label>
-          <input class="form-input signup-form__input" type="text" id="cepDoador" name="CEP" placeholder="Somente números" inputmode="numeric" autocomplete="postal-code" minlength="8" maxlength="8" pattern="[0-9]{8}" aria-describedby="cepAjuda" required />
-          <p id="cepAjuda" class="signup-form__hint">Informe os 8 dígitos, sem hífen.</p>
+          <label class="signup-form__label" for="cepDoador">CEP <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="text" id="cepDoador" name="CEP" placeholder="CEP" inputmode="numeric" autocomplete="postal-code" maxlength="9" aria-describedby="cepAjuda" required />
+          <p id="cepAjuda" class="signup-form__hint" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
-          <label class="signup-form__label" for="senhaUsuario">Senha <span class="signup-form__required">Obrigatório</span></label>
+          <label class="signup-form__label" for="senhaUsuario">Senha <span class="signup-form__required">*</span></label>
           <div class="signup-form__password-wrap">
-            <input class="form-input signup-form__input" type="password" id="senhaUsuario" name="SENHA_DOADOR" placeholder="Até 10 caracteres" autocomplete="new-password" maxlength="10" aria-describedby="senhaAjuda" required />
-            <button class="signup-form__password-toggle" type="button" aria-controls="senhaUsuario" aria-pressed="false">Mostrar</button>
+            <input class="form-input signup-form__input" type="password" id="senhaUsuario" name="SENHA_DOADOR" placeholder="Senha" autocomplete="new-password" aria-describedby="senhaAjuda" required />
+            <button class="signup-form__password-toggle" type="button" aria-controls="senhaUsuario" aria-pressed="false" aria-label="Mostrar ou ocultar senha">
+              <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
           </div>
-          <p id="senhaAjuda" class="signup-form__hint">Máximo de 10 caracteres.</p>
+          <p id="senhaAjuda" class="signup-form__hint" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
-          <label class="signup-form__label" for="nomeDoador">Nome completo <span class="signup-form__required">Obrigatório</span></label>
-          <input class="form-input signup-form__input" type="text" id="nomeDoador" name="NM_DOADOR" placeholder="Digite seu nome completo" autocomplete="name" maxlength="30" required />
+          <label class="signup-form__label" for="nomeDoador">Nome completo <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="text" id="nomeDoador" name="NM_DOADOR" placeholder="Nome completo" autocomplete="name" maxlength="60" required />
         </div>
 
         <div class="signup-form__field">
-          <label class="signup-form__label" for="telefoneDoador">Telefone <span class="signup-form__required">Obrigatório</span></label>
-          <input class="form-input signup-form__input" type="tel" id="telefoneDoador" name="TELEFONE" placeholder="Somente números" inputmode="numeric" autocomplete="tel-national" minlength="11" maxlength="11" pattern="[0-9]{11}" aria-describedby="telefoneAjuda" required />
-          <p id="telefoneAjuda" class="signup-form__hint">Informe DDD + número, com 11 dígitos.</p>
+          <label class="signup-form__label" for="telefoneDoador">Telefone <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="tel" id="telefoneDoador" name="TELEFONE" placeholder="(XX) XXXXX-XXXX" autocomplete="tel" maxlength="15" aria-describedby="telefoneAjuda" required />
+          <p id="telefoneAjuda" class="signup-form__hint">Informe o DDD entre parênteses, com até 11 dígitos. Ex: (11) 98765-4321</p>
         </div>
 
         <button class="btn btn--primary btn--full signup-form__submit" type="submit">Cadastrar-se <span aria-hidden="true">↗</span></button>
+        <div class="signup-card__footer-centered">
+          <p>Já tem uma conta? <a href="../../login/index.html" class="signup-card__login-link">Entrar</a></p>
+        </div>
         <p class="signup-form__status" id="cadastroStatus" role="status" aria-live="polite"></p>
       </form>
-
-      <footer class="signup-card__footer">
-        <p>Já tem uma conta? <a href="../../login/index.html" class="signup-card__login-link">Entrar</a></p>
-        <span class="signup-card__footer-note">FEITO PARA CIRCULAR</span>
-      </footer>
     </section>
 
     <p class="signup-page__signature"><span aria-hidden="true">✳</span> CADA PEÇA PODE CONTINUAR DE UM JEITO DIFERENTE</p>

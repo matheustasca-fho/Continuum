@@ -15,7 +15,7 @@
 
   <!-- HEADER -->
   <header class="header-bar">
-    <a href="../projeto-detalhe/index.html" class="btn btn--secondary" style="padding: 0.5vh 1vw;">← Voltar</a>
+    <a href="../projeto-detalhe/index.html" class="btn btn--secondary btn--compact">← Voltar</a>
     <div class="breadcrumb">Projetos › PRJ-05 › Revisão de Peça</div>
   </header>
 
@@ -47,7 +47,7 @@
 
       <!-- Checklist de Liberação -->
       <div class="checklist">
-        <h3 style="font-family: var(--font-title); font-size: 20px; text-transform: uppercase; margin-bottom: 2vh; color: var(--color-charcoal-text); letter-spacing: 0.04em;">INSPEÇÃO FÍSICA OBRIGATÓRIA</h3>
+        <h3 class="inspection-title">INSPEÇÃO FÍSICA OBRIGATÓRIA</h3>
         
         <label class="check-item">
           <input type="checkbox" class="chk-inspecao">
@@ -67,9 +67,9 @@
         </label>
 
         <div class="action-bar">
-          <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%;">
+          <div class="approve-actions">
             <button class="btn btn--primary" id="btn-aprovar" disabled>Aprovar e Finalizar</button>
-            <span class="helper-text" id="helper-aprovar" style="margin-top: 4px;">Conclua a inspeção para liberar</span>
+            <span class="helper-text u-mt-xs" id="helper-aprovar">Conclua a inspeção para liberar</span>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@
       Deseja finalizar o projeto? Após confirmar, o QR code será enviado para impressão.
     </div>
     <div class="modal__footer">
-      <button class="btn btn--primary" id="btn-confirma-fim" style="padding: 1.5vh 3vw;">Confirmar e enviar</button>
+      <button class="btn btn--primary btn--roomy" id="btn-confirma-fim">Confirmar e enviar</button>
       <button class="btn btn--secondary" id="btn-cancela-fim">Cancelar</button>
     </div>
   </dialog>
