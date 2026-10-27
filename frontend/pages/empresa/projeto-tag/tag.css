@@ -88,3 +88,25 @@ button, input, select { font: inherit; }
   .tag-container { box-shadow: none; border-color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .tag-hole { border-color: #000; background: white; }
 }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.u-mt-auto.u-mt-auto {
+  margin-top: auto;
+}
+
+.u-mr-sm.u-mr-sm {
+  margin-right: 8px;
+}
+
+.u-mb-lg.u-mb-lg {
+  margin-bottom: 2vh;
+}
+
+.btn--quiet.btn--quiet {
+  border: none;
+  color: var(--color-muted-text);
+}

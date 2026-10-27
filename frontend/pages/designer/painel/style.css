@@ -1288,3 +1288,126 @@
       padding: 6px 16px;
       font-size: 13px;
     }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.dash-card__texture.dash-card__texture {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.page-header--centered.page-header--centered {
+  align-items: center;
+}
+
+.impact-banner--jeans.impact-banner--jeans {
+  background-image: url('../../../assets/images/tecido-jeans.jpg');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.impact-banner__overlay.impact-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.impact-banner__machine.impact-banner__machine {
+  position: absolute;
+  right: 5%;
+  bottom: -20px;
+  height: 130%;
+  object-fit: contain;
+  opacity: 0.2;
+  transform: rotate(5deg);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.impact-banner__content.impact-banner__content {
+  position: relative;
+  z-index: 2;
+}
+
+.impact-banner__title.impact-banner__title {
+  color: var(--color-primary-light);
+  margin-bottom: 8px;
+}
+
+.impact-banner__copy.impact-banner__copy {
+  font-family: var(--font-body);
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 24px;
+  max-width: 600px;
+  color: #fff;
+}
+
+.impact-number--light.impact-number--light {
+  color: #fff;
+}
+
+.u-mt-xl.u-mt-xl {
+  margin-top: var(--space-xl);
+}
+
+.dash-card--textured.dash-card--textured {
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.dash-card__texture--listrado.dash-card__texture--listrado {
+  background-image: url('../../../assets/images/tecido-listrado.jpg');
+}
+
+.dash-card__texture--jeans.dash-card__texture--jeans {
+  background-image: url('../../../assets/images/tecido-jeans.jpg');
+}
+
+.dash-card__texture--veludo.dash-card__texture--veludo {
+  background-image: url('../../../assets/images/tecido-veludo.jpg');
+}
+
+.dash-card__body.dash-card__body {
+  position: relative;
+  z-index: 1;
+}
+
+.section-header.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--space-md);
+}
+
+.u-mb-0.u-mb-0 {
+  margin-bottom: 0;
+}
+
+.link-more.link-more {
+  font-family: var(--font-detail);
+  font-size: 11px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.btn--compact.btn--compact {
+  padding: 6px 16px;
+  font-size: 13px;
+}
+
+.btn--roomy.btn--roomy {
+  padding: 12px 24px;
+}

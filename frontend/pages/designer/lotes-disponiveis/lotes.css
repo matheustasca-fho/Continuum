@@ -162,3 +162,222 @@
   .toolbar{ flex-direction: column; align-items: stretch; }
   .toolbar__actions{ justify-content: flex-end; }
 }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.main-content--lotes.main-content--lotes {
+  flex: 1;
+  padding: max(20px, 3vw) max(20px, 4vw);
+  position: relative;
+}
+
+.u-mt-lg.u-mt-lg {
+  margin-top: 24px;
+}
+
+.actions-header--spread.actions-header--spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.u-relative.u-relative {
+  position: relative;
+}
+
+.btn--filter.btn--filter {
+  background: white;
+  border: 1px solid var(--color-border);
+  color: var(--color-charcoal-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+}
+
+.filter-menu.filter-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 8px 0;
+  list-style: none;
+  z-index: 10;
+  min-width: 200px;
+  margin-top: 4px;
+}
+
+.dropdown-item--separated.dropdown-item--separated {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.u-w-60.u-w-60 {
+  width: 60%;
+}
+
+.error-text.error-text {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-error);
+  margin-top: 8px;
+}
+
+.drawer--top.drawer--top {
+  z-index: 101;
+}
+
+.briefing-text--spaced.briefing-text--spaced {
+  margin-bottom: 3vh;
+}
+
+.hint-text.hint-text {
+  font-size: 12px;
+  color: var(--color-muted-text);
+  margin-top: 8px;
+}
+
+.u-text-left.u-text-left {
+  text-align: left;
+}
+
+.modal__text--callout.modal__text--callout {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--color-sand-offwhite);
+  border-radius: var(--radius-md);
+}
+
+.u-text-charcoal.u-text-charcoal {
+  color: var(--color-charcoal-text);
+}
+
+.u-mb-md.u-mb-md {
+  margin-bottom: 16px;
+}
+
+.u-text-primary.u-text-primary {
+  color: var(--color-primary);
+}
+
+.modal__text--emphasis.modal__text--emphasis {
+  margin-bottom: 24px;
+  font-weight: 500;
+  color: var(--color-charcoal-text);
+}
+
+.checkbox-label.checkbox-label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-label__input.checkbox-label__input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.checkbox-label__text.checkbox-label__text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal__subtitle.modal__subtitle {
+  margin-bottom: 8px;
+  color: var(--color-charcoal-text);
+}
+
+.u-text-sm.u-text-sm {
+  font-size: 12px;
+}
+
+.modal__row.modal__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.badge--success.badge--success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.modal__body--centered.modal__body--centered {
+  padding-top: 4vh;
+  text-align: center;
+}
+
+.reservation-tag.reservation-tag {
+  margin: 0 auto 24px;
+  width: 80px;
+  height: 100px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 32px;
+  box-shadow: 0 10px 20px rgba(120, 39, 54, 0.3);
+  transform-origin: top center;
+}
+
+.u-mb-sm.u-mb-sm {
+  margin-bottom: 8px;
+}
+
+.modal__text--note.modal__text--note {
+  font-size: 12px;
+  padding: 12px;
+  background: var(--color-sand-offwhite);
+  border-radius: 4px;
+}
+
+.modal__footer--stacked.modal__footer--stacked {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.u-w-full.u-w-full {
+  width: 100%;
+}
+
+.btn--link.btn--link {
+  width: 100%;
+  border: none;
+  background: transparent;
+}
+
+.u-text-error.u-text-error {
+  color: var(--color-error);
+}
+
+.modal__text--code.modal__text--code {
+  font-size: 13px;
+  font-family: var(--font-detail);
+  padding: 12px;
+  background: var(--color-sand-offwhite);
+  border-left: 3px solid var(--color-error);
+}
+
+.dev-toggle.dev-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0.1;
+  z-index: 9999;
+}

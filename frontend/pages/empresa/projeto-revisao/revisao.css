@@ -62,3 +62,36 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 800px) {
   .main-grid { grid-template-columns: 1fr; gap: 4vh; }
 }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.btn--compact.btn--compact {
+  padding: 0.5vh 1vw;
+}
+
+.inspection-title.inspection-title {
+  font-family: var(--font-title);
+  font-size: 20px;
+  text-transform: uppercase;
+  margin-bottom: 2vh;
+  color: var(--color-charcoal-text);
+  letter-spacing: 0.04em;
+}
+
+.approve-actions.approve-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.u-mt-xs.u-mt-xs {
+  margin-top: 4px;
+}
+
+.btn--roomy.btn--roomy {
+  padding: 1.5vh 3vw;
+}

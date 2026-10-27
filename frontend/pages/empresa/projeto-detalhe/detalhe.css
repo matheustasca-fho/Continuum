@@ -80,3 +80,43 @@ a{ text-decoration: none; color: inherit; }
   .main-content{ grid-template-columns: 1fr; }
   
 }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.badge--inline.badge--inline {
+  vertical-align: middle;
+  margin-left: 1vw;
+}
+
+.briefing-copy.briefing-copy {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 2vh;
+}
+
+.u-text-muted.u-text-muted {
+  color: var(--color-muted-text);
+}
+
+.designer-name.designer-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.badge--tiny.badge--tiny {
+  font-size: 8px;
+}
+
+.designer-email.designer-email {
+  font-size: 13px;
+  color: var(--color-muted-text);
+  margin-bottom: 10px;
+}
+
+.btn--block-sm.btn--block-sm {
+  width: 100%;
+  font-size: 12px;
+}

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -16,18 +16,17 @@
 <div class="app-layout">
   <div id="appHeader" data-role="empresa" data-active="lotes"></div>
   <main class="main-content">
-    <header class="page-header">
+    <header class="page-header animate-slide-up">
       <div class="lots-page-heading">
         <p class="page-eyebrow">GEST&Atilde;O DE LOTES T&Ecirc;XTEIS</p>
         <h1 class="text-display">MEUS LOTES</h1>
       </div>
     </header>
-    <section class="lots-container">
+    <section class="lots-container animate-slide-up delay-1">
       <div class="filter-wrapper">
-        <button type="button" class="search-toggle" id="searchToggle" aria-label="Abrir pesquisa" title="Pesquisar lotes" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m16.5 16.5 4 4"/></svg></button>
-        <div class="filter-trigger" id="filterTrigger" hidden>
-          <svg viewBox="0 0 24 24" width="1.1vw" height="1.1vw" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="filterSearchInput" class="filter-search-input" placeholder="Buscar por cÃ³digo ou descriÃ§Ã£o" autocomplete="off" aria-label="Pesquisar lotes">
+        <div class="search-expandable">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="filterSearchInput" class="filter-search-input" placeholder="Buscar por código ou descrição..." autocomplete="off" aria-label="Pesquisar lotes">
         </div>
         <div class="filter-dropdown hidden" id="filterDropdown" aria-hidden="true">
           <button type="button" class="filter-option" data-filter="DISPONIVEL">DisponÃ­veis</button>

@@ -745,3 +745,46 @@
     .avatar__edit:hover{
       transform: scale(1.1);
     }
+
+/* ==========================================================================
+   Classes extraídas de estilos inline do HTML.
+   Seletores duplicados (.x.x) mantêm a precedência que o inline tinha.
+   ========================================================================== */
+
+.eyebrow-label.eyebrow-label {
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.icon-sm.icon-sm {
+  width: 14px;
+  height: 14px;
+}
+
+.profile-name.profile-name {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: var(--color-charcoal-text);
+  letter-spacing: 0.02em;
+}
+
+.profile-meta.profile-meta {
+  color: var(--color-muted-text);
+  font-size: 0.9rem;
+}
+
+.u-mt-xl.u-mt-xl {
+  margin-top: var(--space-xl);
+}
+
+.btn--ghost-dark.btn--ghost-dark {
+  color: var(--color-charcoal-text);
+  border-color: var(--color-border);
+}
+
+.btn--dark.btn--dark {
+  background-color: #2D3748;
+  border-color: #2D3748;
+}

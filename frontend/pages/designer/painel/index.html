@@ -37,7 +37,7 @@
         <!-- MAIN CONTENT -->
         <!-- MAIN CONTENT -->
     <main class="main-content">
-      <header class="page-header" style="align-items: center;">
+      <header class="page-header page-header--centered">
         <div>
           <span class="text-breadcrumb">PAINEL DO DESIGNER</span>
           <h1 class="page-header__title">OLÁ, ANA SILVA</h1>
@@ -68,33 +68,33 @@
       </header>
 
       <!-- IMPACTO AMBIENTAL -->
-      <section class="dashboard-section impact-banner" style="background-image: url('../../../assets/images/tecido-jeans.jpg'); background-size: cover; background-position: center; border: 1px solid var(--color-border); box-shadow: var(--shadow-md);">
-        <div style="position: absolute; inset: 0; background-color: var(--color-primary); opacity: 0.9;"></div>
+      <section class="dashboard-section impact-banner impact-banner--jeans">
+        <div class="impact-banner__overlay"></div>
         
-        <img src="../../../assets/images/maquina.jpg" alt="Máquina de costura" style="position: absolute; right: 5%; bottom: -20px; height: 130%; object-fit: contain; opacity: 0.2; transform: rotate(5deg); pointer-events: none; mix-blend-mode: multiply;" />
+        <img class="impact-banner__machine" src="../../../assets/images/maquina.jpg" alt="Máquina de costura" />
 
-        <div style="position: relative; z-index: 2;">
-          <h3 class="dashboard-section__title" style="color: var(--color-primary-light); margin-bottom: 8px;">SEU IMPACTO CIRCULAR</h3>
-          <p style="font-family: var(--font-body); font-size: 14px; opacity: 0.9; margin-bottom: 24px; max-width: 600px; color: #fff;">Sua dedicação em ressignificar resíduos têxteis está transformando a indústria. Veja seus resultados este ano:</p>
+        <div class="impact-banner__content">
+          <h3 class="dashboard-section__title impact-banner__title">SEU IMPACTO CIRCULAR</h3>
+          <p class="impact-banner__copy">Sua dedicação em ressignificar resíduos têxteis está transformando a indústria. Veja seus resultados este ano:</p>
           
           <div class="impact-metrics">
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number" style="color: #fff;">142</span>
+                <span class="impact-number impact-number--light">142</span>
                 <span class="impact-unit">KG</span>
               </div>
               <span class="impact-label">Resíduos Salvos</span>
             </div>
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number" style="color: #fff;">38</span>
+                <span class="impact-number impact-number--light">38</span>
                 <span class="impact-unit">PEÇAS</span>
               </div>
               <span class="impact-label">Ressignificadas</span>
             </div>
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number" style="color: #fff;">98</span>
+                <span class="impact-number impact-number--light">98</span>
                 <span class="impact-unit">%</span>
               </div>
               <span class="impact-label">Confiabilidade (SLA)</span>
@@ -104,24 +104,24 @@
       </section>
 
       <!-- CARDS DE MÉTRICAS OPERACIONAIS -->
-      <section class="dash-cards" style="margin-top: var(--space-xl);">
-        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
-          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-listrado.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
-          <div style="position: relative; z-index: 1;">
+      <section class="dash-cards u-mt-xl">
+        <div class="dash-card dash-card--textured">
+          <div class="dash-card__texture dash-card__texture--listrado"></div>
+          <div class="dash-card__body">
             <div class="dash-card__number">03</div>
             <div class="dash-card__label">LOTES RESERVADOS</div>
           </div>
         </div>
-        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
-          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-jeans.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
-          <div style="position: relative; z-index: 1;">
+        <div class="dash-card dash-card--textured">
+          <div class="dash-card__texture dash-card__texture--jeans"></div>
+          <div class="dash-card__body">
             <div class="dash-card__number">02</div>
             <div class="dash-card__label">EM ANDAMENTO</div>
           </div>
         </div>
-        <div class="dash-card" style="position: relative; overflow: hidden; background-color: #fff;">
-          <div style="position: absolute; inset: 0; background-image: url('../../../assets/images/tecido-veludo.jpg'); background-size: cover; opacity: 0.1; pointer-events: none;"></div>
-          <div style="position: relative; z-index: 1;">
+        <div class="dash-card dash-card--textured">
+          <div class="dash-card__texture dash-card__texture--veludo"></div>
+          <div class="dash-card__body">
             <div class="dash-card__number">11</div>
             <div class="dash-card__label">FINALIZADOS</div>
           </div>
@@ -129,10 +129,10 @@
       </section>
 
       <!-- LOTES DISPONÍVEIS (MATCHES) -->
-      <section class="dashboard-section" style="margin-top: var(--space-xl);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-md);">
-          <h3 class="dashboard-section__title" style="margin-bottom: 0;">MATCHES PERFEITOS PARA VOCÊ</h3>
-          <a href="../lotes-disponiveis/index.html" style="font-family: var(--font-detail); font-size: 11px; color: var(--color-primary); text-decoration: none; font-weight: bold; text-transform: uppercase;">Ver todos →</a>
+      <section class="dashboard-section u-mt-xl">
+        <div class="section-header">
+          <h3 class="dashboard-section__title u-mb-0">MATCHES PERFEITOS PARA VOCÊ</h3>
+          <a class="link-more" href="../lotes-disponiveis/index.html">Ver todos →</a>
         </div>
         
         <div class="lote-cards">
@@ -193,24 +193,24 @@
       </section>
 
       <!-- PENDÊNCIAS -->
-      <section class="dashboard-section" style="margin-top: var(--space-xl);">
+      <section class="dashboard-section u-mt-xl">
         <h3 class="dashboard-section__title">PENDÊNCIAS</h3>
         <div class="task-list">
           <div class="task-item">
             <span class="task-item__text">Lote de algodão cru aguardando confirmação de recebimento</span>
-            <button class="btn btn--outline btn--sm" style="padding: 6px 16px; font-size: 13px;">Ver</button>
+            <button class="btn btn--outline btn--sm btn--compact">Ver</button>
           </div>
           <div class="task-item">
             <span class="task-item__text">Projeto "Jaqueta reversível" com prazo em 3 dias</span>
-            <button class="btn btn--outline btn--sm" style="padding: 6px 16px; font-size: 13px;">Ver</button>
+            <button class="btn btn--outline btn--sm btn--compact">Ver</button>
           </div>
         </div>
       </section>
 
       <!-- AÇÃO RÁPIDA -->
-      <section class="dashboard-section" style="margin-top: var(--space-xl);">
+      <section class="dashboard-section u-mt-xl">
         <h3 class="dashboard-section__title">AÇÃO RÁPIDA</h3>
-        <button class="btn btn--primary" style="padding: 12px 24px;">Ver lotes disponíveis</button>
+        <button class="btn btn--primary btn--roomy">Ver lotes disponíveis</button>
       </section>
     </main>
   </div>
