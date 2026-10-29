@@ -4,9 +4,8 @@
  */
 
 export const motion = {
-
   prefersReduced() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   },
 
   /**
@@ -23,11 +22,11 @@ export const motion = {
 
     let startTime = null;
 
-    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
     const tick = (timestamp) => {
       if (!startTime) startTime = timestamp;
-      const elapsed  = timestamp - startTime;
+      const elapsed = timestamp - startTime;
       const progress = Math.min(elapsed / duration, 1);
       el.textContent = Math.floor(easeOutCubic(progress) * endVal);
       if (progress < 1) requestAnimationFrame(tick);
@@ -46,20 +45,20 @@ export const motion = {
     if (this.prefersReduced()) return;
 
     elements.forEach((el, i) => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(12px)';
+      el.style.opacity = "0";
+      el.style.transform = "translateY(12px)";
 
       setTimeout(() => {
         el.animate(
           [
-            { opacity: 0, transform: 'translateY(12px)' },
-            { opacity: 1, transform: 'translateY(0)' }
+            { opacity: 0, transform: "translateY(12px)" },
+            { opacity: 1, transform: "translateY(0)" },
           ],
           {
             duration: 280,
-            easing:   'cubic-bezier(0.16, 1, 0.3, 1)',
-            fill:     'forwards'
-          }
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+            fill: "forwards",
+          },
         );
       }, i * staggerMs);
     });
@@ -76,5 +75,5 @@ export const motion = {
       return;
     }
     await document.startViewTransition(updateCallback).finished;
-  }
+  },
 };
