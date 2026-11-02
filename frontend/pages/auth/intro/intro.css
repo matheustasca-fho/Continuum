@@ -2,16 +2,23 @@
    ESTILOS EXCLUSIVOS DO LOGIN INTERATIVO
    ========================================================================== */
 
-body, html {
-  margin: 0; padding: 0; height: 100%;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   overflow: hidden; /* Trava o scroll para a experiência fullscreen */
   /* Profundidade com iluminação central no Bege */
-  background: radial-gradient(circle at center, var(--color-sand-offwhite) 10%, #E2DCCB 100%);
+  background: radial-gradient(
+    circle at center,
+    var(--color-sand-offwhite) 10%,
+    #e2dccb 100%
+  );
 }
 
 /* Textura Tátil (Grão/Papel/Algodão Cru) sobrepondo toda a tela sutilmente */
 body::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 9999; /* Fica acima de tudo, dando textura até para a Fita */
@@ -22,11 +29,15 @@ body::after {
 /* O Canvas dos fios têxteis */
 #fabric-canvas {
   position: absolute;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 1;
   cursor: crosshair;
-  transition: filter 1.5s ease, opacity 1s ease;
+  transition:
+    filter 1.5s ease,
+    opacity 1s ease;
 }
 
 /* Fundo desfocado quando o login aparece */
@@ -39,11 +50,17 @@ body::after {
 /* ================= INTRO SCENE ================= */
 .intro-layer {
   position: absolute;
-  inset: 0; z-index: 2;
-  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   padding-left: 10vw;
   pointer-events: none; /* Deixa o mouse interagir com o canvas atrás */
-  transition: opacity 0.8s ease, transform 1s ease;
+  transition:
+    opacity 0.8s ease,
+    transform 1s ease;
 }
 
 .intro-layer.hidden {
@@ -67,32 +84,55 @@ body::after {
   animation: floatBreathing 4s ease-in-out infinite;
 }
 
-.cta-text { 
-  font-family: var(--font-body); 
-  font-size: max(16px, 1.2vw); 
+.cta-text {
+  font-family: var(--font-body);
+  font-size: max(16px, 1.2vw);
   font-weight: 400; /* Mais leve */
   color: var(--color-muted-text); /* Tonalidade mais clara e cinza */
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
 .cta-text.fade-out {
   opacity: 0;
   transform: translateY(8px);
 }
-.cta-sub { font-family: var(--font-detail); font-size: max(10px, 0.8vw); color: var(--color-muted-text); margin-top: 1vh; text-transform: uppercase; }
+.cta-sub {
+  font-family: var(--font-detail);
+  font-size: max(10px, 0.8vw);
+  color: var(--color-muted-text);
+  margin-top: 1vh;
+  text-transform: uppercase;
+}
 
 @keyframes floatBreathing {
-  0%, 100% { opacity: 0.6; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-5px); }
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
 }
 
 /* ================= LOGIN SCENE ================= */
 .login-layer {
   position: absolute;
-  inset: 0; z-index: 3;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none;
-  background: radial-gradient(circle at center, transparent 0%, rgba(245, 242, 235, 0.6) 100%);
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(245, 242, 235, 0.6) 100%
+  );
   transition: opacity 0.8s ease;
 }
 
@@ -106,11 +146,14 @@ body::after {
   backdrop-filter: blur(20px);
   padding: 5vh 3vw;
   border-radius: var(--radius-lg);
-  width: 90%; max-width: 420px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+  width: 90%;
+  max-width: 420px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom: 8px solid var(--color-primary); /* Assinatura visual na base */
-  
+
   transform: translateY(40px);
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -119,10 +162,22 @@ body::after {
   transform: translateY(0);
 }
 
-.login-header { text-align: center; margin-bottom: 4vh; }
+.login-header {
+  text-align: center;
+  margin-bottom: 4vh;
+}
 
-.input-group { margin-bottom: 2.5vh; }
-.input-label { display: block; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--color-charcoal-text); margin-bottom: 8px; }
+.input-group {
+  margin-bottom: 2.5vh;
+}
+.input-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-charcoal-text);
+  margin-bottom: 8px;
+}
 .input-field {
   width: 100%;
   background: var(--color-sand-offwhite);
@@ -132,18 +187,30 @@ body::after {
   font-family: var(--font-body);
   font-size: 15px;
   color: var(--color-charcoal-text);
-  transition: border-color 0.3s, background 0.3s;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
 }
-.input-field:focus { outline: none; border-color: var(--color-primary); background: var(--color-white); }
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-white);
+}
 
 .login-footer {
-  display: flex; justify-content: space-between;
-  margin-top: 3vh; padding-top: 3vh;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3vh;
+  padding-top: 3vh;
   border-top: 1px solid var(--color-border);
 }
 
 .login-link {
-  font-family: var(--font-body); font-size: 13px;
-  color: var(--color-muted-text); transition: color 0.2s;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-muted-text);
+  transition: color 0.2s;
 }
-.login-link:hover { color: var(--color-charcoal-text); }
+.login-link:hover {
+  color: var(--color-charcoal-text);
+}

@@ -9,34 +9,36 @@ export const dates = {
    * Ex: "há 3 dias", "amanhã", "hoje"
    */
   formatRelative(isoDate) {
-    const rtf = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' });
-    const diffMs  = new Date(isoDate) - new Date();
+    const rtf = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+    const diffMs = new Date(isoDate) - new Date();
     const diffDays = Math.round(diffMs / 86400000);
-    if (Math.abs(diffDays) < 1) return 'Hoje';
-    return rtf.format(diffDays, 'day');
+    if (Math.abs(diffDays) < 1) return "Hoje";
+    return rtf.format(diffDays, "day");
   },
 
   /**
    * Formata data ISO em formato curto: "04 set. 2026"
    */
   formatShort(isoDate) {
-    if (!isoDate) return '—';
-    return new Intl.DateTimeFormat('pt-BR', {
-      day:   '2-digit',
-      month: 'short',
-      year:  'numeric'
-    }).format(new Date(isoDate)).replace('.', '');
+    if (!isoDate) return "—";
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+      .format(new Date(isoDate))
+      .replace(".", "");
   },
 
   /**
    * Formata data ISO em formato longo: "quinta-feira, 4 de setembro"
    */
   formatLong(isoDate) {
-    if (!isoDate) return '—';
-    return new Intl.DateTimeFormat('pt-BR', {
-      weekday: 'long',
-      day:     'numeric',
-      month:   'long'
+    if (!isoDate) return "—";
+    return new Intl.DateTimeFormat("pt-BR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
     }).format(new Date(isoDate));
   },
 
@@ -61,14 +63,14 @@ export const dates = {
    */
   getPrazoStatus(reservadoEmISO) {
     const prazoFinal = this.addBusinessDays(reservadoEmISO, 10);
-    const prazoISO   = prazoFinal.toISOString();
-    const diffMs     = prazoFinal - new Date();
-    const diffDias   = Math.ceil(diffMs / 86400000);
+    const prazoISO = prazoFinal.toISOString();
+    const diffMs = prazoFinal - new Date();
+    const diffDias = Math.ceil(diffMs / 86400000);
 
     let status;
-    if (diffDias < 0)  status = 'excedido';
-    else if (diffDias <= 3) status = 'proximo';
-    else               status = 'no_prazo';
+    if (diffDias < 0) status = "excedido";
+    else if (diffDias <= 3) status = "proximo";
+    else status = "no_prazo";
 
     return { status, dias: diffDias, prazoISO };
   },
@@ -78,5 +80,5 @@ export const dates = {
    */
   today() {
     return this.formatLong(new Date().toISOString());
-  }
+  },
 };

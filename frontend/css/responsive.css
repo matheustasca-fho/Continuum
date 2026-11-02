@@ -9,27 +9,70 @@
 }
 
 @media (max-width: 768px) {
-  .main-content { padding-inline: 18px; padding-bottom: 40px; }
+  .main-content {
+    padding-inline: 18px;
+    padding-bottom: 40px;
+  }
 }
 
 @media (max-width: 480px) {
-  .main-content { padding-inline: 14px; }
-  .btn { width: 100%; }
+  .main-content {
+    padding-inline: 14px;
+  }
+  .btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 1024px) {
-  body, p, .text-body { font-size: 1.6vw; }
-  h1, .text-display { font-size: 3.6vw; }
-  h2, .text-subtitle { font-size: 2.6vw; }
-  .text-detail, .meta-info { font-size: 1.4vw; }
-  .btn, .radio-card { font-size: 1.6vw; }
+  body,
+  p,
+  .text-body {
+    font-size: 1.6vw;
+  }
+  h1,
+  .text-display {
+    font-size: 3.6vw;
+  }
+  h2,
+  .text-subtitle {
+    font-size: 2.6vw;
+  }
+  .text-detail,
+  .meta-info {
+    font-size: 1.4vw;
+  }
+  .btn,
+  .radio-card {
+    font-size: 1.6vw;
+  }
 }
 
 @media (max-width: 640px) {
-  body, p, .text-body { font-size: 3.8vw; }
-  h1, .text-display { font-size: 8vw; }
-  h2, .text-subtitle { font-size: 6vw; }
-  .text-detail, .meta-info { font-size: 3vw; }
-  .btn, .radio-card { font-size: 3.8vw; padding: 2vh 4vw; }
-  :root { --radius-md: 2vw; --radius-lg: 3vw; }
+  body,
+  p,
+  .text-body {
+    font-size: 3.8vw;
+  }
+  h1,
+  .text-display {
+    font-size: 8vw;
+  }
+  h2,
+  .text-subtitle {
+    font-size: 6vw;
+  }
+  .text-detail,
+  .meta-info {
+    font-size: 3vw;
+  }
+  .btn,
+  .radio-card {
+    font-size: 3.8vw;
+    padding: 2vh 4vw;
+  }
+  :root {
+    --radius-md: 2vw;
+    --radius-lg: 3vw;
+  }
 }

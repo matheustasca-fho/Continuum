@@ -4,18 +4,17 @@
  */
 
 export const ui = {
-
   /* -----------------------------------------------------------------------
      TOAST
   ----------------------------------------------------------------------- */
 
   _getOrCreateToastRegion() {
-    let region = document.querySelector('.toast-region');
+    let region = document.querySelector(".toast-region");
     if (!region) {
-      region = document.createElement('div');
-      region.className = 'toast-region';
-      region.setAttribute('aria-live', 'polite');
-      region.setAttribute('aria-atomic', 'false');
+      region = document.createElement("div");
+      region.className = "toast-region";
+      region.setAttribute("aria-live", "polite");
+      region.setAttribute("aria-atomic", "false");
       document.body.appendChild(region);
     }
     return region;
@@ -27,21 +26,21 @@ export const ui = {
    * @param {'info'|'success'|'error'|'warning'} type
    * @param {Function|null} onUndo - Callback para ação de desfazer
    */
-  showToast(message, type = 'info', onUndo = null) {
+  showToast(message, type = "info", onUndo = null) {
     const region = this._getOrCreateToastRegion();
-    const toast  = document.createElement('div');
+    const toast = document.createElement("div");
 
     toast.className = `toast toast--${type}`;
-    toast.setAttribute('role', 'status');
+    toast.setAttribute("role", "status");
 
     toast.innerHTML = `
       <span class="toast__msg">${message}</span>
-      ${onUndo ? '<button class="toast__undo">Desfazer</button>' : ''}
+      ${onUndo ? '<button class="toast__undo">Desfazer</button>' : ""}
       <div class="toast__progress"></div>
     `;
 
     if (onUndo) {
-      toast.querySelector('.toast__undo').addEventListener('click', () => {
+      toast.querySelector(".toast__undo").addEventListener("click", () => {
         onUndo();
         this._dismissToast(toast);
       });
@@ -56,7 +55,9 @@ export const ui = {
   _dismissToast(toast) {
     clearTimeout(toast._timer);
     toast.style.animation = `toast-out var(--dur-base) var(--ease-in-out) both`;
-    toast.addEventListener('animationend', () => toast.remove(), { once: true });
+    toast.addEventListener("animationend", () => toast.remove(), {
+      once: true,
+    });
   },
 
   /* -----------------------------------------------------------------------
@@ -99,30 +100,31 @@ export const ui = {
     const tablist = container.querySelector('[role="tablist"]');
     if (!tablist) return;
 
-    const tabs   = Array.from(tablist.querySelectorAll('[role="tab"]'));
+    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
     const panels = Array.from(container.querySelectorAll('[role="tabpanel"]'));
 
     const activate = (tab) => {
-      tabs.forEach(t => {
-        t.setAttribute('aria-selected', 'false');
-        t.classList.remove('tabs__btn--active');
+      tabs.forEach((t) => {
+        t.setAttribute("aria-selected", "false");
+        t.classList.remove("tabs__btn--active");
       });
-      panels.forEach(p => p.hidden = true);
+      panels.forEach((p) => (p.hidden = true));
 
-      tab.setAttribute('aria-selected', 'true');
-      tab.classList.add('tabs__btn--active');
-      const panelId = tab.getAttribute('aria-controls');
+      tab.setAttribute("aria-selected", "true");
+      tab.classList.add("tabs__btn--active");
+      const panelId = tab.getAttribute("aria-controls");
       document.getElementById(panelId).hidden = false;
     };
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => activate(tab));
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => activate(tab));
 
       // Suporte a teclado (← →)
-      tab.addEventListener('keydown', e => {
+      tab.addEventListener("keydown", (e) => {
         const idx = tabs.indexOf(e.currentTarget);
-        if (e.key === 'ArrowRight') tabs[(idx + 1) % tabs.length].focus();
-        if (e.key === 'ArrowLeft')  tabs[(idx - 1 + tabs.length) % tabs.length].focus();
+        if (e.key === "ArrowRight") tabs[(idx + 1) % tabs.length].focus();
+        if (e.key === "ArrowLeft")
+          tabs[(idx - 1 + tabs.length) % tabs.length].focus();
       });
     });
 
@@ -140,9 +142,11 @@ export const ui = {
    * @param {number} lines - Número de linhas a mostrar
    */
   showSkeleton(el, lines = 3) {
-    el.innerHTML = Array.from({ length: lines }, (_, i) =>
-      `<div class="skeleton" style="height:20px;width:${85 - i * 10}%;margin-bottom:10px;border-radius:4px"></div>`
-    ).join('');
+    el.innerHTML = Array.from(
+      { length: lines },
+      (_, i) =>
+        `<div class="skeleton" style="height:20px;width:${85 - i * 10}%;margin-bottom:10px;border-radius:4px"></div>`,
+    ).join("");
   },
 
   /* -----------------------------------------------------------------------
@@ -154,12 +158,12 @@ export const ui = {
    * @param {HTMLElement} container
    * @param {string} message
    */
-  showEmpty(container, message = 'Nenhum item encontrado.') {
+  showEmpty(container, message = "Nenhum item encontrado.") {
     container.innerHTML = `
       <div style="padding:var(--space-2xl);text-align:center;color:var(--color-muted);">
         <p style="font-size:var(--text-lg);margin-bottom:var(--space-xs);">—</p>
         <p style="font-size:var(--text-sm);">${message}</p>
       </div>
     `;
-  }
+  },
 };

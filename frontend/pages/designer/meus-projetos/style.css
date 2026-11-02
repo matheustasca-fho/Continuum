@@ -15,9 +15,9 @@
   --color-charcoal-text: #2d3748;
   --color-muted-text: #718096;
   --color-border: #dfe3e8;
-  --font-title: 'Anton', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-detail: 'Space Mono', monospace;
+  --font-title: "Anton", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-detail: "Space Mono", monospace;
 }
 
 /* ==========================================================================
@@ -69,7 +69,11 @@ a:focus-visible {
   padding: 28px 30px 30px;
   border: 1px solid rgba(120, 39, 54, 0.1);
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(253, 242, 244, 0.48));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(253, 242, 244, 0.48)
+  );
   box-shadow: 0 16px 38px rgba(45, 55, 72, 0.06);
   overflow: hidden;
 }
@@ -177,7 +181,9 @@ a:focus-visible {
   padding: 18px 2px;
   border-bottom: 1px solid rgba(45, 55, 72, 0.22);
   animation: project-in 0.45s cubic-bezier(0.22, 0.75, 0.25, 1) both;
-  transition: background 0.25s ease, transform 0.25s ease;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
 }
 
 .project-row:hover {
@@ -193,7 +199,9 @@ a:focus-visible {
   border-radius: 8px;
   background: var(--color-white);
   box-shadow: 0 7px 16px rgba(120, 39, 54, 0.12);
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 .project-row:hover .project-row__thumb {
@@ -268,7 +276,10 @@ a:focus-visible {
   background: #e3e3df;
   color: #666;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
 }
 
 .project-row__more:hover {
@@ -443,7 +454,9 @@ a:focus-visible {
   pointer-events: none;
   transform: scale(0.08);
   transform-origin: center;
-  transition: opacity 0.18s ease, transform 0.48s cubic-bezier(0.22, 0.75, 0.25, 1);
+  transition:
+    opacity 0.18s ease,
+    transform 0.48s cubic-bezier(0.22, 0.75, 0.25, 1);
 }
 
 .page-transition span {
@@ -477,7 +490,23 @@ a:focus-visible {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, #782736 0 16deg, #f5f2eb 16deg 34deg, #782736 34deg 58deg, #f5f2eb 58deg 78deg, #782736 78deg 103deg, #f5f2eb 103deg 124deg, #782736 124deg 151deg, #f5f2eb 151deg 174deg, #782736 174deg 204deg, #f5f2eb 204deg 230deg, #782736 230deg 262deg, #f5f2eb 262deg 291deg, #782736 291deg 326deg, #f5f2eb 326deg 360deg);
+  background: conic-gradient(
+    from 0deg,
+    #782736 0 16deg,
+    #f5f2eb 16deg 34deg,
+    #782736 34deg 58deg,
+    #f5f2eb 58deg 78deg,
+    #782736 78deg 103deg,
+    #f5f2eb 103deg 124deg,
+    #782736 124deg 151deg,
+    #f5f2eb 151deg 174deg,
+    #782736 174deg 204deg,
+    #f5f2eb 204deg 230deg,
+    #782736 230deg 262deg,
+    #f5f2eb 262deg 291deg,
+    #782736 291deg 326deg,
+    #f5f2eb 326deg 360deg
+  );
   box-shadow: 0 0 0 12px rgba(120, 39, 54, 0.2);
   transform: scale(0.08) rotate(0deg);
   transition: transform 0.72s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -543,7 +572,9 @@ a:focus-visible {
   backdrop-filter: blur(7px);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.22s, visibility 0.22s;
+  transition:
+    opacity 0.22s,
+    visibility 0.22s;
 }
 
 .project-dialog--visible {
@@ -868,7 +899,10 @@ a:focus-visible {
   padding: 0 22px;
   border-radius: 999px;
   font-size: 12px;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
 }
 
 .project-dialog .consent-dialog__cancel {

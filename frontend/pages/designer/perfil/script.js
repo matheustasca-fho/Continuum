@@ -1,5 +1,5 @@
 (() => {
-  'use strict';
+  "use strict";
 
   const TRAIL_DOT_COUNT = 8;
   const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
@@ -13,39 +13,50 @@
      TABS
      ========================================================== */
   const initTabs = () => {
-    const tabButtons = [...document.querySelectorAll('.tabs__btn')];
-    const tabPanels = document.querySelectorAll('.tabs__panel');
+    const tabButtons = [...document.querySelectorAll(".tabs__btn")];
+    const tabPanels = document.querySelectorAll(".tabs__panel");
 
     const activateTab = (button) => {
       tabButtons.forEach((tab) => {
-        tab.classList.remove('tabs__btn--active');
-        tab.setAttribute('aria-selected', 'false');
-        tab.setAttribute('tabindex', '-1');
+        tab.classList.remove("tabs__btn--active");
+        tab.setAttribute("aria-selected", "false");
+        tab.setAttribute("tabindex", "-1");
       });
-      tabPanels.forEach((panel) => panel.classList.remove('tabs__panel--active'));
+      tabPanels.forEach((panel) =>
+        panel.classList.remove("tabs__panel--active"),
+      );
 
-      button.classList.add('tabs__btn--active');
-      button.setAttribute('aria-selected', 'true');
-      button.removeAttribute('tabindex');
-      document.getElementById(button.getAttribute('aria-controls'))?.classList.add('tabs__panel--active');
+      button.classList.add("tabs__btn--active");
+      button.setAttribute("aria-selected", "true");
+      button.removeAttribute("tabindex");
+      document
+        .getElementById(button.getAttribute("aria-controls"))
+        ?.classList.add("tabs__panel--active");
     };
 
     const resolveKeyTarget = (key, index) => {
       const last = tabButtons.length - 1;
       switch (key) {
-        case 'ArrowRight':
-        case 'ArrowDown': return tabButtons[(index + 1) % tabButtons.length];
-        case 'ArrowLeft':
-        case 'ArrowUp': return tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
-        case 'Home': return tabButtons[0];
-        case 'End': return tabButtons[last];
-        default: return null;
+        case "ArrowRight":
+        case "ArrowDown":
+          return tabButtons[(index + 1) % tabButtons.length];
+        case "ArrowLeft":
+        case "ArrowUp":
+          return tabButtons[
+            (index - 1 + tabButtons.length) % tabButtons.length
+          ];
+        case "Home":
+          return tabButtons[0];
+        case "End":
+          return tabButtons[last];
+        default:
+          return null;
       }
     };
 
     tabButtons.forEach((button, index) => {
-      button.addEventListener('click', () => activateTab(button));
-      button.addEventListener('keydown', (event) => {
+      button.addEventListener("click", () => activateTab(button));
+      button.addEventListener("keydown", (event) => {
         const target = resolveKeyTarget(event.key, index);
         if (!target) return;
         event.preventDefault();
@@ -58,7 +69,7 @@
      THREAD TRAIL — fio que segue o mouse
      ========================================================== */
   const initThreadTrail = () => {
-    const trail = $('threadTrail');
+    const trail = $("threadTrail");
     if (!trail) return;
 
     const mouse = { x: 0, y: 0 };
@@ -67,39 +78,44 @@
     const createDot = (index) => {
       const dot = trail.cloneNode();
       const size = `${6 - index * 0.5}px`;
-      dot.id = '';
+      dot.id = "";
       Object.assign(dot.style, {
-        position: 'fixed',
-        pointerEvents: 'none',
-        zIndex: '9999',
+        position: "fixed",
+        pointerEvents: "none",
+        zIndex: "9999",
         width: size,
         height: size,
-        borderRadius: '50%',
-        backgroundColor: 'var(--color-primary)',
-        opacity: '0',
-        transition: 'opacity 0.3s'
+        borderRadius: "50%",
+        backgroundColor: "var(--color-primary)",
+        opacity: "0",
+        transition: "opacity 0.3s",
       });
       document.body.appendChild(dot);
       return { el: dot, x: 0, y: 0 };
     };
 
-    const trailDots = Array.from({ length: TRAIL_DOT_COUNT }, (_, index) => createDot(index));
+    const trailDots = Array.from({ length: TRAIL_DOT_COUNT }, (_, index) =>
+      createDot(index),
+    );
     trail.remove();
 
-    const setTrailOpacity = (value) => trailDots.forEach(({ el }) => { el.style.opacity = value; });
+    const setTrailOpacity = (value) =>
+      trailDots.forEach(({ el }) => {
+        el.style.opacity = value;
+      });
 
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener("mousemove", (event) => {
       mouse.x = event.clientX;
       mouse.y = event.clientY;
       if (!trailActive) {
         trailActive = true;
-        setTrailOpacity('0.25');
+        setTrailOpacity("0.25");
       }
     });
 
-    document.addEventListener('mouseleave', () => {
+    document.addEventListener("mouseleave", () => {
       trailActive = false;
-      setTrailOpacity('0');
+      setTrailOpacity("0");
     });
 
     const animateTrail = () => {
@@ -123,12 +139,13 @@
      AVATAR UPLOAD
      ========================================================== */
   const showAvatar = (src) => {
-    const circle = document.querySelector('.avatar__circle');
-    const img = document.createElement('img');
+    const circle = document.querySelector(".avatar__circle");
+    const img = document.createElement("img");
     img.src = src;
-    img.alt = 'Foto de perfil';
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
-    circle.innerHTML = '';
+    img.alt = "Foto de perfil";
+    img.style.cssText =
+      "width:100%;height:100%;object-fit:cover;border-radius:50%";
+    circle.innerHTML = "";
     circle.appendChild(img);
   };
 
@@ -136,7 +153,7 @@
     const [file] = event.target.files;
     if (!file) return;
     if (file.size > MAX_AVATAR_BYTES) {
-      alert('Máximo 2MB.');
+      alert("Máximo 2MB.");
       return;
     }
 
@@ -147,12 +164,14 @@
   };
 
   const initAvatarUpload = () => {
-    document.querySelector('.avatar__edit').addEventListener('click', () => {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/jpeg,image/png';
-      fileInput.style.display = 'none';
-      fileInput.addEventListener('change', (event) => handleAvatarSelected(event, fileInput));
+    document.querySelector(".avatar__edit").addEventListener("click", () => {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/jpeg,image/png";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", (event) =>
+        handleAvatarSelected(event, fileInput),
+      );
       document.body.appendChild(fileInput);
       fileInput.click();
     });
@@ -162,13 +181,13 @@
      TEXTAREA CHAR COUNT
      ========================================================== */
   const initManifestoCounter = () => {
-    const manifesto = $('manifesto');
-    const counter = $('manifestoCount');
+    const manifesto = $("manifesto");
+    const counter = $("manifestoCount");
 
     const counterColor = (length) => {
-      if (length >= MANIFESTO_LIMIT) return 'var(--color-error)';
-      if (length > MANIFESTO_WARNING) return 'var(--color-warning)';
-      return 'var(--color-muted-text)';
+      if (length >= MANIFESTO_LIMIT) return "var(--color-error)";
+      if (length > MANIFESTO_WARNING) return "var(--color-warning)";
+      return "var(--color-muted-text)";
     };
 
     const update = () => {
@@ -177,31 +196,35 @@
       counter.style.color = counterColor(length);
     };
 
-    manifesto.addEventListener('input', update);
+    manifesto.addEventListener("input", update);
     update();
   };
 
   /* ==========================================================
      MASKS
      ========================================================== */
-  const onlyDigits = (value) => value.replace(/\D/g, '');
+  const onlyDigits = (value) => value.replace(/\D/g, "");
 
   const maskCep = (value) => {
     const digits = onlyDigits(value).slice(0, 8);
-    return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+    return digits.length > 5
+      ? `${digits.slice(0, 5)}-${digits.slice(5)}`
+      : digits;
   };
 
   const maskPhone = (value) => {
     const digits = onlyDigits(value).slice(0, 11);
-    if (digits.length > 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-    if (digits.length > 6) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    if (digits.length > 10)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    if (digits.length > 6)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
     if (digits.length > 2) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
     if (digits.length > 0) return `(${digits}`;
     return digits;
   };
 
   const bindMask = (id, maskFn) => {
-    $(id).addEventListener('input', (event) => {
+    $(id).addEventListener("input", (event) => {
       event.target.value = maskFn(event.target.value);
     });
   };
@@ -210,57 +233,61 @@
      FORM + TOAST
      ========================================================== */
   const showToast = (message) => {
-    const toast = $('toast');
-    $('toastMsg').textContent = message;
-    toast.classList.add('toast--visible');
-    setTimeout(() => toast.classList.remove('toast--visible'), TOAST_DURATION_MS);
+    const toast = $("toast");
+    $("toastMsg").textContent = message;
+    toast.classList.add("toast--visible");
+    setTimeout(
+      () => toast.classList.remove("toast--visible"),
+      TOAST_DURATION_MS,
+    );
   };
 
   const clearGroupError = (group) => {
-    group.classList.remove('form-group--error');
-    group.querySelector('.form-message')?.remove();
+    group.classList.remove("form-group--error");
+    group.querySelector(".form-message")?.remove();
   };
 
   const markFieldInvalid = (field, message) => {
-    const group = field.closest('.form-group');
-    const feedback = document.createElement('span');
-    feedback.className = 'form-message';
+    const group = field.closest(".form-group");
+    const feedback = document.createElement("span");
+    feedback.className = "form-message";
     feedback.textContent = message;
-    group.classList.add('form-group--error');
+    group.classList.add("form-group--error");
     group.appendChild(feedback);
-    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute("aria-invalid", "true");
   };
 
   const isInvalid = (field) =>
-    !field.value.trim() || (field.type === 'email' && !field.value.includes('@'));
+    !field.value.trim() ||
+    (field.type === "email" && !field.value.includes("@"));
 
   const initProfileForm = () => {
     const requiredFields = [
-      { el: $('apelido'), msg: 'Informe o apelido ou nome do ateliê.' },
-      { el: $('nomeCompleto'), msg: 'Informe o nome completo.' },
-      { el: $('email'), msg: 'Informe um e-mail válido.' }
+      { el: $("apelido"), msg: "Informe o apelido ou nome do ateliê." },
+      { el: $("nomeCompleto"), msg: "Informe o nome completo." },
+      { el: $("email"), msg: "Informe um e-mail válido." },
     ];
 
-    $('profileForm').addEventListener('submit', (event) => {
+    $("profileForm").addEventListener("submit", (event) => {
       event.preventDefault();
-      document.querySelectorAll('.form-group--error').forEach(clearGroupError);
+      document.querySelectorAll(".form-group--error").forEach(clearGroupError);
 
       const invalidFields = requiredFields.filter(({ el }) => isInvalid(el));
       invalidFields.forEach(({ el, msg }) => markFieldInvalid(el, msg));
 
       if (invalidFields.length) {
-        $('btn-dados').click();
+        $("btn-dados").click();
         return;
       }
-      showToast('Alterações salvas com sucesso!');
+      showToast("Alterações salvas com sucesso!");
     });
 
-    document.querySelectorAll('.form-input,.form-textarea').forEach((field) => {
-      field.addEventListener('input', () => {
-        const group = field.closest('.form-group');
-        if (!group?.classList.contains('form-group--error')) return;
+    document.querySelectorAll(".form-input,.form-textarea").forEach((field) => {
+      field.addEventListener("input", () => {
+        const group = field.closest(".form-group");
+        if (!group?.classList.contains("form-group--error")) return;
         clearGroupError(group);
-        field.removeAttribute('aria-invalid');
+        field.removeAttribute("aria-invalid");
       });
     });
   };
@@ -269,8 +296,9 @@
      LOGOUT
      ========================================================== */
   const initLogout = () => {
-    $('btnLogout').addEventListener('click', () => {
-      if (confirm('Tem certeza que deseja sair?')) alert('Desconectado. Redirecionando...');
+    $("btnLogout").addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja sair?"))
+        alert("Desconectado. Redirecionando...");
     });
   };
 
@@ -278,8 +306,8 @@
   initThreadTrail();
   initAvatarUpload();
   initManifestoCounter();
-  bindMask('cep', maskCep);
-  bindMask('telefone', maskPhone);
+  bindMask("cep", maskCep);
+  bindMask("telefone", maskPhone);
   initProfileForm();
   initLogout();
 })();
