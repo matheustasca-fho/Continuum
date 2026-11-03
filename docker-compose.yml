@@ -1,0 +1,19 @@
+version: '1.0'
+
+services:
+  api:
+    build:
+      dockerfile: ./backend/docker/Dockerfile
+    container_name: php_api
+    ports:
+      - "8000:80"
+    env_file:
+      - .env
+    volumes:
+      - ./backend/src:/var/www/html
+      - ./backend/wallet:/var/www/wallet
+    environment:
+      - TNS_ADMIN=/var/www/wallet
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SERVICE=${DB_SERVICE}

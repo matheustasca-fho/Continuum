@@ -1,0 +1,10 @@
+.env
+*.envs
+
+backend/wallet/*
+
+!backend/wallet/.gitkeep
+
+*.log
+.DS_Store
+Thumbs.db
