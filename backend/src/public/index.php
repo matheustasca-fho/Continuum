@@ -1,45 +1,23 @@
 <?php
+
 header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *'); // Em produção, aponte para o domínio do frontend
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 
-if(!extension_loaded('oci8')) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'A extensão OCI8 não está carregada no PHP!'
-    ]);
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-$username   = getenv('DB_USER');
-$password   = getenv('DB_PASSWORD');
-$db_service = getenv('DB_SERVICE');
+require_once __DIR__ . '/../routes/Router.php';
+require_once __DIR__ . '/../controllers/LotesController.php';
 
-$coon = @oci_connect($username, $password, $db_service, 'AL32UTF8');
+$router = new Router();
+$lotesController = new LotesController();
 
-if(!$coon) {
-    $error = oci_error();
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Falha ao conectar ao banco',
-        'detalhes' => $error
-    ], JSON_PRETTY_PRINT);
-    exit;
-}
+$router->add('GET', '/api/lotes', [$lotesController, 'listar']);
 
-$sql = "SELECT 
-            SYSDATE AS DATA_ATUAL, USER AS USUARIO_CONECTADO
-        FROM DUAL";
+$router->add('POST', '/api/lotes', [$lotesController, 'criar']);
 
-$stmt = oci_parse($coon, $sql);
-
-oci_execute($stmt);
-
-$resultado = oci_fetch_assoc($stmt);
-
-oci_free_statement($stmt);
-oci_close($coon);
-
-echo json_encode([
-    'status' => 'success',
-    'message' => 'Conexão com o Oracle Cloud realizada com sucesso!',
-    'dados' => $resultado
-], JSON_PRETTY_PRINT);
+$router->run();
