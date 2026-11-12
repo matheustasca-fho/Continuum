@@ -26,20 +26,20 @@
       <form id="formCadastroConta" class="signup-form" novalidate>
         <div class="signup-form__field">
           <label class="signup-form__label" for="cpfDoador">CPF <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="cpfDoador" name="CPF" placeholder="CPF" inputmode="numeric" autocomplete="off" maxlength="14" aria-describedby="cpfAjuda" required />
+          <input class="form-input signup-form__input" type="text" id="cpfDoador" name="CPF" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" maxlength="14" aria-describedby="cpfAjuda" required />
           <p id="cpfAjuda" class="signup-form__hint" aria-live="polite" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
           <label class="signup-form__label" for="cepDoador">CEP <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="cepDoador" name="CEP" placeholder="CEP" inputmode="numeric" autocomplete="postal-code" maxlength="9" aria-describedby="cepAjuda" required />
+          <input class="form-input signup-form__input" type="text" id="cepDoador" name="CEP" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" maxlength="9" aria-describedby="cepAjuda" required />
           <p id="cepAjuda" class="signup-form__hint" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
           <label class="signup-form__label" for="senhaUsuario">Senha <span class="signup-form__required">*</span></label>
           <div class="signup-form__password-wrap">
-            <input class="form-input signup-form__input" type="password" id="senhaUsuario" name="SENHA_DOADOR" placeholder="Senha" autocomplete="new-password" aria-describedby="senhaAjuda" required />
+          <input class="form-input signup-form__input" type="password" id="senhaUsuario" name="SENHA_DOADOR" placeholder="Senha" autocomplete="new-password" minlength="8" aria-describedby="senhaAjuda" required />
             <button class="signup-form__password-toggle" type="button" aria-controls="senhaUsuario" aria-pressed="false" aria-label="Mostrar ou ocultar senha">
               <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -56,13 +56,42 @@
 
         <div class="signup-form__field">
           <label class="signup-form__label" for="nomeDoador">Nome completo <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="nomeDoador" name="NM_DOADOR" placeholder="Nome completo" autocomplete="name" maxlength="60" required />
+          <input class="form-input signup-form__input" type="text" id="nomeDoador" name="NM_DOADOR" placeholder="Nome completo" autocomplete="name" maxlength="120" required />
+        </div>
+
+        <div class="signup-form__field"><label class="signup-form__label" for="ufDoador">Estado (UF) *</label><input class="form-input signup-form__input" id="ufDoador" name="uf" maxlength="2" required /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="cidadeDoador">Cidade *</label><input class="form-input signup-form__input" id="cidadeDoador" name="cidade" required /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="bairroDoador">Bairro *</label><input class="form-input signup-form__input" id="bairroDoador" name="bairro" required /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="logradouroDoador">Rua (Logradouro) *</label><input class="form-input signup-form__input" id="logradouroDoador" name="logradouro" required /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="numeroDoador">Número *</label><input class="form-input signup-form__input" id="numeroDoador" name="numero" required /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="complementoDoador">Complemento</label><input class="form-input signup-form__input" id="complementoDoador" name="complemento" /></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="faixaEtariaDoador">Faixa etária (opcional)</label><select class="form-input signup-form__input" id="faixaEtariaDoador" name="faixaEtaria"><option value="">Selecione — opcional</option><option>18 a 24 anos</option><option>25 a 34 anos</option><option>35 a 44 anos</option><option>45 a 54 anos</option><option>55 anos ou mais</option><option>Prefiro não informar</option></select></div>
+        <div class="signup-form__field"><label class="signup-form__label" for="comoConheceuDoador">Como conheceu o CONTINUUM? (opcional)</label><select class="form-input signup-form__input" id="comoConheceuDoador" name="comoConheceu"><option value="">Selecione — opcional</option><option>Loja física participante</option><option>Instagram / Redes Sociais</option><option>Indicação de amigos</option><option>Pesquisa Google</option><option>Eventos de moda/sustentabilidade</option><option>Outros</option></select></div>
+
+        <div class="signup-form__field">
+          <label class="signup-form__label" for="emailDoador">E-mail <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="email" id="emailDoador" name="EMAIL" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="emailAjuda" required />
+          <p id="emailAjuda" class="signup-form__hint" style="display:none;"></p>
+        </div>
+
+        <div class="signup-form__field">
+          <label class="signup-form__label" for="confirmarSenhaDoador">Confirmar senha <span class="signup-form__required">*</span></label>
+          <input class="form-input signup-form__input" type="password" id="confirmarSenhaDoador" name="CONFIRMAR_SENHA" placeholder="Repita a senha" autocomplete="new-password" aria-describedby="confirmarSenhaAjuda" required />
+          <p id="confirmarSenhaAjuda" class="signup-form__hint" style="display:none;"></p>
         </div>
 
         <div class="signup-form__field">
           <label class="signup-form__label" for="telefoneDoador">Telefone <span class="signup-form__required">*</span></label>
           <input class="form-input signup-form__input" type="tel" id="telefoneDoador" name="TELEFONE" placeholder="(XX) XXXXX-XXXX" autocomplete="tel" maxlength="15" aria-describedby="telefoneAjuda" required />
           <p id="telefoneAjuda" class="signup-form__hint">Informe o DDD entre parênteses, com até 11 dígitos. Ex: (11) 98765-4321</p>
+        </div>
+
+        <div class="signup-form__field signup-form__terms">
+          <label class="signup-form__check-label" for="aceiteTermosDoador">
+            <input type="checkbox" id="aceiteTermosDoador" name="ACEITE_TERMOS" required aria-describedby="termosAjuda" />
+            <span>Li e aceito os termos de uso <span class="signup-form__required">*</span></span>
+          </label>
+          <p id="termosAjuda" class="signup-form__hint" style="display:none;"></p>
         </div>
 
         <button class="btn btn--primary btn--full signup-form__submit" type="submit">Cadastrar-se <span aria-hidden="true">↗</span></button>
@@ -75,6 +104,6 @@
 
     <p class="signup-page__signature"><span aria-hidden="true">✳</span> CADA PEÇA PODE CONTINUAR DE UM JEITO DIFERENTE</p>
   </main>
-  <script src="cadastro-formulario.js"></script>
+  <script type="module" src="cadastro-formulario.js"></script>
 </body>
 </html>

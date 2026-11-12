@@ -1,214 +1,137 @@
-/** CONTINUUM — tela de acesso demonstrativa (autenticação mockada no sessionStorage). */
-"use strict";
-
-/* ---------- Mock de autenticação (sessionStorage) ---------- */
-const USERS_KEY = "continuum_usuarios";
-const SESSION_KEY = "continuum_sessao";
-const MOCK_USERS = [
-  {
-    login: "doador",
-    senha: "doador123",
-    perfil: "doador",
-    nome: "Doador(a) teste",
-  },
-  {
-    login: "empresa",
-    senha: "empresa123",
-    perfil: "empresa",
-    nome: "Empresa teste",
-  },
-  {
-    login: "designer",
-    senha: "designer123",
-    perfil: "designer",
-    nome: "Designer teste",
-  },
-];
-const DESTINATIONS = {
-  doador: "../../doador/painel/index.html",
-  empresa: "../../empresa/painel/index.html",
-  designer: "../../designer/painel/index.html",
-};
-
-function seedMockUsers() {
-  try {
-    sessionStorage.setItem(USERS_KEY, JSON.stringify(MOCK_USERS));
-  } catch (error) {
-    /* sessionStorage indisponível: loadMockUsers() usa o mock em memória */
-  }
-}
-
-function loadMockUsers() {
-  try {
-    return JSON.parse(sessionStorage.getItem(USERS_KEY)) || MOCK_USERS;
-  } catch (error) {
-    return MOCK_USERS;
-  }
-}
-
-seedMockUsers();
-
+import { api } from "../../../js/shared/api.js";
+import {
+  onlyDigits,
+  mascaraCPF,
+  mascaraCNPJ,
+} from "../../../js/shared/validators.js";
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formLogin");
-  const status = document.getElementById("loginStatus");
-  const identifier = document.getElementById("loginIdentificador");
-  const identifierLabel = document.getElementById("loginIdentificadorLabel");
-  const password = document.getElementById("loginSenha");
-  const passwordToggle = document.querySelector(".login-form__password-toggle");
-  const profileOptions = document.querySelectorAll(".login-switch__option");
-  const forgotPassword = document.getElementById("forgotPassword");
-  const helpButton = document.getElementById("loginHelp");
-  const helpMessage = document.getElementById("loginHelpMessage");
-
-  const profileSettings = {
+  const form = document.getElementById("formLogin"),
+    status = document.getElementById("loginStatus"),
+    identifier = document.getElementById("loginIdentificador"),
+    label = document.getElementById("loginIdentificadorLabel"),
+    password = document.getElementById("loginSenha"),
+    tabs = [...document.querySelectorAll(".login-switch__option")];
+  const settings = {
     doador: {
-      label: "Nome de usuário",
-      name: "usuario",
-      placeholder: "Digite seu nome de usuário",
-      autocomplete: "username",
-      inputmode: "text",
+      label: "CPF ou E-mail",
+      placeholder: "CPF ou e-mail",
+      name: "cpfEmail",
     },
     designer: {
-      label: "CPF / CNPJ",
+      label: "CPF ou CNPJ",
+      placeholder: "CPF ou CNPJ",
       name: "cpfCnpj",
-      placeholder: "000.000.000-00 ou 00.000.000/0001-00",
-      autocomplete: "username",
-      inputmode: "text",
     },
     empresa: {
-      label: "ID de Acesso",
-      name: "idAcesso",
-      placeholder: "Digite o ID ou CNPJ corporativo",
-      autocomplete: "username",
-      inputmode: "text",
+      label: "CNPJ ou E-mail Corporativo",
+      placeholder: "CNPJ ou e-mail corporativo",
+      name: "cnpjEmail",
     },
   };
-
-  const setProfile = (profile) => {
-    const settings = profileSettings[profile] || profileSettings.doador;
-    profileOptions.forEach((option) => {
-      option.setAttribute("aria-pressed", String(option.value === profile));
-    });
-    identifierLabel.textContent = settings.label;
-    identifier.name = settings.name;
-    identifier.placeholder = settings.placeholder;
-    identifier.autocomplete = settings.autocomplete;
-    identifier.inputMode = settings.inputmode;
+  let perfil = new URLSearchParams(location.search).get("perfil") || "doador";
+  const setProfile = (p) => {
+    perfil = settings[p] ? p : "doador";
+    tabs.forEach((x) =>
+      x.setAttribute("aria-pressed", String(x.value === perfil)),
+    );
+    label.textContent = settings[perfil].label;
+    identifier.placeholder = settings[perfil].placeholder;
+    identifier.name = settings[perfil].name;
+    identifier.value = "";
     status.textContent = "";
   };
-
-  let initialProfile = new URLSearchParams(window.location.search).get(
-    "perfil",
-  );
-  if (!profileSettings[initialProfile]) {
-    try {
-      initialProfile = sessionStorage.getItem("continuum_perfil");
-    } catch (error) {
-      initialProfile = "doador";
-    }
-  }
-  setProfile(profileSettings[initialProfile] ? initialProfile : "doador");
-
-  profileOptions.forEach((option) => {
-    option.addEventListener("click", () => setProfile(option.value));
+  setProfile(perfil);
+  tabs.forEach((t) => t.addEventListener("click", () => setProfile(t.value)));
+  identifier.addEventListener("input", () => {
+    const raw = identifier.value;
+    if (/[a-z@]/i.test(raw)) return;
+    const d = onlyDigits(raw);
+    identifier.value =
+      perfil === "doador"
+        ? mascaraCPF(d)
+        : perfil === "designer" && d.length <= 11
+          ? mascaraCPF(d)
+          : mascaraCNPJ(d);
   });
-
-  const eyeOpenIcon = passwordToggle.querySelector(".icon-eye-open");
-  const eyeClosedIcon = passwordToggle.querySelector(".icon-eye-closed");
-  const helpClose = document.getElementById("loginHelpClose");
-  let helpTimeout = null;
-
-  const closeHelp = () => {
-    if (helpTimeout) {
-      clearTimeout(helpTimeout);
-      helpTimeout = null;
-    }
-    helpButton.setAttribute("aria-expanded", "false");
-    helpMessage.hidden = true;
-  };
-
-  const openHelp = () => {
-    helpButton.setAttribute("aria-expanded", "true");
-    helpMessage.hidden = false;
-    if (helpTimeout) clearTimeout(helpTimeout);
-    helpTimeout = setTimeout(() => {
-      closeHelp();
-    }, 5000);
-  };
-
-  passwordToggle.addEventListener("click", () => {
-    const showPassword = password.type === "password";
-    password.type = showPassword ? "text" : "password";
-    passwordToggle.setAttribute("aria-pressed", String(showPassword));
-    if (eyeOpenIcon && eyeClosedIcon) {
-      eyeOpenIcon.style.display = showPassword ? "none" : "block";
-      eyeClosedIcon.style.display = showPassword ? "block" : "none";
-    }
-  });
-
-  forgotPassword.addEventListener("click", () => {
-    status.textContent =
-      "A recuperação de senha ainda não está disponível nesta tela.";
-  });
-
-  helpButton.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const isExpanded = helpButton.getAttribute("aria-expanded") === "true";
-    if (isExpanded) {
-      closeHelp();
-    } else {
-      openHelp();
-    }
-  });
-
-  if (helpClose) {
-    helpClose.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeHelp();
+  document
+    .querySelector(".login-form__password-toggle")
+    ?.addEventListener("click", (e) => {
+      password.type = password.type === "password" ? "text" : "password";
+      e.currentTarget.setAttribute(
+        "aria-pressed",
+        String(password.type === "text"),
+      );
     });
-  }
-
-  document.addEventListener("click", (e) => {
-    if (!helpButton.contains(e.target) && !helpMessage.contains(e.target)) {
-      closeHelp();
-    }
-  });
-
-  helpButton.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeHelp();
-    }
-  });
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const typedLogin = identifier.value.trim().toLowerCase();
-    const typedPassword = password.value;
-    const user = loadMockUsers().find(
-      (u) => u.login === typedLogin && u.senha === typedPassword,
-    );
-
-    if (!user) {
-      status.textContent = "Usuário ou senha inválidos.";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const session = await api.login(perfil, identifier.value, password.value);
+      try {
+        sessionStorage.setItem(
+          "continuum_sessao",
+          JSON.stringify({
+            perfil,
+            nome: session.usuario?.nome || session.usuarioEmpresa?.nome,
+            perfilEmpresa: session.usuarioEmpresa?.perfil,
+          }),
+        );
+      } catch {}
+      status.textContent = "Acesso liberado. Redirecionando…";
+      const dest = {
+        doador: "../../doador/painel/index.html",
+        designer: "../../designer/painel/index.html",
+        empresa: "../../empresa/painel/index.html",
+      };
+      setTimeout(() => (location.href = dest[perfil]), 250);
+    } catch (err) {
+      status.textContent = err.message;
       password.value = "";
       password.focus();
+    }
+  });
+  const forgot = document.getElementById("forgotPassword");
+  forgot?.addEventListener("click", () => {
+    status.textContent = "";
+    form.hidden = true;
+    const panel = document.getElementById("recoveryPanel");
+    if (panel) {
+      panel.hidden = false;
       return;
     }
-
-    try {
-      sessionStorage.setItem(
-        SESSION_KEY,
-        JSON.stringify({
-          login: user.login,
-          perfil: user.perfil,
-          nome: user.nome,
-        }),
-      );
-    } catch (error) {
-      /* sessionStorage indisponível: segue sem persistir a sessão */
-    }
-    status.textContent = "Acesso liberado. Redirecionando…";
-    window.location.href = DESTINATIONS[user.perfil];
+    const box = document.createElement("section");
+    box.id = "recoveryPanel";
+    box.innerHTML =
+      '<h2>Redefinir senha</h2><label>CPF, CNPJ ou e-mail<input id="recoveryId" class="form-input" required></label><label>Nova senha<input id="recoveryPass" class="form-input" type="password" minlength="8" required></label><label>Confirmar nova senha<input id="recoveryConfirm" class="form-input" type="password" minlength="8" required></label><button class="btn btn--primary btn--full" id="recoverySubmit">Salvar nova senha</button><button class="btn btn--full" id="recoveryBack" type="button">Voltar ao login</button><p id="recoveryStatus" role="status"></p>';
+    form.after(box);
+    box.querySelector("#recoveryBack").onclick = () => {
+      box.hidden = true;
+      form.hidden = false;
+    };
+    box.querySelector("#recoverySubmit").onclick = async () => {
+      const msg = box.querySelector("#recoveryStatus");
+      try {
+        await api.redefinirSenha(
+          box.querySelector("#recoveryId").value,
+          box.querySelector("#recoveryPass").value,
+          box.querySelector("#recoveryConfirm").value,
+        );
+        msg.textContent = "Senha alterada com sucesso!";
+        setTimeout(() => {
+          box.hidden = true;
+          form.hidden = false;
+        }, 900);
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    };
+  });
+  const hb = document.getElementById("loginHelp"),
+    hm = document.getElementById("loginHelpMessage");
+  hb?.addEventListener("click", () => {
+    hm.hidden = !hm.hidden;
+    hb.setAttribute("aria-expanded", String(!hm.hidden));
+  });
+  document.getElementById("loginHelpClose")?.addEventListener("click", () => {
+    hm.hidden = true;
   });
 });

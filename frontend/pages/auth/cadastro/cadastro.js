@@ -27,11 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("Armazenamento em sessionStorage não disponível:", e);
     }
 
-    if (perfil === "empresa") {
-      openCompanyContact();
-      return;
-    }
-
     selectionInProgress = true;
 
     const selectedCard = document
@@ -48,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case designerProfile:
         targetUrl = "designer/index.html";
+        break;
+      case "empresa":
+        targetUrl = "../../empresa/jornada/index.html";
         break;
     }
 
@@ -68,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   optionCards.forEach((card) => {
     card.addEventListener("click", () => {
       const radio = card.querySelector('input[type="radio"]');
-      if (radio?.checked && radio.value === "empresa") openCompanyContact();
+      if (radio?.checked && radio.value === "empresa") return;
     });
 
     card.addEventListener("keydown", (event) => {

@@ -115,6 +115,13 @@
           icon: "mannequin",
           href: "pages/empresa/perfil/index.html",
         },
+        {
+          key: "usuarios",
+          label: "Gestão de Usuários / Equipe",
+          icon: "pattern",
+          href: "pages/empresa/usuarios/index.html",
+          adminOnly: true,
+        },
       ],
     },
   };
@@ -148,7 +155,10 @@
   };
 
   const buildNav = (nav) => {
-    config.links.forEach((item) => nav.appendChild(createNavLink(item)));
+    config.links.forEach((item) => {
+      if (item.adminOnly && session?.perfilEmpresa !== "ADMIN") return;
+      nav.appendChild(createNavLink(item));
+    });
   };
 
   const setupLogo = () => {
@@ -168,12 +178,18 @@
     if (!logout) return;
 
     logout.href = new URL("pages/auth/login/index.html", ROOT).href;
-    logout.addEventListener("click", () => {
+    logout.addEventListener("click", async (event) => {
+      event.preventDefault();
       try {
         sessionStorage.removeItem(SESSION_KEY);
       } catch (error) {
         /* ignore */
       }
+      try {
+        const { api } = await import(new URL("../../js/shared/api.js", script.src).href);
+        api.logout();
+      } catch (error) { /* ignore */ }
+      window.location.href = logout.href;
     });
   };
 

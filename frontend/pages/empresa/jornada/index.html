@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Parceria | CONTINUUM</title>
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../../../css/responsive.css" />
+    <style>
+      body {
+        padding: 2rem;
+        background: #eff0e8;
+      }
+      .wizard {
+        max-width: 850px;
+        margin: auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+      }
+      .step[hidden] {
+        display: none;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+      .grid label {
+        display: grid;
+        gap: 0.35rem;
+      }
+      .wizard input,
+      .wizard textarea,
+      .wizard select {
+        padding: 0.8rem;
+        border: 1px solid #aaa;
+        border-radius: 8px;
+      }
+      .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .error {
+        color: #a00;
+      }
+      small {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wizard">
+      <p>CONTINUUM · PARCERIA</p>
+      <div id="step1" class="step">
+        <h1>Uma nova vida para os materiais</h1>
+        <p>
+          Acompanhe doações, quilos reaproveitados, peças de upcycling e
+          designers apoiados em um painel de impacto. Receba Certificado de
+          Sustentabilidade e rastreie peças por QR Code.
+        </p>
+        <p>
+          Plano Parceiro Circular — <strong>R$ 299,90/mês</strong> (valor
+          demonstrativo MVP)
+        </p>
+        <ul>
+          <li>KPIs ambientais e comerciais</li>
+          <li>Certificado oficial de sustentabilidade</li>
+          <li>História do processo criativo em QR Code</li>
+        </ul>
+        <div class="grid">
+          <p>Doações recebidas: <strong id="impactDonations">—</strong></p>
+          <p>Kg reaproveitados: <strong id="impactKg">—</strong></p>
+          <p>Peças finalizadas: <strong id="impactPieces">—</strong></p>
+          <p>Designers apoiados: <strong id="impactDesigners">—</strong></p>
+          <p>
+            Cupons revertidos em vendas: <strong id="impactCoupons">—</strong>
+          </p>
+        </div>
+        <button class="btn btn--primary" data-next="2">Continuar</button>
+      </div>
+      <div id="step2" class="step" hidden>
+        <h1>Vamos conversar?</h1>
+        <p>
+          Tire dúvidas com nosso time ou siga para cadastro e pagamento
+          demonstrativo.
+        </p>
+        <div class="actions">
+          <a
+            class="btn"
+            target="_blank"
+            rel="noopener"
+            href="https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20o%20CONTINUUM%20para%20minha%20loja"
+            >Tirar dúvidas via WhatsApp</a
+          ><button class="btn btn--primary" data-next="3">
+            Seguir para Cadastro e Pagamento
+          </button>
+        </div>
+      </div>
+      <form id="companyForm" class="step" hidden>
+        <h1>Dados da empresa e do ponto de coleta</h1>
+        <div class="grid">
+          <label
+            >CNPJ *<input
+              id="cnpj"
+              required
+              inputmode="numeric"
+              maxlength="18" /></label
+          ><label>Razão Social *<input id="razao" required /></label
+          ><label>Nome Fantasia *<input id="fantasia" required /></label
+          ><label
+            >Nome do administrador *<input id="adminNome" required /></label
+          ><label
+            >E-mail corporativo *<input
+              id="adminEmail"
+              type="email"
+              required /></label
+          ><label
+            >Telefone / WhatsApp *<input id="adminTelefone" required /></label
+          ><label
+            >Senha do administrador *<input
+              id="adminSenha"
+              type="password"
+              minlength="8"
+              required /></label
+          ><label
+            >Confirmar senha *<input
+              id="adminConfirm"
+              type="password"
+              required /></label
+          ><label>CEP *<input id="cep" maxlength="9" required /></label
+          ><label>UF *<input id="uf" maxlength="2" required /></label
+          ><label>Cidade *<input id="cidade" required /></label
+          ><label>Bairro *<input id="bairro" required /></label
+          ><label>Rua / Logradouro *<input id="logradouro" required /></label
+          ><label>Número *<input id="numero" required /></label
+          ><label>Complemento<input id="complemento" /></label
+          ><label
+            >Abertura *<input
+              id="abertura"
+              type="time"
+              value="10:00"
+              required /></label
+          ><label
+            >Fechamento *<input
+              id="fechamento"
+              type="time"
+              value="18:00"
+              required /></label
+          ><label
+            >Horário/observação de retirada<input
+              id="retirada"
+              value="Seg a Sex das 10h às 18h"
+          /></label>
+        </div>
+        <p>
+          O envio via Correios dentro de SP é sempre oferecido e custeado pelo
+          CONTINUUM.
+        </p>
+        <label
+          ><input id="aceitaRetirada" type="checkbox" checked /> Aceita retirada
+          presencial do lote pelo designer na loja?</label
+        >
+        <p>
+          <label
+            ><input id="termos" type="checkbox" required /> Aceito os Termos de
+            Parceria e a Política de Privacidade *</label
+          >
+        </p>
+        <div class="actions">
+          <button type="button" data-next="2">Voltar</button
+          ><button class="btn btn--primary">Continuar ao pagamento</button>
+        </div>
+        <p id="companyError" class="error" role="alert"></p>
+      </form>
+      <form id="paymentForm" class="step" hidden>
+        <h1>Pagamento demonstrativo</h1>
+        <p>Plano Parceiro Circular · R$ 299,90/mês</p>
+        <div class="grid">
+          <label
+            >Nome impresso no cartão *<input id="cardName" required /></label
+          ><label
+            >Número do cartão *<input
+              id="cardNumber"
+              inputmode="numeric"
+              maxlength="19"
+              placeholder="0000 0000 0000 0000"
+              required /></label
+          ><label
+            >Validade (MM/AA) *<input
+              id="expiry"
+              maxlength="5"
+              placeholder="MM/AA"
+              required /></label
+          ><label
+            >CVV *<input id="cvv" inputmode="numeric" maxlength="4" required
+          /></label>
+        </div>
+        <p id="paymentError" class="error" role="alert"></p>
+        <div class="actions">
+          <button type="button" data-next="3">Voltar</button
+          ><button class="btn btn--primary">Ativar assinatura e acessar</button>
+        </div>
+      </form>
+      <section id="step5" class="step" hidden>
+        <h1>Parceria ativada</h1>
+        <p>
+          Sua conta de administradora foi criada. Redirecionando ao Ponto de
+          Coleta…
+        </p>
+      </section>
+    </main>
+    <script type="module" src="jornada.js"></script>
+  </body>
+</html>

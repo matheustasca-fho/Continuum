@@ -156,6 +156,91 @@
                 required
               />
             </div>
+            <div
+              class="person-form__field person-form__field--wide"
+              id="razaoSocialField"
+              hidden
+            >
+              <label class="person-form__label" for="razaoSocialDesigner"
+                >Razão Social *</label
+              ><input
+                class="form-input person-form__input"
+                id="razaoSocialDesigner"
+                name="razaoSocial"
+              />
+            </div>
+
+            <div class="person-form__field">
+              <label class="person-form__label" for="emailConfeccionista"
+                >E-mail <span class="person-form__required">*</span></label
+              >
+              <input
+                class="form-input person-form__input"
+                type="email"
+                id="emailConfeccionista"
+                name="EMAIL"
+                placeholder="voce@exemplo.com"
+                autocomplete="email"
+                aria-describedby="emailPessoaAjuda"
+                required
+              />
+              <p
+                id="emailPessoaAjuda"
+                class="person-form__hint"
+                style="display: none"
+              ></p>
+            </div>
+            <div class="person-form__field">
+              <label class="person-form__label" for="ufPessoa"
+                >Estado (UF) *</label
+              ><input
+                class="form-input person-form__input"
+                id="ufPessoa"
+                maxlength="2"
+                required
+              />
+            </div>
+            <div class="person-form__field">
+              <label class="person-form__label" for="cidadePessoa"
+                >Cidade *</label
+              ><input
+                class="form-input person-form__input"
+                id="cidadePessoa"
+                required
+              />
+            </div>
+            <div class="person-form__field">
+              <label class="person-form__label" for="bairroPessoa"
+                >Bairro *</label
+              ><input
+                class="form-input person-form__input"
+                id="bairroPessoa"
+                required
+              />
+            </div>
+
+            <div class="person-form__field">
+              <label class="person-form__label" for="telefoneConfeccionista"
+                >Telefone <span class="person-form__required">*</span></label
+              >
+              <input
+                class="form-input person-form__input"
+                type="tel"
+                id="telefoneConfeccionista"
+                name="TELEFONE"
+                placeholder="(11) 98765-4321"
+                autocomplete="tel"
+                inputmode="numeric"
+                maxlength="15"
+                aria-describedby="telefonePessoaAjuda"
+                required
+              />
+              <p
+                id="telefonePessoaAjuda"
+                class="person-form__hint"
+                style="display: none"
+              ></p>
+            </div>
 
             <div class="person-form__field">
               <label class="person-form__label" for="cepPessoa"
@@ -180,6 +265,27 @@
               ></p>
             </div>
 
+            <div class="person-form__field person-form__field--wide">
+              <label class="person-form__label" for="logradouroPessoa"
+                >Logradouro <span class="person-form__required">*</span></label
+              >
+              <input
+                class="form-input person-form__input"
+                type="text"
+                id="logradouroPessoa"
+                name="LOGRADOURO"
+                placeholder="Rua, avenida, travessa..."
+                autocomplete="street-address"
+                aria-describedby="logradouroAjuda"
+                required
+              />
+              <p
+                id="logradouroAjuda"
+                class="person-form__hint"
+                style="display: none"
+              ></p>
+            </div>
+
             <div class="person-form__field">
               <label class="person-form__label" for="numeroEndereco"
                 >Número do endereço
@@ -196,7 +302,61 @@
                 required
               />
             </div>
+
+            <div class="person-form__field">
+              <label class="person-form__label" for="complementoPessoa"
+                >Complemento</label
+              >
+              <input
+                class="form-input person-form__input"
+                type="text"
+                id="complementoPessoa"
+                name="COMPLEMENTO"
+                placeholder="Apto., bloco, sala..."
+                autocomplete="address-line2"
+                maxlength="100"
+              />
+            </div>
           </div>
+
+          <div class="person-form__field">
+            <label class="person-form__label" for="canalDesigner"
+              >Como conheceu o CONTINUUM?</label
+            ><select class="form-input person-form__input" id="canalDesigner">
+              <option value="">Selecione</option>
+              <option>Loja física participante</option>
+              <option>Instagram / Redes Sociais</option>
+              <option>Indicação de amigos</option>
+              <option>Pesquisa Google</option>
+              <option>Eventos de moda/sustentabilidade</option>
+              <option>Outros</option>
+            </select>
+          </div>
+          <div class="person-form__field">
+            <label class="person-form__label" for="confirmarSenhaPessoa"
+              >Confirmar senha *</label
+            ><input
+              class="form-input person-form__input"
+              type="password"
+              id="confirmarSenhaPessoa"
+              minlength="8"
+              required
+            />
+          </div>
+          <label class="person-form__check"
+            ><input id="maioridadeDesigner" type="checkbox" required /> Confirmo
+            que sou maior de 18 anos *</label
+          >
+          <label class="person-form__check"
+            ><input id="termosDesigner" type="checkbox" required /> Aceito os
+            Termos de Uso e a Política de Privacidade, incluindo regras de nota
+            e restrição por cancelamento *</label
+          >
+          <label class="person-form__check"
+            ><input id="consentimentoPublicoDesigner" type="checkbox" />
+            Autorizo a exibição pública do meu perfil e portfólio na página do
+            QR Code das peças</label
+          >
 
           <button
             class="btn btn--primary btn--full person-form__submit"
@@ -221,6 +381,6 @@
         </form>
       </section>
     </main>
-    <script src="cadastro-pessoa.js"></script>
+    <script type="module" src="cadastro-pessoa.js"></script>
   </body>
 </html>

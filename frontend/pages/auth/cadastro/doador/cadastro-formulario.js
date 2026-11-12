@@ -1,211 +1,180 @@
-/** CONTINUUM — formulário de criação de conta (JavaScript Vanilla). */
-'use strict';
-
-function validarCPF(cpf) {
-  const digits = String(cpf).replace(/\D/g, '');
-  if (digits.length !== 11 || /^([0-9])\1{10}$/.test(digits)) return false;
-
-  const calculateDigit = (length, initialWeight) => {
-    let sum = 0;
-    for (let index = 0; index < length; index += 1) {
-      sum += Number(digits[index]) * (initialWeight - index);
-    }
-    const remainder = (sum * 10) % 11;
-    return remainder === 10 ? 0 : remainder;
+import { api } from "../../../../js/shared/api.js";
+import {
+  validarCPF,
+  onlyDigits,
+  mascaraCPF,
+  mascaraCEP,
+  mascaraTelefone,
+} from "../../../../js/shared/validators.js";
+import { conectarBuscaCep } from "../../../../js/shared/cep.js";
+document.addEventListener("DOMContentLoaded", () => {
+  const $ = (id) => document.getElementById(id),
+    form = $("formCadastroConta"),
+    status = $("cadastroStatus"),
+    f = {
+      cpf: $("cpfDoador"),
+      cep: $("cepDoador"),
+      pass: $("senhaUsuario"),
+      confirm: $("confirmarSenhaDoador"),
+      name: $("nomeDoador"),
+      email: $("emailDoador"),
+      phone: $("telefoneDoador"),
+      terms: $("aceiteTermosDoador"),
+      uf: $("ufDoador"),
+      city: $("cidadeDoador"),
+      bairro: $("bairroDoador"),
+      street: $("logradouroDoador"),
+      number: $("numeroDoador"),
+    };
+  const fields = {
+    uf: f.uf,
+    cidade: f.city,
+    bairro: f.bairro,
+    logradouro: f.street,
   };
-
-  return calculateDigit(9, 10) === Number(digits[9])
-    && calculateDigit(10, 11) === Number(digits[10]);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('formCadastroConta');
-  const title = document.getElementById('signup-card-title');
-  const description = document.querySelector('.signup-card__description');
-  const password = document.getElementById('senhaUsuario');
-  const passwordToggle = document.querySelector('.signup-form__password-toggle');
-  const status = document.getElementById('cadastroStatus');
-  const cpfInput = document.getElementById('cpfDoador');
-  const cpfHint = document.getElementById('cpfAjuda');
-  const cpfHintDefault = cpfHint.textContent;
-  const profileData = {
-    title: 'Cadastro Doador',
-    description: 'Crie sua conta e dê um novo destino aos materiais.'  
+  conectarBuscaCep(f.cep, fields, { aoEncontrar: () => f.number.focus() });
+  const hints = {
+    cpf: $("cpfAjuda"),
+    cep: $("cepAjuda"),
+    pass: $("senhaAjuda"),
+    confirm: $("confirmarSenhaAjuda"),
+    email: $("emailAjuda"),
+    phone: $("telefoneAjuda"),
+    terms: $("termosAjuda"),
   };
-
-  title.textContent = profileData.title;
-  description.textContent = profileData.description;
-  document.title = `Cadastro Doador| CONTINUUM`;
-
-  const eyeOpenIcon = passwordToggle.querySelector('.icon-eye-open');
-  const eyeClosedIcon = passwordToggle.querySelector('.icon-eye-closed');
-
-  passwordToggle.addEventListener('click', () => {
-    const isVisible = password.type === 'text';
-    password.type = isVisible ? 'password' : 'text';
-    passwordToggle.setAttribute('aria-pressed', String(!isVisible));
-    if (eyeOpenIcon && eyeClosedIcon) {
-      eyeOpenIcon.style.display = isVisible ? 'block' : 'none';
-      eyeClosedIcon.style.display = isVisible ? 'none' : 'block';
+  const check = (key, msg) => {
+    const el = f[key],
+      hint = hints[key];
+    el.setCustomValidity(msg);
+    el.setAttribute("aria-invalid", String(!!msg));
+    if (hint) {
+      hint.textContent = msg;
+      hint.style.display = msg ? "block" : "none";
     }
+    return !msg;
+  };
+  const v = {
+    name: () =>
+      check(
+        "name",
+        f.name.value.trim().split(/\s+/).length >= 2 &&
+          f.name.value.trim().length >= 3
+          ? ""
+          : "Informe nome e sobrenome (mínimo 3 caracteres).",
+      ),
+    cpf: () =>
+      check("cpf", validarCPF(f.cpf.value) ? "" : "Informe um CPF válido."),
+    email: () =>
+      check("email", f.email.validity.valid ? "" : "Informe um e-mail válido."),
+    phone: () =>
+      check(
+        "phone",
+        onlyDigits(f.phone.value).length >= 10
+          ? ""
+          : "Informe telefone com DDD.",
+      ),
+    cep: () =>
+      check(
+        "cep",
+        onlyDigits(f.cep.value).length === 8
+          ? ""
+          : "O CEP deve conter 8 dígitos.",
+      ),
+    pass: () =>
+      check(
+        "pass",
+        f.pass.value.length >= 8
+          ? ""
+          : "A senha deve ter pelo menos 8 caracteres.",
+      ),
+    confirm: () =>
+      check(
+        "confirm",
+        f.confirm.value && f.confirm.value === f.pass.value
+          ? ""
+          : "As senhas precisam ser iguais.",
+      ),
+    terms: () =>
+      check("terms", f.terms.checked ? "" : "Você precisa aceitar os termos."),
+    uf: () =>
+      check("uf", f.uf.value.trim() ? "" : "Informe a UF. Consulte o CEP."),
+    city: () =>
+      check(
+        "city",
+        f.city.value.trim() ? "" : "Informe a cidade. Consulte o CEP.",
+      ),
+    bairro: () =>
+      check(
+        "bairro",
+        f.bairro.value.trim() ? "" : "Informe o bairro. Consulte o CEP.",
+      ),
+    street: () =>
+      check(
+        "street",
+        f.street.value.trim() ? "" : "Informe o logradouro. Consulte o CEP.",
+      ),
+    number: () =>
+      check(
+        "number",
+        f.number.value.trim() ? "" : "Informe o número do endereço.",
+      ),
+  };
+  f.cpf.addEventListener("input", () => {
+    f.cpf.value = mascaraCPF(f.cpf.value);
+    v.cpf();
   });
-
-  const cepInput = document.getElementById('cepDoador');
-  const cepHint = document.getElementById('cepAjuda');
-  const senhaHint = document.getElementById('senhaAjuda');
-  const telefoneInput = document.getElementById('telefoneDoador');
-  const telefoneHint = document.getElementById('telefoneAjuda');
-  const nomeInput = document.getElementById('nomeDoador');
-
-  // Máscaras de entrada úteis e seguras
-  cpfInput.addEventListener('input', () => {
-    cpfInput.value = cpfInput.value.replace(/\D/g, '').slice(0, 11);
-    validateCpfField();
+  f.cep.addEventListener("input", () => {
+    f.cep.value = mascaraCEP(f.cep.value);
+    v.cep();
   });
-
-  cepInput.addEventListener('input', () => {
-    cepInput.value = cepInput.value.replace(/\D/g, '').slice(0, 8);
-    validateCepField();
+  f.phone.addEventListener("input", () => {
+    f.phone.value = mascaraTelefone(f.phone.value);
+    v.phone();
   });
-
-  password.addEventListener('input', () => {
-    validateSenhaField();
+  Object.entries(v).forEach(([k, fn]) =>
+    f[k].addEventListener(k === "terms" ? "change" : "blur", fn),
+  );
+  f.pass.addEventListener("input", () => {
+    v.pass();
+    v.confirm();
   });
-
-  telefoneInput.addEventListener('input', () => {
-    let raw = telefoneInput.value;
-    // Permite digitação com formato (XX) XXXXX-XXXX
-    validateTelefoneField();
-  });
-
-  const showFieldFeedback = (input, hintElement, message, isValid) => {
-    input.setCustomValidity(isValid ? '' : message);
-    if (!isValid) {
-      input.setAttribute('aria-invalid', 'true');
-      if (hintElement) {
-        hintElement.textContent = message;
-        hintElement.dataset.state = 'error';
-        hintElement.style.display = 'block';
-      }
-    } else {
-      input.setAttribute('aria-invalid', 'false');
-      if (hintElement) {
-        if (hintElement === telefoneHint) {
-          hintElement.textContent = 'Informe o DDD entre parênteses, com até 11 dígitos. Ex: (11) 98765-4321';
-          hintElement.dataset.state = 'valid';
-          hintElement.style.display = 'block';
-        } else {
-          hintElement.textContent = '';
-          hintElement.dataset.state = 'valid';
-          hintElement.style.display = 'none';
-        }
-      }
-    }
-  };
-
-  const validateCpfField = (report = false) => {
-    const val = cpfInput.value.trim();
-    if (!val) {
-      if (report) showFieldFeedback(cpfInput, cpfHint, 'O CPF é obrigatório.', false);
-      return false;
-    }
-    if (/[.\-]/.test(val)) {
-      showFieldFeedback(cpfInput, cpfHint, 'O CPF não pode conter pontos ou traços.', false);
-      return false;
-    }
-    const digits = val.replace(/\D/g, '');
-    if (digits.length < 11) {
-      showFieldFeedback(cpfInput, cpfHint, 'O CPF deve ter no mínimo 11 dígitos.', false);
-      return false;
-    }
-    if (!validarCPF(digits)) {
-      showFieldFeedback(cpfInput, cpfHint, 'CPF inválido. Confira os números digitados.', false);
-      return false;
-    }
-    showFieldFeedback(cpfInput, cpfHint, '', true);
-    return true;
-  };
-
-  const validateCepField = (report = false) => {
-    const val = cepInput.value.trim();
-    if (!val) {
-      if (report) showFieldFeedback(cepInput, cepHint, 'O CEP é obrigatório.', false);
-      return false;
-    }
-    if (val.includes('-')) {
-      showFieldFeedback(cepInput, cepHint, 'O CEP não pode conter hífen.', false);
-      return false;
-    }
-    const digits = val.replace(/\D/g, '');
-    if (digits.length < 8) {
-      showFieldFeedback(cepInput, cepHint, 'O CEP deve ter 8 dígitos.', false);
-      return false;
-    }
-    showFieldFeedback(cepInput, cepHint, '', true);
-    return true;
-  };
-
-  const validateSenhaField = (report = false) => {
-    const val = password.value;
-    if (!val) {
-      if (report) showFieldFeedback(password, senhaHint, 'A senha é obrigatória.', false);
-      return false;
-    }
-    if (val.length > 10) {
-      showFieldFeedback(password, senhaHint, 'A senha não pode ter mais que 10 caracteres.', false);
-      return false;
-    }
-    showFieldFeedback(password, senhaHint, '', true);
-    return true;
-  };
-
-  const validateTelefoneField = (report = false) => {
-    const val = telefoneInput.value.trim();
-    if (!val) {
-      if (report) showFieldFeedback(telefoneInput, telefoneHint, 'O telefone é obrigatório.', false);
-      return false;
-    }
-    if (!/\(\d{2}\)/.test(val)) {
-      showFieldFeedback(telefoneInput, telefoneHint, 'Informe o DDD entre parênteses. Ex: (11) 98765-4321', false);
-      return false;
-    }
-    const digits = val.replace(/\D/g, '');
-    if (digits.length > 11) {
-      showFieldFeedback(telefoneInput, telefoneHint, 'O telefone não pode ter mais que 11 dígitos.', false);
-      return false;
-    }
-    if (digits.length < 10) {
-      showFieldFeedback(telefoneInput, telefoneHint, 'O telefone deve conter o DDD e pelo menos 8 ou 9 dígitos.', false);
-      return false;
-    }
-    showFieldFeedback(telefoneInput, telefoneHint, '', true);
-    return true;
-  };
-
-  cpfInput.addEventListener('blur', () => validateCpfField(true));
-  cepInput.addEventListener('blur', () => validateCepField(true));
-  password.addEventListener('blur', () => validateSenhaField(true));
-  telefoneInput.addEventListener('blur', () => validateTelefoneField(true));
-
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const isCpfValid = validateCpfField(true);
-    const isCepValid = validateCepField(true);
-    const isSenhaValid = validateSenhaField(true);
-    const isTelValid = validateTelefoneField(true);
-    const isNomeValid = nomeInput.value.trim().length > 0;
-
-    if (!isNomeValid) {
-      nomeInput.setAttribute('aria-invalid', 'true');
-    } else {
-      nomeInput.setAttribute('aria-invalid', 'false');
-    }
-
-    if (!isCpfValid || !isCepValid || !isSenhaValid || !isTelValid || !isNomeValid) {
-      status.textContent = 'Por favor, corrija os erros nos campos antes de continuar.';
+  f.confirm.addEventListener("input", v.confirm);
+  document
+    .querySelector(".signup-form__password-toggle")
+    ?.addEventListener(
+      "click",
+      () => (f.pass.type = f.pass.type === "password" ? "text" : "password"),
+    );
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const valid = Object.values(v)
+      .map((fn) => fn())
+      .every(Boolean);
+    if (!valid) {
+      status.textContent = "Revise os campos destacados.";
       return;
     }
-
-    status.textContent = 'Cadastro demonstrativo realizado com sucesso!';
+    try {
+      await api.registrarDoador({
+        nome: f.name.value.trim(),
+        cpf: onlyDigits(f.cpf.value),
+        email: f.email.value.trim(),
+        telefone: onlyDigits(f.phone.value),
+        cep: onlyDigits(f.cep.value),
+        uf: f.uf.value.trim().toUpperCase(),
+        cidade: f.city.value.trim(),
+        bairro: f.bairro.value.trim(),
+        logradouro: f.street.value.trim(),
+        numero: f.number.value.trim(),
+        complemento: $("complementoDoador").value.trim(),
+        faixaEtaria: $("faixaEtariaDoador").value,
+        comoConheceu: $("comoConheceuDoador").value,
+        senhaHash: f.pass.value,
+      });
+      status.textContent = "Cadastro realizado com sucesso!";
+      form.reset();
+    } catch (err) {
+      status.textContent = err.message;
+    }
   });
 });
