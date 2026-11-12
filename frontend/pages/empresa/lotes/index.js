@@ -1,3 +1,4 @@
+import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 // CONTINUUM - Application Script
 (() => {
   "use strict";
@@ -5,34 +6,30 @@
   /* ==========================================================
      CONSTANTES
      ========================================================== */
-  const ADMIN_PASSWORD = "AdminEmpresa";
   const MAX_LOTS_PER_BATCH = 100;
   const SCROLL_FLAG_THRESHOLD_PX = 12;
   const SCROLLABLE_TOLERANCE_PX = 8;
   const MENU_CLOSE_DELAY_MS = 180;
   const SEARCH_FOCUS_DELAY_MS = 180;
   const MODAL_EASING = "cubic-bezier(.22,.75,.25,1)";
-  const DEFAULT_STATUS = "DISPONÍVEL";
+  const DEFAULT_STATUS = STATUS_LOTE.DISPONIVEL;
 
   const STATUS_OPTIONS = [
     { value: "ALL", label: "Todos os status" },
-    { value: "DISPONÍVEL", label: "Disponível" },
-    { value: "RESERVADO", label: "Reservado" },
-    { value: "EM PRODUÇÃO", label: "Em Produção" },
-    { value: "ENVIADO", label: "Enviado" },
-    { value: "FINALIZADO", label: "Finalizado" },
+    ...Object.values(STATUS_LOTE).map((value) => ({ value, label: value })),
   ];
   const LOT_STATUS_OPTIONS = STATUS_OPTIONS.slice(1);
   const STATUS_ORDER = LOT_STATUS_OPTIONS.map(({ value }) => value);
 
   const STATUS_ICON_PATHS = {
     ALL: '<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/>',
-    DISPONÍVEL: '<path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/>',
+    [STATUS_LOTE.DISPONIVEL]:
+      '<path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/>',
     RESERVADO:
       '<path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z"/>',
-    "EM PRODUÇÃO":
+    [STATUS_LOTE.EM_PRODUCAO]:
       '<path d="M3 21V10l6 5v-5l6 5V8h6v13H3z"/><path d="M18 4h3M7 19h.01M12 19h.01M17 19h.01"/>',
-    ENVIADO:
+    [STATUS_LOTE.ENVIADO_LOJA]:
       '<path d="M3 12h12m-5-5 5 5-5 5"/><path d="M15 5h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"/>',
     FINALIZADO:
       '<path d="m5 12 4 4L19 6"/><path d="M21 12a9 9 0 1 1-2.64-6.36"/>',
@@ -54,32 +51,7 @@
   /* ==========================================================
      ESTADO
      ========================================================== */
-  let lotsData = [
-    {
-      id: 1,
-      code: "L00128092026",
-      date: "28/09/2026",
-      desc: "Descrição detalhada do lote textil recuperado",
-      status: "DISPONÍVEL",
-      image: null,
-    },
-    {
-      id: 2,
-      code: "L00228092026",
-      date: "28/09/2026",
-      desc: "Descrição detalhada do lote textil recuperado",
-      status: "EM PRODUÇÃO",
-      image: null,
-    },
-    {
-      id: 3,
-      code: "L00328092026",
-      date: "28/09/2026",
-      desc: "Descrição detalhada do lote textil recuperado",
-      status: "RESERVADO",
-      image: null,
-    },
-  ];
+  let lotsData = [];
 
   let activeFilter = "ALL";
   let searchQuery = "";
@@ -110,6 +82,7 @@
   const addLotForm = byId("addLotForm");
   const lotCodeInput = byId("lotCode");
   const lotDescInput = byId("lotDesc");
+  const lotWeightInput = byId("lotWeight");
   const lotIdInput = byId("lotIdInput");
   const btnDeleteLot = byId("btnDeleteLot");
   const modalFormTitle = byId("modalFormTitle");
@@ -430,7 +403,7 @@
       '<div class="card-lote__body" data-action="edit-lot">' +
       `<div class="card-lote__heading"><h3 class="card-lote__title">${escapeHtml(getLotCode(lot))}</h3>` +
       `<time class="card-lote__date">${escapeHtml(getLotDate(lot))}</time></div>` +
-      `<p class="card-lote__desc">${escapeHtml(lot.desc || "Sem descrição cadastrada.")}</p>` +
+      `<p class="card-lote__desc">${escapeHtml(lot.desc || "Sem descrição cadastrada.")} · ${escapeHtml(String(lot.pesoKg ?? 0))} kg</p>` +
       `<div class="card-lote__footer"><span class="${statusBadgeClass(lot.status)}">${escapeHtml(lot.status)}</span></div></div>`
     );
   };
@@ -569,9 +542,10 @@
      MODAL DE LOTE (abrir / fechar / salvar)
      ========================================================== */
   const setEditorFieldsMode = (isEditing) => {
-    statusField.classList.toggle("hidden", !isEditing);
+    const canEdit = api.podeExecutar("EDITAR_EXCLUIR_LOTE");
+    statusField.classList.toggle("hidden", !isEditing || !canEdit);
     quantityField.classList.toggle("hidden", isEditing);
-    btnDeleteLot.style.display = isEditing ? "inline-flex" : "none";
+    btnDeleteLot.style.display = isEditing && canEdit ? "inline-flex" : "none";
   };
 
   const openNewLotModal = () => {
@@ -588,6 +562,7 @@
     modalFormTitle.textContent = "Novo Lote Têxtil";
     lotCodeInput.value = getNextLotCode();
     lotDescInput.value = "";
+    lotWeightInput.value = "1";
     lotQuantity.value = "1";
     lotStatusSelect.value = DEFAULT_STATUS;
     setEditorFieldsMode(false);
@@ -598,6 +573,10 @@
   };
 
   function openEditModal(id) {
+    if (!api.podeExecutar("EDITAR_EXCLUIR_LOTE")) {
+      alert("Acesso restrito ao administrador da loja.");
+      return;
+    }
     const lot = findLotById(id);
     if (!lot) return;
 
@@ -606,6 +585,7 @@
     modalFormTitle.textContent = "Editar Lote";
     lotCodeInput.value = getLotCode(lot);
     lotDescInput.value = lot.desc;
+    lotWeightInput.value = lot.pesoKg || 1;
     lotStatusSelect.value = lot.status;
     setEditorFieldsMode(true);
     syncEditorStatus();
@@ -627,8 +607,22 @@
   };
 
   const applyLotChanges = (lot, { code, desc, status }) => {
-    Object.assign(lot, { code, desc, status });
+    Object.assign(lot, {
+      code,
+      desc,
+      status,
+      pesoKg: Number(lotWeightInput.value) || 1,
+    });
     if (pendingModalImage !== null) lot.image = pendingModalImage;
+    api
+      .atualizarLote(lot.id, {
+        codigo: code,
+        titulo: desc,
+        descricao: desc,
+        status,
+        pesoKg: lot.pesoKg,
+      })
+      .catch((error) => alert(error.message));
   };
 
   const handleEditSubmit = ({ code, desc, status }) => {
@@ -680,8 +674,14 @@
     if (event.target === addModal) closeAddModal();
   });
 
-  btnDeleteLot.addEventListener("click", () => {
+  btnDeleteLot.addEventListener("click", async () => {
     if (currentEditingLotId === null) return;
+    try {
+      await api.excluirLote(currentEditingLotId);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     lotsData = lotsData.filter((lot) => lot.id !== currentEditingLotId);
     renderLots();
     closeAddModal();
@@ -711,35 +711,40 @@
     pendingNewLot = null;
   };
 
-  function createLotBatch({ count, desc, image }) {
-    const batchStart = Date.now();
-    Array.from({ length: count }, (_, index) => {
-      lotsData.push({
-        id: batchStart + index,
-        code: getNextLotCode(),
-        date: getTodayStr(),
-        desc,
-        status: DEFAULT_STATUS,
-        image,
+  async function createLotBatch({ count, desc, image }) {
+    const empresa = await api.getEmpresa();
+    for (let index = 0; index < count; index++) {
+      const saved = await api.criarLote({
+        empresaId: empresa.id,
+        titulo: desc || "Novo lote têxtil",
+        descricao: desc,
+        pesoKg: Number(lotWeightInput.value) || 1,
+        quantidadePecas: 0,
+        briefing: {
+          ideiaMarca: "",
+          expectativa: "",
+          liberdadeCriativa: "",
+          prazoProducaoDias: 30,
+        },
       });
-    });
+      lotsData.push({
+        id: saved.id,
+        code: saved.codigo,
+        date: getTodayStr(),
+        desc: saved.descricao,
+        status: saved.status,
+        image,
+        pesoKg: saved.pesoKg,
+      });
+    }
     renderLots();
     closeAddModal();
   }
 
   // Listener em fase de captura: registra a autorização antes do submit principal
-  consentForm.addEventListener(
-    "submit",
-    () => {
-      authorizationConfirmed =
-        adminPassword.value === ADMIN_PASSWORD && consentCheck.checked;
-    },
-    true,
-  );
-
-  consentForm.addEventListener("submit", (event) => {
+  consentForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (adminPassword.value !== ADMIN_PASSWORD) {
+    if (!(await api.validarSenhaAdmin(adminPassword.value))) {
       passwordMessage.textContent = "Senha incorreta.";
       return;
     }
@@ -747,6 +752,7 @@
       passwordMessage.textContent = "Confirme sua autorização para continuar.";
       return;
     }
+    authorizationConfirmed = true;
     closeConsentModal();
     openNewLotModal();
   });
@@ -803,5 +809,18 @@
      INICIALIZAÇÃO
      ========================================================== */
   statusField.after(quantityField);
-  renderLots();
+  (async () => {
+    const company = await api.getEmpresa();
+    lotsData = (await api.listarLotesEmpresa(company.id)).map((l) => ({
+      id: l.id,
+      code: l.codigo,
+      date: new Date(l.criadoEm).toLocaleDateString("pt-BR"),
+      desc: l.descricao || l.titulo,
+      status: l.status,
+      image: l.image || null,
+      pesoKg: l.pesoKg,
+    }));
+    if (!api.podeExecutar("EDITAR_EXCLUIR_LOTE")) btnAddLote.hidden = true;
+    renderLots();
+  })();
 })();

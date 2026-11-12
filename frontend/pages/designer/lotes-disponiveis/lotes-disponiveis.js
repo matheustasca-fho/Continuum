@@ -1,10 +1,4 @@
-import {
-  getLotes,
-  getLojas,
-  getDesigner,
-  toggleFavorito,
-  setReservaAtiva,
-} from "../../../js/shared/store.js";
+import {api,STATUS_LOTE} from "../../../js/shared/api.js";
 
 // Elementos da DOM
 const grid = document.getElementById("lotes-grid");
@@ -33,11 +27,13 @@ async function init() {
   // Simula latência de rede
   await new Promise((r) => setTimeout(r, 400));
 
-  designer = getDesigner();
-  lotes = getLotes().filter(
-    (l) => l.status === "DISPONIVEL" || l.id === designer.reservaAtiva,
-  );
-  lojas = getLojas();
+  designer = await api.getDesigner();
+  lotes = await api.listarLotesVitrineSP();
+  if (designer.reservaAtiva && !lotes.some(l=>l.id===designer.reservaAtiva)) {
+    const reserved=await api.obterLotePorCodigo(designer.reservaAtiva);
+    if(reserved){const companies=await api.listarEmpresas(),e=companies.find(x=>x.id===reserved.empresaId);lotes.push({...reserved,lojaId:e?.id,peso:`${String(reserved.pesoKg).replace('.',',')} kg`,direcao:reserved.briefing?.ideiaMarca||reserved.descricao,logistica_aceita:e?.aceitaRetirada?["retirada","envio"]:["envio"]});}
+  }
+  lojas = (await api.listarEmpresas()).map(e=>({id:e.id,nome:e.nomeFantasia,sobre:e.perfilLoja,endereco:`${e.logradouro}, ${e.numero} - ${e.bairro}, ${e.cidade} - ${e.uf}`,horario_retirada:e.horarioRetirada}));
 
   renderLojas();
   renderGrid();
@@ -50,7 +46,7 @@ function renderLojas() {
   lojas.forEach((loja) => {
     // Conta quantos lotes disponiveis da loja
     const qtde = lotes.filter(
-      (l) => l.lojaId === loja.id && l.status === "DISPONIVEL",
+      (l) => l.lojaId === loja.id && l.status === STATUS_LOTE.DISPONIVEL,
     ).length;
     if (qtde > 0) {
       html += `<button class="chip">${loja.nome} (${qtde})</button>`;
@@ -63,7 +59,7 @@ function renderFaixaReserva() {
   if (designer.reservaAtiva) {
     const lote = lotes.find((l) => l.id === designer.reservaAtiva);
     const loja = lojas.find((l) => l.id === lote.lojaId);
-    textoReserva.innerHTML = `${lote.id} • ${loja.nome} • retirar em 10 dias úteis`;
+    textoReserva.innerHTML = `${lote.codigo} • ${loja.nome} • retirar em 10 dias úteis`;
     bannerReserva.hidden = false;
   } else {
     bannerReserva.hidden = true;
@@ -79,7 +75,7 @@ function renderGrid() {
       return false;
     // Omitir o reservado atual da grade, pois ele fica na faixa de topo
     if (l.id === designer.reservaAtiva) return false;
-    return l.status === "DISPONIVEL";
+    return l.status === STATUS_LOTE.DISPONIVEL;
   });
 
   countSalvos.textContent = designer.favoritos.length;
@@ -153,7 +149,7 @@ function openDrawerLote(id) {
   body.innerHTML = `
     <div class="form-group">
       <label>Código do Lote</label>
-      <input type="text" class="form-control" value="${lote.id}" readonly>
+      <input type="text" class="form-control" value="${lote.codigo}" readonly>
       <span class="form-helper">Gerado automaticamente pelo sistema.</span>
     </div>
     <div class="form-group">
@@ -269,12 +265,12 @@ function setupListeners() {
     });
   });
 
-  grid.addEventListener("click", (e) => {
+  grid.addEventListener("click", async (e) => {
     // Favo
     const btnFav = e.target.closest(".lote-card__btn-fav");
     if (btnFav) {
       const id = btnFav.dataset.id;
-      designer.favoritos = toggleFavorito(id);
+      designer.favoritos = await api.alternarFavorito(id);
       renderGrid();
       if (loteSelecionado && loteSelecionado.id === id) {
         openDrawerLote(id); // atualiza estado no drawer
@@ -361,15 +357,16 @@ function setupListeners() {
   });
 
   // M2 -> M3 (E salva no banco falso)
-  document.getElementById("btn-m2-salvar").addEventListener("click", () => {
+  document.getElementById("btn-m2-salvar").addEventListener("click", async () => {
     const modo = document.querySelector('input[name="logistica"]:checked');
     if (!modo) return;
 
     m2.close();
 
     // Efetiva reserva
-    setReservaAtiva(loteSelecionado.id);
-    designer.reservaAtiva = loteSelecionado.id; // atualiza estado local
+    try { await api.reservarLote(loteSelecionado.codigo || loteSelecionado.id, designer.id, modo.value === "retirada" ? "RETIRADA" : "ENVIO"); }
+    catch (error) { alert(error.message); return; }
+    designer.reservaAtiva = loteSelecionado.id;
 
     // Prepara M3
     document.getElementById("m3-loja-nome").textContent = lojas.find(
@@ -394,8 +391,8 @@ function setupListeners() {
   document
     .getElementById("btn-m1-cancelar")
     .addEventListener("click", () => m1.close());
-  document.getElementById("btn-m2-depois").addEventListener("click", () => {
-    setReservaAtiva(loteSelecionado.id); // Salva sem escolher
+    document.getElementById("btn-m2-depois").addEventListener("click", async () => {
+    try { await api.reservarLote(loteSelecionado.codigo || loteSelecionado.id, designer.id, "ENVIO"); } catch (error) { alert(error.message); return; }
     location.reload();
   });
   document
@@ -420,8 +417,8 @@ function setupListeners() {
 
   // Demo Switch
   demoToggle.addEventListener("click", () => {
-    if (designer.reservaAtiva) setReservaAtiva(null);
-    else setReservaAtiva("LT-01");
+    if (designer.reservaAtiva) alert("A reserva ativa deve ser concluída pela jornada do lote.");
+    else alert("Reserve um lote pela vitrine para atualizar seus lotes.");
     location.reload();
   });
 }

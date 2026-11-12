@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Equipe | CONTINUUM</title>
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="../../../components/header/header.css" />
+    <style>
+      .users {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      .users table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .users td,
+      .users th {
+        padding: 0.75rem;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      .users form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.8rem;
+        margin: 2rem 0;
+      }
+      .users input,
+      .users select {
+        padding: 0.7rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="appHeader" data-role="empresa" data-active="usuarios"></div>
+      <main class="main-content users">
+        <h1>Gestão de Usuários / Equipe</h1>
+        <p id="message" role="status"></p>
+        <form id="userForm">
+          <label>Nome<input id="name" required /></label
+          ><label>E-mail<input id="email" type="email" required /></label
+          ><label>Telefone<input id="phone" /></label
+          ><label
+            >Perfil<select id="role">
+              <option>OPERADOR</option>
+              <option>ADMIN</option>
+            </select></label
+          ><label
+            >Senha inicial<input
+              id="password"
+              type="password"
+              minlength="8"
+              required /></label
+          ><button class="btn btn--primary">Adicionar usuário</button>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+              <th>Perfil</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </main>
+    </div>
+    <script type="module" src="usuarios.js"></script>
+    <script src="../../../components/header/header.js"></script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
-import { getProjetos, updateProjeto } from "../../../js/shared/store.js";
+import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+let projetosData = [];
 
 let filtroAtual = "TODOS";
 let projetoSelecionado = null;
@@ -16,28 +17,24 @@ const sidebarRestore = document.getElementById("sidebarRestore");
 // RENDERIZAÇÃO E CÓDIGOS DE LOTE
 // ==========================================
 function getBadgeConfig(status) {
-  if (status === "FINALIZADO")
+  if (status === STATUS_LOTE.FINALIZADO)
     return { class: "badge--finalizado", text: "FINALIZADO" };
-  if (status === "EM_PRODUCAO")
+  if (status === STATUS_LOTE.EM_PRODUCAO)
     return { class: "badge--em-producao", text: "EM PRODUÇÃO" };
-  if (status === "ENVIADO") return { class: "badge--enviado", text: "ENVIADO" };
-  if (status === "RESERVADO")
+  if (status === STATUS_LOTE.ENVIADO_LOJA)
+    return { class: "badge--enviado", text: STATUS_LOTE.ENVIADO_LOJA };
+  if (status === STATUS_LOTE.RESERVADO)
     return { class: "badge--reservado", text: "RESERVADO" };
-  if (status === "DISPONIVEL")
-    return { class: "badge--disponivel", text: "DISPONÍVEL" };
-  if (status === "EXCEDIDO")
-    return { class: "badge--excedido", text: "PRAZO EXCEDIDO" };
+  if (status === STATUS_LOTE.DISPONIVEL)
+    return { class: "badge--disponivel", text: STATUS_LOTE.DISPONIVEL };
   return { class: "badge--reservado", text: status };
 }
 
-const STATUS_OPCOES_PROJETO = [
-  { value: "DISPONIVEL", label: "Disponível", color: "#4f8a47" },
-  { value: "RESERVADO", label: "Reservado", color: "#b95658" },
-  { value: "EM_PRODUCAO", label: "Em Produção", color: "#a67b43" },
-  { value: "ENVIADO", label: "Enviado", color: "#719a45" },
-  { value: "FINALIZADO", label: "Finalizado", color: "#b4546c" },
-  { value: "EXCEDIDO", label: "Prazo Excedido", color: "var(--color-error)" },
-];
+const STATUS_OPCOES_PROJETO = Object.values(STATUS_LOTE).map((value) => ({
+  value,
+  label: value,
+  color: "#4f8a47",
+}));
 
 // Lógica da equipe: Gera um código falso para o lote baseado no ID e na data
 function gerarCodigoLote(id) {
@@ -53,14 +50,14 @@ function getDataMock() {
 }
 
 function renderGrid() {
-  const projetos = getProjetos();
+  const projetos = projetosData;
   const termoBusca = searchInput.value.toLowerCase();
 
   const filtrados = projetos.filter((p) => {
     const matchStatus = filtroAtual === "TODOS" || p.status === filtroAtual;
     const matchBusca =
-      p.designer_nome.toLowerCase().includes(termoBusca) ||
-      p.ds_descricao.toLowerCase().includes(termoBusca);
+      (p.designer_nome || "").toLowerCase().includes(termoBusca) ||
+      (p.ds_descricao || "").toLowerCase().includes(termoBusca);
     return matchStatus && matchBusca;
   });
 
@@ -159,18 +156,16 @@ if (sidebarRestore) {
 // MODAL DE GERENCIAMENTO (Substitui Drawer)
 // ==========================================
 function getIconForStatus(status) {
-  if (status === "DISPONIVEL")
+  if (status === STATUS_LOTE.DISPONIVEL)
     return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4f8a47" stroke-width="2"><path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg>`;
   if (status === "RESERVADO")
     return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b95658" stroke-width="2"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z"/></svg>`;
-  if (status === "EM_PRODUCAO")
+  if (status === STATUS_LOTE.EM_PRODUCAO)
     return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a67b43" stroke-width="2"><path d="M3 21V10l6 5v-5l6 5V8h6v13H3z"/><path d="M18 4h3M7 19h.01M12 19h.01M17 19h.01"/></svg>`;
-  if (status === "ENVIADO")
+  if (status === STATUS_LOTE.ENVIADO_LOJA)
     return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#719a45" stroke-width="2"><path d="M3 12h12m-5-5 5 5-5 5"/><path d="M15 5h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"/></svg>`;
   if (status === "FINALIZADO")
     return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b4546c" stroke-width="2"><path d="m5 12 4 4L19 6"/><path d="M21 12a9 9 0 1 1-2.64-6.36"/></svg>`;
-  if (status === "EXCEDIDO")
-    return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--color-error)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
   return "";
 }
 
@@ -217,6 +212,9 @@ function abrirDrawer(p) {
 
   const statusTrigger = document.getElementById("modal-status-trigger");
   const statusOptions = document.getElementById("modal-status-options");
+  if (!api.podeExecutar("FINALIZAR_PECA_QR")) {
+    document.getElementById("modal-status-menu").hidden = true;
+  }
 
   statusTrigger.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -235,7 +233,9 @@ function abrirDrawer(p) {
     if (!opt) return;
     const newStatus = opt.dataset.status;
     p.status = newStatus;
-    updateProjeto(p.cd_projeto, newStatus);
+    api
+      .alterarStatusProjeto(p.cd_projeto, newStatus)
+      .catch((error) => alert(error.message));
 
     statusTrigger.querySelector(".status-menu__label").textContent =
       getBadgeConfig(newStatus).text;
@@ -254,17 +254,20 @@ function abrirDrawer(p) {
   let acaoEsquerda = `<button class="btn-form-cancel" style="border:none; color:var(--color-primary); background:transparent; padding:0; box-shadow:none;" onclick="window.location.href='../projeto-detalhe/index.html'">Acessar Histórico</button>`;
   let acaoDireita = "";
 
-  if (p.status === "EM_PRODUCAO" || p.status === "ENVIADO") {
+  if (!api.podeExecutar("FINALIZAR_PECA_QR")) {
+    acaoDireita = `<button class="btn-form-cancel" id="btn-cancelar-modal-form">Fechar</button>`;
+  } else if (
+    [
+      STATUS_LOTE.EM_TRANSPORTE,
+      STATUS_LOTE.EM_PRODUCAO,
+      STATUS_LOTE.ENVIADO_LOJA,
+    ].includes(p.status)
+  ) {
     acaoDireita = `
       <button class="btn-form-cancel" id="btn-cancelar-modal-form">Cancelar</button>
       <button class="btn-form-submit" onclick="window.location.href='../projeto-revisao/index.html'">Avançar e Concluir</button>
     `;
-  } else if (p.status === "EXCEDIDO") {
-    acaoDireita = `
-      <button class="btn-form-cancel" id="btn-cancelar-modal-form">Cancelar</button>
-      <button class="btn-form-danger" onclick="abrirModal('EM_PRODUCAO')">Liberar Prazo</button>
-    `;
-  } else if (p.status === "FINALIZADO") {
+  } else if (p.status === STATUS_LOTE.FINALIZADO) {
     acaoDireita = `
       <button class="btn-form-cancel" id="btn-cancelar-modal-form">Fechar</button>
       <button class="btn-form-submit" style="background:var(--color-charcoal-text);" onclick="window.location.href='../projeto-tag/index.html'">Imprimir Tag</button>
@@ -307,11 +310,16 @@ document.getElementById("btn-cancelar-modal").onclick = () => modal.close();
 document.getElementById("btn-confirmar-modal").onclick = (e) => {
   const acao = e.target.dataset.acao;
   if (projetoSelecionado) {
-    updateProjeto(projetoSelecionado.cd_projeto, acao);
+    api
+      .alterarStatusProjeto(projetoSelecionado.cd_projeto, acao)
+      .catch((error) => alert(error.message));
     renderGrid();
   }
   modal.close();
 };
 
 // Start
-renderGrid();
+(async () => {
+  projetosData = await api.listarProjetosEmpresa();
+  renderGrid();
+})();
