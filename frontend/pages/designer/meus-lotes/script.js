@@ -1,2 +1,53 @@
-import {api,STATUS_LOTE} from "../../../js/shared/api.js";
-document.addEventListener('DOMContentLoaded',async()=>{const $=s=>document.querySelector(s),list=$('#lotes'),empty=$('#empty'),search=$('#search'),modal=$('#confirmModal'),confirm=$('#modalConfirm');const designer=await api.getDesigner();let lots=await api.listarMeusLotesDesigner(designer.id),selected=null;const render=()=>{const query=(search.value||'').toLowerCase(),items=lots.filter(l=>`${l.codigo} ${l.titulo} ${l.empresaParceira}`.toLowerCase().includes(query));list.innerHTML=items.map(l=>`<li class="lote" data-id="${l.id}"><div class="lote__row"><div class="lote__info"><h3 class="lote__title">${l.titulo}</h3><p class="lote__meta">${l.codigo} · ${l.pesoKg} kg · Empresa Parceira: ${l.empresaParceira}</p></div><div class="lote__aside"><span class="badge">${l.status}</span>${l.status===STATUS_LOTE.RESERVADO?'<button class="btn-pill" data-action="receive">Sinalizar recebido</button>':''}</div></div></li>`).join('');empty.hidden=items.length>0;$('#totalKg').textContent=items.reduce((n,l)=>n+(Number(l.pesoKg)||0),0).toFixed(1);$('#totalSub').textContent=`${items.length} lote(s) reservado(s)`;};search.addEventListener('input',render);list.addEventListener('click',e=>{const b=e.target.closest('[data-action="receive"]');if(!b)return;selected=b.closest('[data-id]').dataset.id;$('#modalLote').textContent=lots.find(l=>l.id===selected)?.titulo||'';modal.showModal();});confirm.addEventListener('click',async e=>{if(!selected)return;e.preventDefault();try{await api.confirmarRecebimentoDesigner(selected);lots=await api.listarMeusLotesDesigner(designer.id);modal.close();render();}catch(err){alert(err.message);}});render();});
+import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+document.addEventListener("DOMContentLoaded", async () => {
+  const $ = (s) => document.querySelector(s),
+    list = $("#lotes"),
+    empty = $("#empty"),
+    search = $("#search"),
+    modal = $("#confirmModal"),
+    confirm = $("#modalConfirm");
+  const designer = await api.getDesigner();
+  let lots = await api.listarMeusLotesDesigner(designer.id),
+    selected = null;
+  const render = () => {
+    const query = (search.value || "").toLowerCase(),
+      items = lots.filter((l) =>
+        `${l.codigo} ${l.titulo} ${l.empresaParceira}`
+          .toLowerCase()
+          .includes(query),
+      );
+    list.innerHTML = items
+      .map(
+        (l) =>
+          `<li class="lote" data-id="${l.id}"><div class="lote__row"><div class="lote__info"><h3 class="lote__title">${l.titulo}</h3><p class="lote__meta">${l.codigo} · ${l.pesoKg} kg · Empresa Parceira: ${l.empresaParceira}</p></div><div class="lote__aside"><span class="badge">${l.status}</span>${l.status === STATUS_LOTE.RESERVADO ? '<button class="btn-pill" data-action="receive">Sinalizar recebido</button>' : ""}</div></div></li>`,
+      )
+      .join("");
+    empty.hidden = items.length > 0;
+    $("#totalKg").textContent = items
+      .reduce((n, l) => n + (Number(l.pesoKg) || 0), 0)
+      .toFixed(1);
+    $("#totalSub").textContent = `${items.length} lote(s) reservado(s)`;
+  };
+  search.addEventListener("input", render);
+  list.addEventListener("click", (e) => {
+    const b = e.target.closest('[data-action="receive"]');
+    if (!b) return;
+    selected = b.closest("[data-id]").dataset.id;
+    $("#modalLote").textContent =
+      lots.find((l) => l.id === selected)?.titulo || "";
+    modal.showModal();
+  });
+  confirm.addEventListener("click", async (e) => {
+    if (!selected) return;
+    e.preventDefault();
+    try {
+      await api.confirmarRecebimentoDesigner(selected);
+      lots = await api.listarMeusLotesDesigner(designer.id);
+      modal.close();
+      render();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+  render();
+});

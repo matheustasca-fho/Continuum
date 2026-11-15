@@ -36,19 +36,28 @@ document.addEventListener("DOMContentLoaded", () => {
     { aoEncontrar: () => f.number.focus() },
   );
   const setType = (t) => {
+    // Alterna CPF/CNPJ e remove da validação os campos exclusivos da PJ.
     type = t === "fisica" ? "PF" : "PJ";
     document
       .querySelectorAll(".person-switch__option")
       .forEach((x) => x.setAttribute("aria-pressed", String(x.value === t)));
     $("documentoTipo").textContent = type === "PF" ? "CPF" : "CNPJ";
+    f.doc.name = type === "PF" ? "CPF" : "CNPJ";
+    $("nomePessoaLabel").textContent =
+      type === "PF" ? "Nome completo" : "Nome do responsável";
+    f.name.placeholder =
+      type === "PF" ? "Nome completo" : "Nome do responsável";
     f.doc.value = "";
+    if (type !== "PJ") f.razao.value = "";
     f.doc.maxLength = type === "PF" ? 14 : 18;
     $("razaoSocialField").hidden = type !== "PJ";
     f.razao.required = type === "PJ";
+    f.razao.disabled = type !== "PJ";
   };
   document
     .querySelectorAll(".person-switch__option")
     .forEach((x) => x.addEventListener("click", () => setType(x.value)));
+  setType("fisica");
   const phoneMask = (v) => {
     const d = onlyDigits(v).slice(0, 11);
     return d.length > 2
@@ -116,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         maioridadeConfirmada: true,
         comoConheceu: $("canalDesigner").value,
         consentimentoPerfilPublico: $("consentimentoPublicoDesigner").checked,
+        consentimentoUsoImagem: $("consentimentoPublicoDesigner").checked,
         especialidades: [],
         faixaExperiencia: "",
         portfolio: "",

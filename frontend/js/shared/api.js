@@ -5,6 +5,7 @@ import {
   STATUS_CURADORIA,
   STATUS_CUPOM,
 } from "./store.js";
+import { createRoutedApi } from "./routes.js";
 export { STATUS_LOTE, STATUS_RESERVA, STATUS_CURADORIA, STATUS_CUPOM };
 const delay = (ms = 80) => new Promise((r) => setTimeout(r, ms));
 const digits = (x) => String(x || "").replace(/\D/g, "");
@@ -132,7 +133,9 @@ function findAccount(identifier) {
   }
   return null;
 }
-const api = {
+// Implementação demonstrativa da API: a camada pública abaixo encaminha cada
+// operação para HTTP quando há um backend configurado, ou usa este store local.
+const mockApi = {
   async registrarDoador(dados) {
     await delay();
     const all = store.get("doadores"),
@@ -227,6 +230,7 @@ const api = {
     store.set("confeccionistas", all);
     consent("TERMOS_DESIGNER", n.id);
     consent("PERFIL_PUBLICO", n.id, { aceito: !!n.consentimentoPerfilPublico });
+    consent("USO_IMAGEM", n.id, { aceito: !!n.consentimentoUsoImagem });
     return n;
   },
   async cadastrarConfeccionista(d) {
@@ -965,6 +969,7 @@ const api = {
     return u;
   },
 };
+const api = createRoutedApi(mockApi);
 export { api, cpfValido, cnpjValido };
 export const getLotes = () => store.get("lotes"),
   getLojas = () => store.get("lojas"),
