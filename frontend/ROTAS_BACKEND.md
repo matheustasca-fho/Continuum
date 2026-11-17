@@ -45,25 +45,23 @@ Requisições GET não enviam corpo.
 | guardarEmpresaPendente                           | POST   | /empresas/rascunhos               |
 | registrarEmpresaComAssinatura                    | POST   | /empresas                         |
 | atualizarPerfilEmpresa                           | PATCH  | /empresas/{id}                    |
-| listarLotesVitrineSP, listarLotesVitrine         | GET    | /lotes/vitrine?uf=SP              |
+| listarLotesVitrineSP                             | GET    | /lotes/vitrine?uf=SP              |
 | obterLotePorCodigo                               | GET    | /lotes/{codigo}                   |
 | criarLote                                        | POST   | /lotes                            |
 | atualizarLote                                    | PATCH  | /lotes/{id}                       |
 | excluirLote                                      | DELETE | /lotes/{id}                       |
-<!-- | validarSenhaAdmin                                | POST   | /empresas/sessao/validar-admin    | -->
+| validarSenhaAdmin                                | POST   | /empresas/sessao/validar-admin    |
 | reservarLote                                     | POST   | /lotes/{codigo}/reservas          |
-| listarMeusLotesDesigner, getMeusLotes            | GET    | /designers/{id}/lotes             |
+| listarMeusLotesDesigner                          | GET    | /designers/{id}/lotes             |
 | listarLotesEmpresa                               | GET    | /empresas/{id}/lotes              |
-| confirmarRecebimentoDesigner, sinalizarRecebido  | PATCH  | /lotes/{id}/recebimento           |
+| confirmarRecebimentoDesigner                     | PATCH  | /lotes/{id}/recebimento           |
 | listarProjetosEmpresa                            | GET    | /empresas/projetos                |
 | alterarStatusProjeto                             | PATCH  | /projetos/{id}/status             |
 | buscarCep                                        | GET    | /enderecos/cep/{cep}              |
 | consultarCNPJ                                    | GET    | /empresas/consulta-cnpj/{cnpj}    |
-| getLotesDisponiveis                              | GET    | /lotes/disponiveis                |
 | getMeusProjetos                                  | GET    | /designers/{id}/projetos          |
 | getProjeto                                       | GET    | /projetos/{id}                    |
 | getDashboardStats                                | GET    | /designers/{id}/dashboard         |
-| finalizarProjeto                                 | PATCH  | /projetos/me/finalizacao          |
 | getEmpresa                                       | GET    | /empresas/me                      |
 | getDoadorStats                                   | GET    | /doadores/me/estatisticas         |
 | listarEmpresas                                   | GET    | /empresas                         |

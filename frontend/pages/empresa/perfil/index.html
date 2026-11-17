@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil da Empresa | CONTINUUM</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="../../../components/header/header.css" />
+    <style>
+      .perfil-grid {
+        display: grid;
+        gap: 1.5rem;
+        max-width: 880px;
+      }
+      .perfil-card {
+        background: var(--color-surface, #fff);
+        border: 1px solid var(--color-border, #e5e5e5);
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+      .perfil-card h2 {
+        font-family: var(--font-display, "Anton", sans-serif);
+        font-size: 1.25rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 1rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        padding: 0.65rem 0.85rem;
+        border: 1px solid var(--color-border, #d4d4d4);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.75rem;
+        background: #f8f8f6;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+      }
+      .logistics-note {
+        font-size: 0.85rem;
+        color: #555;
+        margin-bottom: 1rem;
+      }
+      details.cartilha-accordion {
+        border: 1px solid var(--color-border, #d4d4d4);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        background: #fafaf8;
+      }
+      details.cartilha-accordion summary {
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1rem;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      details.cartilha-accordion[open] summary {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .badge-version {
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        background: #111;
+        color: #fff;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+      }
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      .alert-banner {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        display: none;
+      }
+      .alert-banner.success {
+        display: block;
+        background: #e8f5e9;
+        color: #1b5e20;
+        border: 1px solid #a5d6a7;
+      }
+      .alert-banner.error {
+        display: block;
+        background: #ffebee;
+        color: #b71c1c;
+        border: 1px solid #ef9a9a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="appHeader" data-role="empresa" data-active="perfil"></div>
+
+      <main class="main-content">
+        <header class="page-header animate-slide-up">
+          <div>
+            <span class="text-detail eyebrow-label">CONFIGURAÇÕES DA LOJA</span>
+            <h1 class="page-header__title text-display">PERFIL DA EMPRESA</h1>
+            <p class="page-header__subtitle text-body">
+              Gerencie as informações exibidas na vitrine do designer, regras de logística e sua Cartilha Padrão.
+            </p>
+          </div>
+        </header>
+
+        <div id="perfilFeedback" class="alert-banner" role="status"></div>
+
+        <form id="perfilEmpresaForm" class="perfil-grid">
+          <section class="perfil-card">
+            <h2>Dados Públicos da Loja</h2>
+            <div class="form-group">
+              <label for="nomeFantasia">Nome Fantasia</label>
+              <input id="nomeFantasia" name="nomeFantasia" type="text" required />
+            </div>
+            <div class="form-group">
+              <label for="perfilLoja">Sobre a loja</label>
+              <textarea
+                id="perfilLoja"
+                name="perfilLoja"
+                rows="3"
+                placeholder="Descreva a proposta da marca, foco em economia circular e materiais..."
+                required
+              ></textarea>
+            </div>
+          </section>
+
+          <section class="perfil-card">
+            <h2>Logística e Frete</h2>
+            <p class="logistics-note">
+              O <strong>envio (Correios/transportadora)</strong> é sempre oferecido na plataforma. Defina abaixo se sua loja também aceita retirada presencial.
+            </p>
+
+            <div class="checkbox-row">
+              <input id="aceitaRetirada" name="aceitaRetirada" type="checkbox" />
+              <label for="aceitaRetirada" style="margin: 0; cursor: pointer;">
+                Aceitar retirada presencial na loja
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="horarioRetirada">Horário de retirada</label>
+              <input
+                id="horarioRetirada"
+                name="horarioRetirada"
+                type="text"
+                placeholder="Ex: Seg a Sex das 10h às 18h"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="frete">Política de Frete</label>
+              <input
+                id="frete"
+                name="frete"
+                type="text"
+                placeholder="Ex: Frete por conta do designer ou a combinar"
+              />
+            </div>
+          </section>
+
+          <section class="perfil-card">
+            <details class="cartilha-accordion" id="cartilhaAccordion">
+              <summary>
+                <span>Cartilha Padrão da Empresa (Orientações Gerais)</span>
+                <span class="badge-version" id="cartilhaVersao">v1.0</span>
+              </summary>
+              <div class="form-group">
+                <label for="cartilhaConteudo">Diretrizes de produção, acabamento e higienização</label>
+                <textarea
+                  id="cartilhaConteudo"
+                  name="cartilhaConteudo"
+                  rows="5"
+                  placeholder="Informe padrões de qualidade, etiqueta, acabamento e cuidados esperados dos designers..."
+                ></textarea>
+              </div>
+              <small id="cartilhaAtualizadoEm" style="color: #666;"></small>
+            </details>
+          </section>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary" id="btnSalvarPerfil">
+              Salvar Perfil e Cartilha
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script type="module" src="../../../components/header/header.js"></script>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

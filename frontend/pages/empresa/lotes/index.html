@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -43,7 +43,7 @@
                 type="text"
                 id="filterSearchInput"
                 class="filter-search-input"
-                placeholder="Buscar por código ou descrição..."
+                placeholder="Buscar por cÃ³digo ou descriÃ§Ã£o..."
                 autocomplete="off"
                 aria-label="Pesquisar lotes"
               />
@@ -56,16 +56,16 @@
               <button
                 type="button"
                 class="filter-option"
-                data-filter="DISPONÍVEL"
+                data-filter="DISPONÃVEL"
               >
-                Disponíveis
+                DisponÃ­veis
               </button>
               <button
                 type="button"
                 class="filter-option"
-                data-filter="EM PRODUÇÃO"
+                data-filter="EM PRODUÃ‡ÃƒO"
               >
-                Em produção
+                Em produÃ§Ã£o
               </button>
               <button
                 type="button"
@@ -81,9 +81,9 @@
               aria-label="Filtrar por status"
             >
               <option value="ALL">Todos os status</option>
-              <option value="DISPONÃVEL">DisponÃ­vel</option>
+              <option value="DISPONÃƒÂVEL">DisponÃƒÂ­vel</option>
               <option value="RESERVADO">Reservado</option>
-              <option value="EM PRODUÃ‡ÃƒO">Em ProduÃ§Ã£o</option>
+              <option value="EM PRODUÃƒâ€¡ÃƒÆ’O">Em ProduÃƒÂ§ÃƒÂ£o</option>
               <option value="ENVIADO PARA A LOJA">Enviado para a loja</option>
               <option value="FINALIZADO">Finalizado</option>
             </select>
@@ -224,55 +224,43 @@
               style="display: none"
             />
           </div>
-          <div class="form-group" id="statusField">
-            <label class="form-label">Status</label>
-            <select id="lotStatusSelect" class="form-input">
-              <option value="DISPONÃVEL">DisponÃ­vel</option>
-              <option value="RESERVADO">Reservado</option>
-              <option value="EM PRODUÃ‡ÃƒO">Em ProduÃ§Ã£o</option>
-              <option value="ENVIADO">Enviado</option>
-              <option value="FINALIZADO">Finalizado</option>
-            </select>
-            <div class="form-group" id="quantityField">
-              <label for="lotQuantity" class="form-label"
-                >Quantidade de lotes</label
-              >
-              <input
-                type="number"
-                id="lotQuantity"
-                class="form-input"
-                value="1"
-                min="1"
-                max="100"
-                step="1"
-                inputmode="numeric"
-              />
-              <span class="field-hint"
-                >Os lotes terÃ£o as mesmas informaÃ§Ãµes.</span
-              >
+          <fieldset class="form-fieldset" id="briefingFieldset" style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+            <legend style="font-weight: 700; padding: 0 0.5rem;">Briefing do Lote</legend>
+            <div class="form-group">
+              <label for="briefingIdeiaMarca" class="form-label">Ideia da marca</label>
+              <input type="text" id="briefingIdeiaMarca" class="form-input" placeholder="Ex: Camisetas oversized, bolsas ou acessorios" />
             </div>
-            <div class="status-radio-group hidden">
-              <label class="radio-card">
-                <input
-                  type="radio"
-                  name="lotStatus"
-                  value="DISPON&#205;VEL"
-                  checked
-                />
-                <span class="radio-card__face badge--disp"
-                  >DISPON&#205;VEL</span
-                >
-              </label>
-              <label class="radio-card">
-                <input type="radio" name="lotStatus" value="EM ANDAMENTO" />
-                <span class="radio-card__face badge--and">EM ANDAMENTO</span>
-              </label>
-              <label class="radio-card">
-                <input type="radio" name="lotStatus" value="RESERVADO" />
-                <span class="radio-card__face badge--res">RESERVADO</span>
-              </label>
+            <div class="form-group">
+              <label for="briefingExpectativa" class="form-label">Expectativa</label>
+              <input type="text" id="briefingExpectativa" class="form-input" placeholder="Ex: Pecas funcionais com bom acabamento" />
             </div>
-          </div>
+            <div class="form-group">
+              <label for="briefingLiberdadeCriativa" class="form-label">Liberdade criativa</label>
+              <input type="text" id="briefingLiberdadeCriativa" class="form-input" placeholder="Ex: Cores e recortes livres" />
+            </div>
+            <div class="form-group">
+              <label for="briefingPrazoProducao" class="form-label">Prazo de producao (dias)</label>
+              <input type="number" id="briefingPrazoProducao" class="form-input" min="1" value="30" />
+            </div>
+            <div class="form-group" style="background: #f8f8f6; padding: 0.75rem; border-radius: 8px; border: 1px solid #e5e5e5;">
+              <label class="form-label" style="margin-bottom: 0.25rem;">Cartilha Padrao da Empresa (Somente Leitura)</label>
+              <div id="cartilhaPadraoReadonly" style="font-size: 0.85rem; color: #444; white-space: pre-wrap;">Carregando cartilha...</div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-fieldset" id="curadoriaFieldset" style="border: 1px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+            <legend style="font-weight: 700; padding: 0 0.5rem;">Curadoria: Vincular Doacoes</legend>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <input type="text" id="curadoriaFiltroTipo" class="form-input" placeholder="Filtrar por tipo de peca..." />
+              <input type="date" id="curadoriaFiltroData" class="form-input" title="Filtrar por data" />
+            </div>
+            <div id="curadoriaDoacoesList" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 0.85rem; color: #666;">Carregando doacoes aguardando curadoria...</span>
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #222;" id="curadoriaPesoSugerido">
+              0 doacao(oes) selecionada(s) · Peso sugerido: 0,0 kg
+            </div>
+          </fieldset>
           <div class="modal-actions">
             <div class="modal-actions-left">
               <button
@@ -305,8 +293,8 @@
           Confirmar cadastro do lote
         </h2>
         <p class="notice-copy">
-          Deseja confirmar o cadastro deste lote? ApÃ³s a confirmaÃ§Ã£o, serÃ¡
-          solicitada a autorizaÃ§Ã£o da empresa.
+          Deseja confirmar o cadastro deste lote? ApÃƒÂ³s a confirmaÃƒÂ§ÃƒÂ£o, serÃƒÂ¡
+          solicitada a autorizaÃƒÂ§ÃƒÂ£o da empresa.
         </p>
         <div class="notice-actions">
           <button
@@ -331,7 +319,7 @@
       <div class="modal-box modal-box--consent">
         <div class="modal-header">
           <h2 id="consentTitle" class="text-subtitle">
-            AutorizaÃ§Ã£o da empresa
+            AutorizaÃƒÂ§ÃƒÂ£o da empresa
           </h2>
           <button
             class="modal-close-btn"
@@ -343,12 +331,12 @@
           </button>
         </div>
         <p class="consent-copy">
-          Informe a senha de autorizaÃ§Ã£o para concluir o cadastro dos lotes.
+          Informe a senha de autorizaÃƒÂ§ÃƒÂ£o para concluir o cadastro dos lotes.
         </p>
         <form id="consentForm">
           <div class="form-group">
             <label for="adminPassword" class="form-label"
-              >Senha de autorizaÃ§Ã£o</label
+              >Senha de autorizaÃƒÂ§ÃƒÂ£o</label
             >
             <div class="password-field">
               <input
@@ -368,7 +356,7 @@
           </div>
           <label class="consent-check"
             ><input type="checkbox" id="consentCheck" required /> Confirmo que
-            tenho autorizaÃ§Ã£o para cadastrar este lote.</label
+            tenho autorizaÃƒÂ§ÃƒÂ£o para cadastrar este lote.</label
           >
           <div class="modal-actions">
             <button type="button" class="btn btn--stitched" id="consentCancel">
@@ -386,7 +374,7 @@
     >
       <div class="modal-box modal-box--consent">
         <div class="modal-header">
-          <h2 class="text-subtitle">Confirmar alteraÃ§Ã£o</h2>
+          <h2 class="text-subtitle">Confirmar alteraÃƒÂ§ÃƒÂ£o</h2>
           <button
             class="modal-close-btn"
             id="statusConfirmClose"

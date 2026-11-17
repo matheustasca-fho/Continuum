@@ -31,11 +31,8 @@ export const ROUTES = {
     cpf,
     ...dados,
   })),
-  getPearfilDodor: route("GET", "/doadores/me", () => undefined),
+  getPerfilDoador: route("GET", "/doadores/me", () => undefined),
   registrarConfeccionista: route("POST", "/designers", ([dados]) =>
-    credentialsForRequest(dados),
-  ),
-  cadastrarConfeccionista: route("POST", "/designers", ([dados]) =>
     credentialsForRequest(dados),
   ),
   atualizarPerfilConfeccionista: route(
@@ -84,7 +81,6 @@ export const ROUTES = {
     ...dados,
   })),
   listarLotesVitrineSP: route("GET", "/lotes/vitrine?uf=SP", () => undefined),
-  listarLotesVitrine: route("GET", "/lotes/vitrine?uf=SP", () => undefined),
   obterLotePorCodigo: route("GET", "/lotes/:codigo", ([codigo]) => ({
     codigo,
   })),
@@ -127,22 +123,11 @@ export const ROUTES = {
   consultarCNPJ: route("GET", "/empresas/consulta-cnpj/:cnpj", ([cnpj]) => ({
     cnpj,
   })),
-  getLotesDisponiveis: route("GET", "/lotes/disponiveis", () => undefined),
-  getMeusLotes: route("GET", "/designers/:id/lotes", ([id]) => ({ id })),
   getMeusProjetos: route("GET", "/designers/:id/projetos", ([id]) => ({ id })),
   getProjeto: route("GET", "/projetos/:id", ([id]) => ({ id })),
   getDashboardStats: route("GET", "/designers/:id/dashboard", ([id]) => ({
     id,
   })),
-  sinalizarRecebido: route(
-    "PATCH",
-    "/lotes/:id/recebimento",
-    ([lote, projeto]) => ({
-      id: typeof lote === "object" ? lote?.id : lote,
-      projetoId: typeof projeto === "object" ? projeto?.id : projeto,
-    }),
-  ),
-  finalizarProjeto: route("PATCH", "/projetos/me/finalizacao", () => ({})),
   getEmpresa: route("GET", "/empresas/me", () => undefined),
   getDoadorStats: route("GET", "/doadores/me/estatisticas", () => undefined),
   listarEmpresas: route("GET", "/empresas", () => undefined),

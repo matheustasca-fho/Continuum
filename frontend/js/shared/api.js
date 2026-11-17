@@ -172,9 +172,6 @@ const mockApi = {
     vincularDoacoesECriarCupons(novo);
     return novo;
   },
-  async cadastrarDoador(d) {
-    return this.registrarDoador(d);
-  },
   async atualizarPerfilDoador(cpf, dados) {
     await delay();
     const all = store.get("doadores"),
@@ -232,9 +229,6 @@ const mockApi = {
     consent("PERFIL_PUBLICO", n.id, { aceito: !!n.consentimentoPerfilPublico });
     consent("USO_IMAGEM", n.id, { aceito: !!n.consentimentoUsoImagem });
     return n;
-  },
-  async cadastrarConfeccionista(d) {
-    return this.registrarConfeccionista(d);
   },
   async atualizarPerfilConfeccionista(id, dados) {
     await delay();
@@ -511,9 +505,6 @@ const mockApi = {
         };
       });
   },
-  async listarLotesVitrine() {
-    return this.listarLotesVitrineSP();
-  },
   async obterLotePorCodigo(c) {
     await delay();
     return store.get("lotes").find((x) => x.codigo === c || x.id === c) || null;
@@ -744,12 +735,6 @@ const mockApi = {
       nomeFantasia: "Empresa Parceira",
     };
   },
-  async getLotesDisponiveis() {
-    return this.listarLotesVitrineSP();
-  },
-  async getMeusLotes(id) {
-    return this.listarMeusLotesDesigner(id);
-  },
   async getMeusProjetos(id) {
     await delay();
     const db = store.read();
@@ -796,12 +781,6 @@ const mockApi = {
       },
       pendencias: [],
     };
-  },
-  async sinalizarRecebido(lote, proj) {
-    return lote;
-  },
-  async finalizarProjeto() {
-    return null;
   },
   async getEmpresa() {
     const s = store.get("sessaoAtual");
