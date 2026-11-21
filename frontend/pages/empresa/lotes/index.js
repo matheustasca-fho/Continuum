@@ -543,10 +543,77 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
      ========================================================== */
   const setEditorFieldsMode = (isEditing) => {
     const canEdit = api.podeExecutar("EDITAR_EXCLUIR_LOTE");
-    statusField.classList.toggle("hidden", !isEditing || !canEdit);
-    quantityField.classList.toggle("hidden", isEditing);
     btnDeleteLot.style.display = isEditing && canEdit ? "inline-flex" : "none";
   };
+
+  const loadBriefingAndCuradoria = async () => {
+    const cartilhaEl = byId("cartilhaPadraoReadonly");
+    if (cartilhaEl) {
+      try {
+        const emp = await api.getEmpresa();
+        const ver = emp?.cartilhaPadrao?.versao || "v1.0";
+        const txt = emp?.cartilhaPadrao?.conteudo || "Nenhuma cartilha padrão cadastrada.";
+        cartilhaEl.textContent = `[${ver}] ${txt}`;
+      } catch {
+        cartilhaEl.textContent = "Não foi possível carregar a cartilha.";
+      }
+    }
+    renderCuradoriaDoacoes();
+  };
+
+  const renderCuradoriaDoacoes = () => {
+    const listEl = byId("curadoriaDoacoesList");
+    const resumoEl = byId("curadoriaPesoSugerido");
+    if (!listEl) return;
+
+    const tipoFiltro = (byId("curadoriaFiltroTipo")?.value || "").trim().toLowerCase();
+    const dataFiltro = byId("curadoriaFiltroData")?.value || "";
+
+    const todas = store.get("doacoes") || [];
+    const pendentes = todas.filter((d) => {
+      if (d.statusCuradoria !== "Aguardando curadoria") return false;
+      if (tipoFiltro && !String(d.tipoPeca || d.tipo || "").toLowerCase().includes(tipoFiltro)) return false;
+      if (dataFiltro && !String(d.criadoEm || "").startsWith(dataFiltro)) return false;
+      return true;
+    });
+
+    if (pendentes.length === 0) {
+      listEl.innerHTML = `<span style="font-size:0.85rem;color:#666;">Nenhuma doação aguardando curadoria encontrada.</span>`;
+    } else {
+      listEl.innerHTML = pendentes
+        .map((d) => {
+          const dt = d.criadoEm ? new Date(d.criadoEm).toLocaleDateString("pt-BR") : "—";
+          const peso = Number(d.pesoKg || 0);
+          const tipo = d.tipoPeca || d.tipo || "Peças diversas";
+          return `
+            <label style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.6rem;background:#fff;border:1px solid #e5e5e5;border-radius:6px;cursor:pointer;font-size:0.85rem;">
+              <input type="checkbox" class="curadoria-check" value="${d.id}" data-peso="${peso}" />
+              <span><strong>${d.id}</strong> · ${tipo} · ${d.pecas || 1} pç(s) · ${peso.toFixed(1)} kg · ${dt}</span>
+            </label>
+          `;
+        })
+        .join("");
+    }
+
+    const updatePeso = () => {
+      const checked = Array.from(listEl.querySelectorAll(".curadoria-check:checked"));
+      const totalPeso = checked.reduce((acc, el) => acc + Number(el.dataset.peso || 0), 0);
+      if (resumoEl) {
+        resumoEl.textContent = `${checked.length} doação(ões) selecionada(s) · Peso sugerido: ${totalPeso.toFixed(1).replace(".", ",")} kg`;
+      }
+      if (checked.length > 0 && lotWeightInput) {
+        lotWeightInput.value = totalPeso.toFixed(1);
+      }
+    };
+
+    listEl.querySelectorAll(".curadoria-check").forEach((cb) => {
+      cb.addEventListener("change", updatePeso);
+    });
+    updatePeso();
+  };
+
+  byId("curadoriaFiltroTipo")?.addEventListener("input", renderCuradoriaDoacoes);
+  byId("curadoriaFiltroData")?.addEventListener("change", renderCuradoriaDoacoes);
 
   const openNewLotModal = () => {
     if (pendingNewLot && authorizationConfirmed) {
@@ -563,11 +630,13 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     lotCodeInput.value = getNextLotCode();
     lotDescInput.value = "";
     lotWeightInput.value = "1";
-    lotQuantity.value = "1";
-    lotStatusSelect.value = DEFAULT_STATUS;
+    if (byId("briefingIdeiaMarca")) byId("briefingIdeiaMarca").value = "";
+    if (byId("briefingExpectativa")) byId("briefingExpectativa").value = "";
+    if (byId("briefingLiberdadeCriativa")) byId("briefingLiberdadeCriativa").value = "";
+    if (byId("briefingPrazoProducao")) byId("briefingPrazoProducao").value = "30";
     setEditorFieldsMode(false);
-    syncEditorStatus();
     resetModalImage();
+    loadBriefingAndCuradoria();
     addModal.classList.add("active");
     lotCodeInput.focus();
   };
@@ -643,7 +712,6 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     event.preventDefault();
     const code = lotCodeInput.value.trim();
     const desc = lotDescInput.value.trim();
-    const status = lotStatusSelect.value;
 
     if (!code) {
       lotCodeInput.setCustomValidity("Informe o nome ou código do lote.");
@@ -652,17 +720,34 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     }
     lotCodeInput.setCustomValidity("");
 
+    const briefing = {
+      ideiaMarca: byId("briefingIdeiaMarca")?.value.trim() || "",
+      expectativa: byId("briefingExpectativa")?.value.trim() || "",
+      liberdadeCriativa: byId("briefingLiberdadeCriativa")?.value.trim() || "",
+      prazoProducaoDias: Number(byId("briefingPrazoProducao")?.value) || 30,
+    };
+
+    const doacoesVinculadas = Array.from(
+      document.querySelectorAll("#curadoriaDoacoesList .curadoria-check:checked"),
+    ).map((el) => el.value);
+
+    if (doacoesVinculadas.length > 0) {
+      const todasDoacoes = store.get("doacoes") || [];
+      todasDoacoes.forEach((d) => {
+        if (doacoesVinculadas.includes(d.id)) {
+          d.statusCuradoria = "Em lote";
+        }
+      });
+      store.set("doacoes", todasDoacoes);
+    }
+
     if (currentEditingLotId === null) {
-      const count = Math.min(
-        MAX_LOTS_PER_BATCH,
-        Math.max(1, Number(lotQuantity.value) || 1),
-      );
-      pendingNewLot = { desc, image: pendingModalImage, count };
+      pendingNewLot = { desc, image: pendingModalImage, count: 1, briefing, doacoesVinculadas };
       openConsentNotice();
       return;
     }
 
-    if (!handleEditSubmit({ code, desc, status })) return;
+    if (!handleEditSubmit({ code, desc, status: DEFAULT_STATUS, briefing, doacoesVinculadas })) return;
     renderLots();
     closeAddModal();
   });

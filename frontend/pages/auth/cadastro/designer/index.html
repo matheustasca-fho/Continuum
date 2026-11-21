@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -140,9 +140,14 @@
               ></p>
             </div>
 
+            <div class="person-form__field person-form__confirm-field">
+              <label class="person-form__label" for="confirmarSenhaPessoa">Confirmar senha *</label>
+              <input class="form-input person-form__input" type="password" id="confirmarSenhaPessoa" minlength="8" autocomplete="new-password" required />
+            </div>
+
             <div class="person-form__field person-form__field--wide">
               <label class="person-form__label" for="nomeConfeccionista"
-                >Nome completo
+                ><span id="nomePessoaLabel">Nome completo</span>
                 <span class="person-form__required">*</span></label
               >
               <input
@@ -332,17 +337,7 @@
               <option>Outros</option>
             </select>
           </div>
-          <div class="person-form__field">
-            <label class="person-form__label" for="confirmarSenhaPessoa"
-              >Confirmar senha *</label
-            ><input
-              class="form-input person-form__input"
-              type="password"
-              id="confirmarSenhaPessoa"
-              minlength="8"
-              required
-            />
-          </div>
+          <div class="person-form__confirmations">
           <label class="person-form__check"
             ><input id="maioridadeDesigner" type="checkbox" required /> Confirmo
             que sou maior de 18 anos *</label
@@ -354,10 +349,10 @@
           >
           <label class="person-form__check"
             ><input id="consentimentoPublicoDesigner" type="checkbox" />
-            Autorizo a exibição pública do meu perfil e portfólio na página do
-            QR Code das peças</label
+            Autorizo o uso da minha imagem e a exibição pública do perfil e portfólio na página do QR Code das peças</label>
           >
 
+          </div>
           <button
             class="btn btn--primary btn--full person-form__submit"
             type="submit"

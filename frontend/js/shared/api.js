@@ -5,6 +5,7 @@ import {
   STATUS_CURADORIA,
   STATUS_CUPOM,
 } from "./store.js";
+import { createRoutedApi } from "./routes.js";
 export { STATUS_LOTE, STATUS_RESERVA, STATUS_CURADORIA, STATUS_CUPOM };
 const delay = (ms = 80) => new Promise((r) => setTimeout(r, ms));
 const digits = (x) => String(x || "").replace(/\D/g, "");
@@ -132,7 +133,9 @@ function findAccount(identifier) {
   }
   return null;
 }
-const api = {
+// Implementação demonstrativa da API: a camada pública abaixo encaminha cada
+// operação para HTTP quando há um backend configurado, ou usa este store local.
+const mockApi = {
   async registrarDoador(dados) {
     await delay();
     const all = store.get("doadores"),
@@ -168,9 +171,6 @@ const api = {
     consent("TERMOS_DOADOR", novo.id);
     vincularDoacoesECriarCupons(novo);
     return novo;
-  },
-  async cadastrarDoador(d) {
-    return this.registrarDoador(d);
   },
   async atualizarPerfilDoador(cpf, dados) {
     await delay();
@@ -227,10 +227,8 @@ const api = {
     store.set("confeccionistas", all);
     consent("TERMOS_DESIGNER", n.id);
     consent("PERFIL_PUBLICO", n.id, { aceito: !!n.consentimentoPerfilPublico });
+    consent("USO_IMAGEM", n.id, { aceito: !!n.consentimentoUsoImagem });
     return n;
-  },
-  async cadastrarConfeccionista(d) {
-    return this.registrarConfeccionista(d);
   },
   async atualizarPerfilConfeccionista(id, dados) {
     await delay();
@@ -507,9 +505,6 @@ const api = {
         };
       });
   },
-  async listarLotesVitrine() {
-    return this.listarLotesVitrineSP();
-  },
   async obterLotePorCodigo(c) {
     await delay();
     return store.get("lotes").find((x) => x.codigo === c || x.id === c) || null;
@@ -740,12 +735,6 @@ const api = {
       nomeFantasia: "Empresa Parceira",
     };
   },
-  async getLotesDisponiveis() {
-    return this.listarLotesVitrineSP();
-  },
-  async getMeusLotes(id) {
-    return this.listarMeusLotesDesigner(id);
-  },
   async getMeusProjetos(id) {
     await delay();
     const db = store.read();
@@ -792,12 +781,6 @@ const api = {
       },
       pendencias: [],
     };
-  },
-  async sinalizarRecebido(lote, proj) {
-    return lote;
-  },
-  async finalizarProjeto() {
-    return null;
   },
   async getEmpresa() {
     const s = store.get("sessaoAtual");
@@ -965,6 +948,7 @@ const api = {
     return u;
   },
 };
+const api = createRoutedApi(mockApi);
 export { api, cpfValido, cnpjValido };
 export const getLotes = () => store.get("lotes"),
   getLojas = () => store.get("lojas"),

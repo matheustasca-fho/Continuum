@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de Doações | CONTINUUM</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="../../../components/header/header.css" />
+    <style>
+      .doacao-layout {
+        display: grid;
+        gap: 1.5rem;
+        max-width: 920px;
+      }
+      .doacao-card {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+      .doacao-card h2 {
+        font-family: "Anton", sans-serif;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 0.75rem;
+      }
+      .form-group label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        padding: 0.65rem 0.85rem;
+        border: 1px solid #d4d4d4;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+      .warning-box {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+        color: #795548;
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        padding: 0.45rem 0.9rem;
+        border: 1px solid #d4d4d4;
+        background: #fff;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .filter-btn.active {
+        background: #111;
+        color: #fff;
+        border-color: #111;
+      }
+      .doacao-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .doacao-table th,
+      .doacao-table td {
+        text-align: left;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid #eee;
+      }
+      .badge-status {
+        display: inline-block;
+        padding: 0.2rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+      .badge-aguardando {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .badge-emlote {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="appHeader" data-role="empresa" data-active="doacoes"></div>
+
+      <main class="main-content">
+        <header class="page-header animate-slide-up">
+          <div>
+            <span class="text-detail eyebrow-label">BOCA DO CAIXA</span>
+            <h1 class="page-header__title text-display">REGISTRO DE DOAÇÕES</h1>
+            <p class="page-header__subtitle text-body">
+              Registre doações recebidas na loja e acompanhe a fila de curadoria.
+            </p>
+          </div>
+        </header>
+
+        <div class="doacao-layout">
+          <section class="doacao-card">
+            <h2>Nova Doação</h2>
+            <div class="warning-box" role="alert">
+              <span>⚠️</span>
+              <span><strong>Atenção:</strong> Sem CPF, a doação não conta para o cupom de desconto.</span>
+            </div>
+
+            <form id="registroDoacaoForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="cpfDoador">CPF do doador (opcional)</label>
+                  <input id="cpfDoador" type="text" placeholder="000.000.000-00" maxlength="14" />
+                </div>
+                <div class="form-group">
+                  <label for="tipoPeca">Tipo de peça *</label>
+                  <input id="tipoPeca" type="text" placeholder="Ex: Camisetas, Jeans, Malha" required />
+                </div>
+                <div class="form-group">
+                  <label for="quantidadePecas">Quantidade de peças *</label>
+                  <input id="quantidadePecas" type="number" min="1" value="1" required />
+                </div>
+                <div class="form-group">
+                  <label for="pesoEstimado">Peso estimado (kg) *</label>
+                  <input id="pesoEstimado" type="number" min="0.1" step="0.1" value="1.0" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="observacoesDoacao">Observações</label>
+                <textarea id="observacoesDoacao" rows="2" placeholder="Estado das peças, observações de triagem..."></textarea>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn--primary">Registrar Doação</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="doacao-card">
+            <h2>Doações Registradas</h2>
+            <div class="filter-bar">
+              <button type="button" class="filter-btn active" data-filter="TODOS">Todas</button>
+              <button type="button" class="filter-btn" data-filter="Aguardando curadoria">Aguardando curadoria</button>
+              <button type="button" class="filter-btn" data-filter="Em lote">Em lote</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="doacao-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Tipo de Peça</th>
+                    <th>Qtd / Peso</th>
+                    <th>CPF</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="doacoesListBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="../../../components/header/header.js"></script>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

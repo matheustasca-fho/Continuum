@@ -98,16 +98,26 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.hidden = false;
       return;
     }
+    // O painel é criado sob demanda e usa o mesmo cartão visual do login.
     const box = document.createElement("section");
     box.id = "recoveryPanel";
+    box.className = "recovery-panel";
     box.innerHTML =
-      '<h2>Redefinir senha</h2><label>CPF, CNPJ ou e-mail<input id="recoveryId" class="form-input" required></label><label>Nova senha<input id="recoveryPass" class="form-input" type="password" minlength="8" required></label><label>Confirmar nova senha<input id="recoveryConfirm" class="form-input" type="password" minlength="8" required></label><button class="btn btn--primary btn--full" id="recoverySubmit">Salvar nova senha</button><button class="btn btn--full" id="recoveryBack" type="button">Voltar ao login</button><p id="recoveryStatus" role="status"></p>';
+      '<header class="recovery-panel__header"><p class="recovery-panel__eyebrow">ACESSO À CONTA</p><h2 class="recovery-panel__title">Redefinir senha</h2><p class="recovery-panel__description">Informe seu cadastro e escolha uma nova senha.</p></header>' +
+      '<form class="recovery-form" id="recoveryForm">' +
+      '<label class="recovery-form__field" for="recoveryId"><span>CPF, CNPJ ou e-mail</span><input id="recoveryId" class="form-input" autocomplete="username" required></label>' +
+      '<label class="recovery-form__field" for="recoveryPass"><span>Nova senha</span><input id="recoveryPass" class="form-input" type="password" minlength="8" autocomplete="new-password" required></label>' +
+      '<label class="recovery-form__field" for="recoveryConfirm"><span>Confirmar nova senha</span><input id="recoveryConfirm" class="form-input" type="password" minlength="8" autocomplete="new-password" required></label>' +
+      '<p class="recovery-form__status" id="recoveryStatus" role="status" aria-live="polite"></p>' +
+      '<button class="btn btn--primary btn--full" id="recoverySubmit" type="submit">Salvar nova senha</button>' +
+      '<button class="recovery-form__back" id="recoveryBack" type="button">Voltar ao login</button></form>';
     form.after(box);
     box.querySelector("#recoveryBack").onclick = () => {
       box.hidden = true;
       form.hidden = false;
     };
-    box.querySelector("#recoverySubmit").onclick = async () => {
+    box.querySelector("#recoveryForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
       const msg = box.querySelector("#recoveryStatus");
       try {
         await api.redefinirSenha(
@@ -123,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         msg.textContent = err.message;
       }
-    };
+    });
   });
   const hb = document.getElementById("loginHelp"),
     hm = document.getElementById("loginHelpMessage");
