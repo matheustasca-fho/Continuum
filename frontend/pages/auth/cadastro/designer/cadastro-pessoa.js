@@ -33,7 +33,25 @@ document.addEventListener("DOMContentLoaded", () => {
   conectarBuscaCep(
     f.cep,
     { logradouro: f.street, bairro: f.bairro, cidade: f.city, uf: f.uf },
-    { aoEncontrar: () => f.number.focus() },
+    {
+      aoEncontrar: () => {
+        const cepHint = $("cepPessoaAjuda");
+        if (cepHint) {
+          cepHint.textContent = "";
+          cepHint.style.display = "none";
+        }
+        f.cep.setAttribute("aria-invalid", "false");
+      },
+      aoErro: (msg) => {
+        const cepHint = $("cepPessoaAjuda");
+        if (cepHint) {
+          cepHint.textContent = msg;
+          cepHint.dataset.state = "error";
+          cepHint.style.display = "block";
+        }
+        f.cep.setAttribute("aria-invalid", "true");
+      },
+    },
   );
   const setType = (t) => {
     // Alterna CPF/CNPJ e remove da validação os campos exclusivos da PJ.
@@ -122,7 +140,8 @@ document.addEventListener("DOMContentLoaded", () => {
         cidade: f.city.value.trim(),
         uf: f.uf.value.trim().toUpperCase(),
         senhaHash: f.pass.value,
-        maioridadeConfirmada: true,
+        maioridadeConfirmada: Boolean($("maioridadeDesigner").checked),
+        termosAceitos: Boolean($("termosDesigner").checked),
         comoConheceu: $("canalDesigner").value,
         consentimentoPerfilPublico: $("consentimentoPublicoDesigner").checked,
         consentimentoUsoImagem: $("consentimentoPublicoDesigner").checked,

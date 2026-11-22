@@ -66,6 +66,7 @@ form.addEventListener("submit", async (e) => {
   if (!empresaAtual) return;
 
   try {
+    api.verificarPermissaoEmpresa("EDITAR_PERFIL_POLITICA_CARTILHA");
     const dados = {
       nomeFantasia: nomeFantasiaEl.value.trim(),
       perfilLoja: perfilLojaEl.value.trim(),

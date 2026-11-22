@@ -1,6 +1,5 @@
 import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 import { dates } from "../../../js/shared/dates.js";
-import { store } from "../../../js/shared/store.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const $ = (s) => document.querySelector(s),
@@ -131,26 +130,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const texto = cancelModal.querySelector("#cancelTexto").value.trim();
     if (!motivo || !texto) return;
 
-    const allLots = store.get("lotes") || [];
-    const lot = allLots.find((x) => x.id === selected);
-    const jaRecebido = lot && lot.status === STATUS_LOTE.EM_PRODUCAO;
-    if (lot) {
-      lot.status = STATUS_LOTE.INTERROMPIDO;
-      lot.cancelamento = { motivo, texto, data: new Date().toISOString() };
-      store.set("lotes", allLots);
+    try {
+      await api.cancelarLoteDesigner(selected, { motivo, texto });
+      lots = await api.listarMeusLotesDesigner(designer.id);
+      cancelModal.close();
+      render();
+    } catch (err) {
+      alert(err.message);
     }
-
-    const designers = store.get("confeccionistas") || [];
-    const d = designers.find((x) => x.id === designer.id);
-    if (d) {
-      d.nota = Math.max(1, Number((d.nota || 5) - 0.5).toFixed(1));
-      if (jaRecebido) d.restricaoAtiva = true;
-      store.set("confeccionistas", designers);
-    }
-
-    lots = await api.listarMeusLotesDesigner(designer.id);
-    cancelModal.close();
-    render();
   });
 
   render();

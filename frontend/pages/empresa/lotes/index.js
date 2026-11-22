@@ -321,48 +321,54 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     };
   };
 
-  const editorMenu = createStatusMenu({
-    extraClass: "status-menu--editor",
-    heading: "Alterar status",
-  });
-  populateSelect(lotStatusSelect, LOT_STATUS_OPTIONS);
-  lotStatusSelect.hidden = true;
-  lotStatusSelect.after(editorMenu.menu);
-  LOT_STATUS_OPTIONS.forEach(({ value, label }) => {
-    const item = createStatusOptionButton(value, label);
-    item.setAttribute("aria-selected", "false");
-    editorMenu.options.appendChild(item);
-  });
+  let editorMenu = null;
+  let editorMenuControls = null;
+  let syncEditorStatus = () => {};
 
-  const syncEditorStatus = () => {
-    const selected =
-      STATUS_OPTIONS.find(({ value }) => value === lotStatusSelect.value) ||
-      STATUS_OPTIONS[1];
-    editorMenu.trigger.dataset.status = slugifyStatus(selected.value);
-    editorMenu.trigger.innerHTML =
-      `${statusIconMarkup(selected.value)}<span class="status-menu__label">${escapeHtml(selected.label)}</span>` +
-      '<span class="status-menu__chevron" aria-hidden="true">⌄</span>';
-    editorMenu.options
-      .querySelectorAll(".status-menu__option")
-      .forEach((option) =>
-        setOptionSelected(option, option.dataset.value === selected.value),
-      );
-  };
+  if (lotStatusSelect) {
+    editorMenu = createStatusMenu({
+      extraClass: "status-menu--editor",
+      heading: "Alterar status",
+    });
+    populateSelect(lotStatusSelect, LOT_STATUS_OPTIONS);
+    lotStatusSelect.hidden = true;
+    lotStatusSelect.after(editorMenu.menu);
+    LOT_STATUS_OPTIONS.forEach(({ value, label }) => {
+      const item = createStatusOptionButton(value, label);
+      item.setAttribute("aria-selected", "false");
+      editorMenu.options.appendChild(item);
+    });
 
-  const editorMenuControls = bindMenuToggle(editorMenu, {
-    onOpen: () => animateEditorModal(true),
-    onClose: () => animateEditorModal(false),
-  });
+    syncEditorStatus = () => {
+      const selected =
+        STATUS_OPTIONS.find(({ value }) => value === lotStatusSelect.value) ||
+        STATUS_OPTIONS[1];
+      editorMenu.trigger.dataset.status = slugifyStatus(selected.value);
+      editorMenu.trigger.innerHTML =
+        `${statusIconMarkup(selected.value)}<span class="status-menu__label">${escapeHtml(selected.label)}</span>` +
+        '<span class="status-menu__chevron" aria-hidden="true">⌄</span>';
+      editorMenu.options
+        .querySelectorAll(".status-menu__option")
+        .forEach((option) =>
+          setOptionSelected(option, option.dataset.value === selected.value),
+        );
+    };
 
-  editorMenu.options.addEventListener("click", (event) => {
-    const item = event.target.closest(".status-menu__option");
-    if (!item) return;
-    lotStatusSelect.value = item.dataset.value;
+    editorMenuControls = bindMenuToggle(editorMenu, {
+      onOpen: () => animateEditorModal(true),
+      onClose: () => animateEditorModal(false),
+    });
+
+    editorMenu.options.addEventListener("click", (event) => {
+      const item = event.target.closest(".status-menu__option");
+      if (!item) return;
+      lotStatusSelect.value = item.dataset.value;
+      syncEditorStatus();
+      editorMenuControls.close();
+    });
+    lotStatusSelect.addEventListener("change", syncEditorStatus);
     syncEditorStatus();
-    editorMenuControls.close();
-  });
-  lotStatusSelect.addEventListener("change", syncEditorStatus);
-  syncEditorStatus();
+  }
 
   /* ==========================================================
      RENDERIZAÇÃO
@@ -546,6 +552,8 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     btnDeleteLot.style.display = isEditing && canEdit ? "inline-flex" : "none";
   };
 
+  let doacoesEmpresaCache = [];
+
   const loadBriefingAndCuradoria = async () => {
     const cartilhaEl = byId("cartilhaPadraoReadonly");
     if (cartilhaEl) {
@@ -558,6 +566,11 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
         cartilhaEl.textContent = "Não foi possível carregar a cartilha.";
       }
     }
+    try {
+      doacoesEmpresaCache = (await api.listarDoacoesEmpresa()) || [];
+    } catch {
+      doacoesEmpresaCache = [];
+    }
     renderCuradoriaDoacoes();
   };
 
@@ -569,7 +582,7 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     const tipoFiltro = (byId("curadoriaFiltroTipo")?.value || "").trim().toLowerCase();
     const dataFiltro = byId("curadoriaFiltroData")?.value || "";
 
-    const todas = store.get("doacoes") || [];
+    const todas = doacoesEmpresaCache;
     const pendentes = todas.filter((d) => {
       if (d.statusCuradoria !== "Aguardando curadoria") return false;
       if (tipoFiltro && !String(d.tipoPeca || d.tipo || "").toLowerCase().includes(tipoFiltro)) return false;
@@ -649,15 +662,22 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     const lot = findLotById(id);
     if (!lot) return;
 
+    if (lot.status === "RESERVADO" || lot.status !== STATUS_LOTE.DISPONIVEL) {
+      alert("Lotes reservados ou em produção não podem ser editados ou excluídos.");
+      return;
+    }
+
     currentEditingLotId = id;
     lotIdInput.value = id;
     modalFormTitle.textContent = "Editar Lote";
     lotCodeInput.value = getLotCode(lot);
     lotDescInput.value = lot.desc;
     lotWeightInput.value = lot.pesoKg || 1;
-    lotStatusSelect.value = lot.status;
+    if (lotStatusSelect) {
+      lotStatusSelect.value = lot.status;
+      syncEditorStatus();
+    }
     setEditorFieldsMode(true);
-    syncEditorStatus();
 
     if (lot.image) showModalImagePreview(lot.image);
     else resetModalImage();
@@ -731,18 +751,8 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
       document.querySelectorAll("#curadoriaDoacoesList .curadoria-check:checked"),
     ).map((el) => el.value);
 
-    if (doacoesVinculadas.length > 0) {
-      const todasDoacoes = store.get("doacoes") || [];
-      todasDoacoes.forEach((d) => {
-        if (doacoesVinculadas.includes(d.id)) {
-          d.statusCuradoria = "Em lote";
-        }
-      });
-      store.set("doacoes", todasDoacoes);
-    }
-
     if (currentEditingLotId === null) {
-      pendingNewLot = { desc, image: pendingModalImage, count: 1, briefing, doacoesVinculadas };
+      pendingNewLot = { code, desc, image: pendingModalImage, count: 1, briefing, doacoesVinculadas };
       openConsentNotice();
       return;
     }
@@ -796,21 +806,24 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     pendingNewLot = null;
   };
 
-  async function createLotBatch({ count, desc, image }) {
+  async function createLotBatch({ code, count, desc, image, briefing, doacoesVinculadas }) {
     const empresa = await api.getEmpresa();
     for (let index = 0; index < count; index++) {
       const saved = await api.criarLote({
         empresaId: empresa.id,
+        codigo: code || undefined,
         titulo: desc || "Novo lote têxtil",
         descricao: desc,
         pesoKg: Number(lotWeightInput.value) || 1,
         quantidadePecas: 0,
-        briefing: {
+        cartilhaPadrao: empresa.cartilhaPadrao,
+        briefing: briefing || {
           ideiaMarca: "",
           expectativa: "",
           liberdadeCriativa: "",
           prazoProducaoDias: 30,
         },
+        doacoesVinculadas: doacoesVinculadas || [],
       });
       lotsData.push({
         id: saved.id,
@@ -887,13 +900,13 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     closeStatusConfirm();
     if (filterTrigger?.classList.contains("is-open")) collapseSearch();
     if (!filterMenu.options.hidden) filterMenuControls.close();
-    if (!editorMenu.options.hidden) editorMenuControls.close();
+    if (editorMenu && !editorMenu.options.hidden) editorMenuControls?.close();
   });
 
   /* ==========================================================
      INICIALIZAÇÃO
      ========================================================== */
-  statusField.after(quantityField);
+  if (statusField && quantityField) statusField.after(quantityField);
   (async () => {
     const company = await api.getEmpresa();
     lotsData = (await api.listarLotesEmpresa(company.id)).map((l) => ({

@@ -81,6 +81,9 @@
               <button class="btn btn--primary" id="btn-aprovar" disabled>
                 Aprovar e Finalizar
               </button>
+              <button class="btn btn--secondary" id="btn-ajuste" type="button">
+                Solicitar Ajuste
+              </button>
               <span class="helper-text u-mt-xs" id="helper-aprovar"
                 >Conclua a inspeção para liberar</span
               >
@@ -89,6 +92,34 @@
         </div>
       </div>
     </main>
+
+    <!-- MODAL SOLICITAR AJUSTE (BE-12.3 e BE-12.4) -->
+    <dialog class="modal" id="modal-ajuste">
+      <div class="modal__header">
+        <div class="modal__logo">CONTINUUM</div>
+        <h2 class="modal__title">Solicitar ajuste na peça</h2>
+      </div>
+      <div class="modal__body">
+        <label style="display:block;font-weight:600;margin-bottom:0.5rem;">
+          Motivo / Observações para o confeccionista *
+        </label>
+        <textarea
+          id="motivo-ajuste"
+          rows="3"
+          required
+          placeholder="Descreva os ajustes necessários na costura ou acabamento..."
+          style="width:100%;padding:0.5rem;border:1px solid #ccc;border-radius:6px;"
+        ></textarea>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--primary btn--roomy" id="btn-confirma-ajuste" type="button">
+          Enviar solicitação de ajuste
+        </button>
+        <button class="btn btn--secondary" id="btn-cancela-ajuste" type="button">
+          Cancelar
+        </button>
+      </div>
+    </dialog>
 
     <!-- MODAL M4: FINALIZAR (Fiel ao Figma 1) -->
     <dialog class="modal" id="modal-finalizar">
@@ -110,6 +141,6 @@
       </div>
     </dialog>
 
-    <script src="revisao.js"></script>
+    <script type="module" src="revisao.js"></script>
   </body>
 </html>

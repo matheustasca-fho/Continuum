@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     rows = $("rows");
   const render = async () => {
     try {
+      api.verificarPermissaoEmpresa("GERENCIAR_USUARIOS_ASSINATURA");
       const users = await api.listarUsuariosEmpresa();
       rows.replaceChildren();
       users.forEach((u) => {

@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bairro: f.bairro,
     logradouro: f.street,
   };
-  conectarBuscaCep(f.cep, fields, { aoEncontrar: () => f.number.focus() });
   const hints = {
     cpf: $("cpfAjuda"),
     cep: $("cepAjuda"),
@@ -127,6 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
     f.cep.value = mascaraCEP(f.cep.value);
     v.cep();
   });
+  conectarBuscaCep(f.cep, fields, {
+    aoEncontrar: () => {
+      v.cep();
+      v.uf();
+      v.city();
+      if (f.bairro.value.trim()) v.bairro();
+      if (f.street.value.trim()) v.street();
+    },
+    aoErro: (msg) => check("cep", msg),
+  });
   f.phone.addEventListener("input", () => {
     f.phone.value = mascaraTelefone(f.phone.value);
     v.phone();
@@ -169,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         complemento: $("complementoDoador").value.trim(),
         faixaEtaria: $("faixaEtariaDoador").value,
         comoConheceu: $("comoConheceuDoador").value,
+        termosAceitos: Boolean(f.terms.checked),
         senhaHash: f.pass.value,
       });
       status.textContent = "Cadastro realizado com sucesso!";

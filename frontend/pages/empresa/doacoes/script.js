@@ -1,5 +1,4 @@
 import { api, STATUS_CURADORIA } from "../../../js/shared/api.js";
-import { store } from "../../../js/shared/store.js";
 
 const form = document.getElementById("registroDoacaoForm");
 const cpfEl = document.getElementById("cpfDoador");
@@ -11,13 +10,33 @@ const listBody = document.getElementById("doacoesListBody");
 const filterBtns = document.querySelectorAll(".filter-btn");
 
 let filtroAtual = "TODOS";
+let doacoesCache = [];
+
+export async function consultarDoadorECupom({ cpf, email, codigoCupom } = {}) {
+  if (cpf) return api.buscarDoador(cpf);
+  if (email) return api.buscarDoadorPorEmail(email);
+  if (codigoCupom) return api.validarCupom(codigoCupom);
+  return null;
+}
+
+export async function resgatarCupomDoador(codigoCupom) {
+  return api.utilizarCupom(codigoCupom);
+}
+
+async function carregarDoacoes() {
+  try {
+    doacoesCache = (await api.listarDoacoesEmpresa()) || [];
+  } catch {
+    doacoesCache = [];
+  }
+  renderDoacoes();
+}
 
 function renderDoacoes() {
-  const todas = (store.get("doacoes") || []).slice().reverse();
   const filtradas =
     filtroAtual === "TODOS"
-      ? todas
-      : todas.filter((d) => d.statusCuradoria === filtroAtual);
+      ? doacoesCache
+      : doacoesCache.filter((d) => d.statusCuradoria === filtroAtual);
 
   if (filtradas.length === 0) {
     listBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#666;padding:1.5rem;">Nenhuma doação encontrada para este filtro.</td></tr>`;
@@ -26,7 +45,9 @@ function renderDoacoes() {
 
   listBody.innerHTML = filtradas
     .map((d) => {
-      const dt = d.criadoEm ? new Date(d.criadoEm).toLocaleDateString("pt-BR") : "—";
+      const dt = d.criadoEm
+        ? new Date(d.criadoEm).toLocaleDateString("pt-BR")
+        : "—";
       const badgeClass =
         d.statusCuradoria === STATUS_CURADORIA.AGUARDANDO
           ? "badge-aguardando"
@@ -56,30 +77,22 @@ filterBtns.forEach((btn) => {
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const emp = await api.getEmpresa();
   const cpfLimpo = cpfEl.value.replace(/\D/g, "");
-  const todas = store.get("doacoes") || [];
-  const nextNum = todas.length + 1;
-  const novaDoacao = {
-    id: `DOA-${String(nextNum).padStart(2, "0")}`,
-    empresaId: emp?.id || "EMP-01",
-    cpfInformado: cpfLimpo || "",
-    doadorId: cpfLimpo ? "DOR-01" : null,
-    tipoPeca: tipoPecaEl.value.trim(),
-    pecas: Math.max(1, Number(qtdEl.value) || 1),
-    pesoKg: Math.max(0.1, Number(pesoEl.value) || 1),
-    observacoes: obsEl.value.trim(),
-    statusCuradoria: STATUS_CURADORIA.AGUARDANDO,
-    statusContagem: cpfLimpo ? "CONTANDO" : "SEM_CUPOM",
-    criadoEm: new Date().toISOString(),
-  };
-
-  todas.push(novaDoacao);
-  store.set("doacoes", todas);
-  form.reset();
-  qtdEl.value = "1";
-  pesoEl.value = "1.0";
-  renderDoacoes();
+  try {
+    await api.registrarDoacaoEmpresa({
+      cpfInformado: cpfLimpo || "",
+      tipoPeca: tipoPecaEl.value.trim(),
+      pecas: Math.max(1, Number(qtdEl.value) || 1),
+      pesoKg: Math.max(0.1, Number(pesoEl.value) || 1),
+      observacoes: obsEl.value.trim(),
+    });
+    form.reset();
+    qtdEl.value = "1";
+    pesoEl.value = "1.0";
+    await carregarDoacoes();
+  } catch (err) {
+    alert(err.message);
+  }
 });
 
-renderDoacoes();
+carregarDoacoes();

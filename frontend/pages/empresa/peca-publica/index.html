@@ -82,5 +82,42 @@
         </div>
       </div>
     </main>
+    <script type="module">
+      import { api } from "../../../js/shared/api.js";
+      document.addEventListener("DOMContentLoaded", async () => {
+        const params = new URLSearchParams(location.search);
+        const codigo = params.get("codigo") || params.get("id") || "CNT-QR-0001";
+        try {
+          const p = (await api.obterPecaPublica(codigo)) || (await api.getProjeto(codigo));
+          if (!p) return;
+          const title = document.querySelector(".hero-title");
+          if (title) title.textContent = p.tituloPeca || p.lote_nome || "Peça Upcycling";
+          const designer = document.querySelector(".hero-designer");
+          if (designer) designer.innerHTML = `por ${p.designer_nome || "Designer"} <span class="hero-badge">AUTORAL</span>`;
+          const infoVals = document.querySelectorAll(".info-grid .info-val");
+          if (infoVals[0]) infoVals[0].textContent = p.material || p.lote?.descricao || "Material têxtil reaproveitado";
+          if (infoVals[1]) infoVals[1].textContent = p.nomeEmpresa || p.lote?.nomeEmpresa || "Empresa Parceira";
+          const story = document.querySelector(".story-block");
+          if (story && (p.processoCriativo || p.ds_descricao)) {
+            story.textContent = p.processoCriativo || p.ds_descricao;
+          }
+          const tlContainer = document.querySelector(".timeline");
+          if (tlContainer && Array.isArray(p.timeline) && p.timeline.length > 0) {
+            tlContainer.innerHTML = p.timeline
+              .map(
+                (item) => `
+              <div class="tl-item">
+                <div class="tl-title">${item.status || "Etapa"}</div>
+                <div class="tl-desc">${item.titulo || item.evento} (${new Date(item.data).toLocaleDateString("pt-BR")} • ${item.autor || ""})</div>
+              </div>
+            `,
+              )
+              .join("");
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    </script>
   </body>
 </html>
