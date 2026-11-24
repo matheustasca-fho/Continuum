@@ -1,5 +1,9 @@
-import { api, ROLE_LABELS_EMPRESA } from "../../../js/shared/api.js";
-import { onlyDigits } from "../../../js/shared/validators.js";
+import {
+  api,
+  ROLE_LABELS_EMPRESA,
+  getPerfilEmpresaAtual,
+} from "../../../js/shared/api.js";
+import { onlyDigits, mascaraTelefone } from "../../../js/shared/validators.js";
 import { runWithDynamicLoading } from "../../../js/shared/loader.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -21,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let searchQuery = "";
   let toastTimer = null;
 
-  const callerRole = api.getPerfilEmpresaAtual();
+  const callerRole = getPerfilEmpresaAtual();
   const isDiretor = callerRole === "DIRETOR";
 
   const ROLE_GUIDES = {
@@ -42,16 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const formatRoleLabel = (role) => ROLE_LABELS_EMPRESA[role] || role;
-
-  const formatPhone = (raw) => {
-    const d = onlyDigits(raw || "").slice(0, 11);
-    if (!d) return "";
-    if (d.length <= 2) return d;
-    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    if (d.length <= 10)
-      return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-  };
 
   const getInitials = (name) => {
     const parts = String(name || "U")
@@ -101,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("editUserId").value = user.id;
     $("editUserName").value = user.nome || "";
     $("editUserEmail").value = user.email || "";
-    $("editUserPhone").value = formatPhone(user.telefone || "");
+    $("editUserPhone").value = mascaraTelefone(user.telefone || "");
 
     const editRoleSelect = $("editUserRole");
     const editRoleField = $("editUserRoleField");
@@ -169,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const tdPhone = document.createElement("td");
       tdPhone.className = "member-phone";
-      tdPhone.textContent = formatPhone(u.telefone) || "—";
+      tdPhone.textContent = mascaraTelefone(u.telefone) || "—";
 
       const tdRole = document.createElement("td");
       const roleBadge = document.createElement("span");
@@ -256,7 +250,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   [$("phone"), $("editUserPhone")].forEach((input) => {
     input?.addEventListener("input", () => {
-      input.value = formatPhone(input.value);
+      input.value = mascaraTelefone(input.value);
     });
   });
 

@@ -1,4 +1,10 @@
-import { api, cpfValido, STATUS_CURADORIA } from "../../../js/shared/api.js";
+import {
+  api,
+  cpfValido,
+  STATUS_CURADORIA,
+  consultarProgressoCupomCpf,
+  registrarDoacaoEmpresa,
+} from "../../../js/shared/api.js";
 import { store } from "../../../js/shared/store.js";
 import { onlyDigits, mascaraCPF } from "../../../js/shared/validators.js";
 import { runWithDynamicLoading } from "../../../js/shared/loader.js";
@@ -99,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const info = api.consultarProgressoCupomCpf(digits, empId);
+    const info = consultarProgressoCupomCpf(digits, empId);
     trackerBox.classList.add("is-linked");
     trackerDonor.textContent = info.doador
       ? `Doador(a): ${info.doador.nome}`
@@ -201,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         let cpfMarkup = '<span class="cpf-cell__empty">Sem CPF · Sem cupom</span>';
         if (cpfDigits.length === 11) {
           const donor = doadores.find((u) => onlyDigits(u.cpf) === cpfDigits);
-          const prog = api.consultarProgressoCupomCpf(cpfDigits, empId);
+          const prog = consultarProgressoCupomCpf(cpfDigits, empId);
           const statusProg =
             d.statusContagem === "EM_CUPOM"
               ? `Convertida em cupom (${prog.cuponsAtivosLoja.length} ativo(s))`
@@ -290,7 +296,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         successText: "Doação registrada!",
         minDuration: 720,
         task: () =>
-          api.registrarDoacaoEmpresa({
+          registrarDoacaoEmpresa({
             empresaId: empId,
             cpfInformado: cpfDigits,
             tipoPeca: tipo,

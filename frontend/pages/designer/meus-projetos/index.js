@@ -1,4 +1,8 @@
-import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+import {
+  api,
+  STATUS_LOTE,
+  atualizarProjetoDesigner,
+} from "../../../js/shared/api.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const $ = (id) => document.getElementById(id);
@@ -197,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const quantidadePecas = Math.max(1, Number($("editProjQty").value) || 1);
     const processoCriativo = $("editProjStory").value.trim();
 
-    await api.atualizarProjetoDesigner(selected.id, {
+    await atualizarProjetoDesigner(selected.id, {
       tituloPeca,
       quantidadePecas,
       processoCriativo,

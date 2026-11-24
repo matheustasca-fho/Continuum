@@ -483,12 +483,6 @@ const mockApi = {
     return store.get("sessaoAtual");
   },
 
-  getPerfilEmpresaAtual() {
-    const s = getSessaoEmpresaEfetiva();
-    if (s?.perfil !== "empresa") return null;
-    return normalizeCompanyRole(s.usuarioEmpresa?.perfil);
-  },
-
   async finalizarProjetoDesigner(id) {
     await delay();
     const all = store.get("projetos"),
@@ -531,72 +525,6 @@ const mockApi = {
     if (!this.podeExecutar(acao))
       throw Error("Sua função atual não possui permissão para esta operação.");
     return true;
-  },
-
-  consultarProgressoCupomCpf(cpfRaw, empresaId = null) {
-    const empId =
-      empresaId ||
-      getSessaoEmpresaEfetiva()?.empresaId ||
-      store.get("empresas")?.[0]?.id ||
-      "EMP-01";
-    const cpf = digits(cpfRaw);
-    if (cpf.length !== 11 || !cpfValido(cpf)) {
-      return {
-        valido: false,
-        cpf,
-        doador: null,
-        contandoNaLoja: 0,
-        metaCupom: 5,
-        faltam: 5,
-        cuponsAtivosLoja: [],
-      };
-    }
-    const res = processarProgressoCuponsPorCpf(cpf, empId);
-    return { valido: true, ...res };
-  },
-
-  async registrarDoacaoEmpresa(dados) {
-    await delay();
-    this.verificarPermissaoEmpresa("REGISTRAR_DOACAO");
-    const s = getSessaoEmpresaEfetiva();
-    const empId =
-      dados.empresaId ||
-      s?.empresaId ||
-      store.get("empresas")?.[0]?.id ||
-      "EMP-01";
-    const cpf = digits(dados.cpfInformado || "");
-    if (cpf && !cpfValido(cpf)) {
-      throw Error("O CPF informado é inválido. Confira os 11 dígitos ou deixe em branco.");
-    }
-
-    const doadores = store.get("doadores") || [];
-    const doador = cpf ? doadores.find((d) => digits(d.cpf) === cpf) || null : null;
-    const todas = store.get("doacoes") || [];
-    const nextNum = todas.length + 1;
-
-    const novaDoacao = {
-      id: `DOA-${String(nextNum).padStart(2, "0")}`,
-      empresaId: empId,
-      cpfInformado: cpf || "",
-      doadorId: doador?.id || null,
-      tipoPeca: String(dados.tipoPeca || "Peças diversas").trim(),
-      pecas: Math.max(1, Number(dados.pecas) || 1),
-      pesoKg: Math.max(0.1, Number(dados.pesoKg) || 1),
-      observacoes: String(dados.observacoes || "").trim(),
-      registradoPor: s?.usuarioEmpresa?.nome || "Equipe",
-      statusCuradoria: STATUS_CURADORIA.AGUARDANDO,
-      statusContagem: cpf ? "CONTANDO" : "SEM_CUPOM",
-      criadoEm: new Date().toISOString(),
-    };
-
-    todas.push(novaDoacao);
-    store.set("doacoes", todas);
-
-    const progresso = cpf
-      ? processarProgressoCuponsPorCpf(cpf, empId)
-      : null;
-
-    return { doacao: novaDoacao, progresso };
   },
 
   async guardarEmpresaPendente(de, da) {
@@ -974,16 +902,6 @@ const mockApi = {
       store.set("projetos", ps);
     }
     return l;
-  },
-
-  async atualizarProjetoDesigner(id, dados) {
-    await delay();
-    const ps = store.get("projetos") || [];
-    const p = ps.find((x) => x.id === id || x.cd_projeto === id);
-    if (!p) throw Error("Projeto não encontrado.");
-    Object.assign(p, dados);
-    store.set("projetos", ps);
-    return p;
   },
 
   async listarProjetosEmpresa() {
@@ -1364,6 +1282,91 @@ const mockApi = {
 };
 
 const api = createRoutedApi(mockApi);
+
+export function getPerfilEmpresaAtual() {
+  const s = getSessaoEmpresaEfetiva();
+  if (s?.perfil !== "empresa") return null;
+  return normalizeCompanyRole(s.usuarioEmpresa?.perfil);
+}
+
+export function consultarProgressoCupomCpf(cpfRaw, empresaId = null) {
+  const empId =
+    empresaId ||
+    getSessaoEmpresaEfetiva()?.empresaId ||
+    store.get("empresas")?.[0]?.id ||
+    "EMP-01";
+  const cpf = digits(cpfRaw);
+  if (cpf.length !== 11 || !cpfValido(cpf)) {
+    return {
+      valido: false,
+      cpf,
+      doador: null,
+      contandoNaLoja: 0,
+      metaCupom: 5,
+      faltam: 5,
+      cuponsAtivosLoja: [],
+    };
+  }
+  const res = processarProgressoCuponsPorCpf(cpf, empId);
+  return { valido: true, ...res };
+}
+
+export async function registrarDoacaoEmpresa(dados) {
+  await delay();
+  mockApi.verificarPermissaoEmpresa("REGISTRAR_DOACAO");
+  const s = getSessaoEmpresaEfetiva();
+  const empId =
+    dados.empresaId ||
+    s?.empresaId ||
+    store.get("empresas")?.[0]?.id ||
+    "EMP-01";
+  const cpf = digits(dados.cpfInformado || "");
+  if (cpf && !cpfValido(cpf)) {
+    throw Error(
+      "O CPF informado é inválido. Confira os 11 dígitos ou deixe em branco.",
+    );
+  }
+
+  const doadores = store.get("doadores") || [];
+  const doador = cpf
+    ? doadores.find((d) => digits(d.cpf) === cpf) || null
+    : null;
+  const todas = store.get("doacoes") || [];
+  const nextNum = todas.length + 1;
+
+  const novaDoacao = {
+    id: `DOA-${String(nextNum).padStart(2, "0")}`,
+    empresaId: empId,
+    cpfInformado: cpf || "",
+    doadorId: doador?.id || null,
+    tipoPeca: String(dados.tipoPeca || "Peças diversas").trim(),
+    pecas: Math.max(1, Number(dados.pecas) || 1),
+    pesoKg: Math.max(0.1, Number(dados.pesoKg) || 1),
+    observacoes: String(dados.observacoes || "").trim(),
+    registradoPor: s?.usuarioEmpresa?.nome || "Equipe",
+    statusCuradoria: STATUS_CURADORIA.AGUARDANDO,
+    statusContagem: cpf ? "CONTANDO" : "SEM_CUPOM",
+    criadoEm: new Date().toISOString(),
+  };
+
+  todas.push(novaDoacao);
+  store.set("doacoes", todas);
+
+  const progresso = cpf ? processarProgressoCuponsPorCpf(cpf, empId) : null;
+
+  return { doacao: novaDoacao, progresso };
+}
+
+export async function atualizarProjetoDesigner(id, dados) {
+  await delay();
+  const ps = store.get("projetos") || [];
+  const p = ps.find((x) => x.id === id || x.cd_projeto === id);
+  if (!p) throw Error("Projeto não encontrado.");
+  Object.assign(p, dados);
+  store.set("projetos", ps);
+  return p;
+}
+
 export { api, cpfValido, cnpjValido };
 export const getLotes = () => store.get("lotes"),
   getLojas = () => store.get("lojas"),
