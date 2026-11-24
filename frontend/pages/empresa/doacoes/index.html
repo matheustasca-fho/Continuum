@@ -14,180 +14,240 @@
 
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="doacoes.css" />
     <link rel="stylesheet" href="../../../components/header/header.css" />
-    <style>
-      .doacao-layout {
-        display: grid;
-        gap: 1.5rem;
-        max-width: 920px;
-      }
-      .doacao-card {
-        background: #fff;
-        border: 1px solid #e5e5e5;
-        border-radius: 12px;
-        padding: 1.5rem;
-      }
-      .doacao-card h2 {
-        font-family: "Anton", sans-serif;
-        font-size: 1.25rem;
-        margin-bottom: 1rem;
-      }
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-      }
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-        margin-bottom: 0.75rem;
-      }
-      .form-group label {
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-      .form-group input,
-      .form-group select,
-      .form-group textarea {
-        padding: 0.65rem 0.85rem;
-        border: 1px solid #d4d4d4;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 0.95rem;
-      }
-      .warning-box {
-        background: #fff8e1;
-        border: 1px solid #ffe082;
-        color: #795548;
-        padding: 0.65rem 0.9rem;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      .filter-bar {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-      }
-      .filter-btn {
-        padding: 0.45rem 0.9rem;
-        border: 1px solid #d4d4d4;
-        background: #fff;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-      .filter-btn.active {
-        background: #111;
-        color: #fff;
-        border-color: #111;
-      }
-      .doacao-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-      }
-      .doacao-table th,
-      .doacao-table td {
-        text-align: left;
-        padding: 0.75rem 0.5rem;
-        border-bottom: 1px solid #eee;
-      }
-      .badge-status {
-        display: inline-block;
-        padding: 0.2rem 0.55rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-      }
-      .badge-aguardando {
-        background: #fff3e0;
-        color: #e65100;
-      }
-      .badge-emlote {
-        background: #e8f5e9;
-        color: #1b5e20;
-      }
-    </style>
   </head>
   <body>
+    <div class="toast" id="doacaoToast" role="status" aria-live="polite">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      <span id="doacaoToastMsg">Doação registrada com sucesso!</span>
+    </div>
+
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="doacoes"></div>
 
       <main class="main-content">
-        <header class="page-header animate-slide-up">
+        <header class="doacoes-header animate-slide-up">
           <div>
-            <span class="text-detail eyebrow-label">BOCA DO CAIXA</span>
-            <h1 class="page-header__title text-display">REGISTRO DE DOAÇÕES</h1>
-            <p class="page-header__subtitle text-body">
-              Registre doações recebidas na loja e acompanhe a fila de curadoria.
+            <p class="doacoes-header__eyebrow">PONTO DE COLETA · BALCÃO</p>
+            <h1 class="doacoes-header__title">REGISTRO DE DOAÇÕES</h1>
+            <p class="doacoes-header__subtitle">
+              Cadastre as peças entregues na loja, vincule o CPF do doador para
+              contabilizar o progresso de cupom e alimente a fila de curadoria têxtil.
             </p>
+          </div>
+          <div class="doacoes-header__policy" id="storeCouponPolicyBadge">
+            5 doações = Cupom 15% OFF
           </div>
         </header>
 
-        <div class="doacao-layout">
-          <section class="doacao-card">
-            <h2>Nova Doação</h2>
-            <div class="warning-box" role="alert">
-              <span>⚠️</span>
-              <span><strong>Atenção:</strong> Sem CPF, a doação não conta para o cupom de desconto.</span>
+        <!-- Indicadores Operacionais -->
+        <section class="doacoes-kpis" aria-label="Resumo de doações">
+          <article class="doacoes-kpi">
+            <div class="doacoes-kpi__num" id="kpiTotalDoacoes">0</div>
+            <div class="doacoes-kpi__label">Doações registradas</div>
+          </article>
+          <article class="doacoes-kpi">
+            <div class="doacoes-kpi__num" id="kpiAguardando">0</div>
+            <div class="doacoes-kpi__label">Aguardando curadoria</div>
+          </article>
+          <article class="doacoes-kpi">
+            <div class="doacoes-kpi__num" id="kpiComCpf">0</div>
+            <div class="doacoes-kpi__label">Vinculadas a CPF</div>
+          </article>
+          <article class="doacoes-kpi doacoes-kpi--highlight">
+            <div class="doacoes-kpi__num" id="kpiCuponsAtivos">0</div>
+            <div class="doacoes-kpi__label">Cupons emitidos na loja</div>
+          </article>
+        </section>
+
+        <!-- Alerta de Novo Cupom Emitido -->
+        <div
+          class="coupon-celebration"
+          id="couponCelebration"
+          role="status"
+          aria-live="polite"
+        >
+          <div>
+            <strong id="couponCelebrationTitle">
+              Ciclo de 5 doações completado!
+            </strong>
+            <div id="couponCelebrationDesc" style="font-size: 0.84rem; opacity: 0.92">
+              Um novo cupom de desconto foi vinculado automaticamente ao CPF do doador.
             </div>
+          </div>
+          <span class="coupon-celebration__code" id="couponCelebrationCode">
+            CONT-000000
+          </span>
+        </div>
 
-            <form id="registroDoacaoForm">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="cpfDoador">CPF do doador (opcional)</label>
-                  <input id="cpfDoador" type="text" placeholder="000.000.000-00" maxlength="14" />
+        <div class="doacoes-workspace">
+          <!-- COLUNA ESQUERDA: Formulário de Recebimento -->
+          <section class="doacao-card doacao-card--form" aria-labelledby="novaDoacaoTitle">
+            <header class="doacao-card__header">
+              <h2 class="doacao-card__title" id="novaDoacaoTitle">
+                Nova Doação
+              </h2>
+              <span class="doacao-card__tag">Triagem inicial</span>
+            </header>
+
+            <form id="registroDoacaoForm" novalidate>
+              <div class="doacao-form-grid">
+                <div class="doacao-field doacao-field--full">
+                  <label for="cpfDoador">
+                    CPF do doador (recomendado para cupom)
+                  </label>
+                  <input
+                    id="cpfDoador"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="000.000.000-00"
+                    maxlength="14"
+                    autocomplete="off"
+                  />
                 </div>
-                <div class="form-group">
-                  <label for="tipoPeca">Tipo de peça *</label>
-                  <input id="tipoPeca" type="text" placeholder="Ex: Camisetas, Jeans, Malha" required />
+              </div>
+
+              <!-- Painel Dinâmico de Vínculo ao Cupom -->
+              <div class="cpf-tracker-box" id="cpfTrackerBox" aria-live="polite">
+                <div class="cpf-tracker__top">
+                  <span class="cpf-tracker__donor" id="cpfTrackerDonor">
+                    Vínculo de Fidelidade Circular
+                  </span>
+                  <span class="cpf-tracker__count" id="cpfTrackerCount">
+                    0 / 5 doações
+                  </span>
                 </div>
-                <div class="form-group">
+                <div class="cpf-dots" id="cpfTrackerDots" aria-hidden="true">
+                  <span class="cpf-dot"></span>
+                  <span class="cpf-dot"></span>
+                  <span class="cpf-dot"></span>
+                  <span class="cpf-dot"></span>
+                  <span class="cpf-dot"></span>
+                </div>
+                <p class="cpf-tracker__hint" id="cpfTrackerHint">
+                  Digite o CPF para consultar o progresso atual do doador. Sem
+                  CPF, a doação entra na curadoria normalmente, mas não conta
+                  para cupom.
+                </p>
+                <div class="cpf-tracker__coupons" id="cpfTrackerCoupons"></div>
+              </div>
+
+              <div class="doacao-form-grid">
+                <div class="doacao-field doacao-field--full">
+                  <label for="tipoPeca">Tipo de peça / Material *</label>
+                  <input
+                    id="tipoPeca"
+                    type="text"
+                    placeholder="Ex.: Camisetas de algodão, Jeans, Retalhos de malha"
+                    required
+                  />
+                </div>
+
+                <div class="doacao-field">
                   <label for="quantidadePecas">Quantidade de peças *</label>
-                  <input id="quantidadePecas" type="number" min="1" value="1" required />
+                  <input
+                    id="quantidadePecas"
+                    type="number"
+                    min="1"
+                    value="1"
+                    required
+                  />
                 </div>
-                <div class="form-group">
+
+                <div class="doacao-field">
                   <label for="pesoEstimado">Peso estimado (kg) *</label>
-                  <input id="pesoEstimado" type="number" min="0.1" step="0.1" value="1.0" required />
+                  <input
+                    id="pesoEstimado"
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value="1.0"
+                    required
+                  />
+                </div>
+
+                <div class="doacao-field doacao-field--full">
+                  <label for="observacoesDoacao">Observações de triagem</label>
+                  <textarea
+                    id="observacoesDoacao"
+                    rows="2"
+                    placeholder="Estado de conservação, cores ou notas para formação de lote..."
+                  ></textarea>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="observacoesDoacao">Observações</label>
-                <textarea id="observacoesDoacao" rows="2" placeholder="Estado das peças, observações de triagem..."></textarea>
-              </div>
+              <p class="doacao-form-error" id="doacaoFormError" role="alert"></p>
 
-              <div style="display: flex; justify-content: flex-end;">
-                <button type="submit" class="btn btn--primary">Registrar Doação</button>
+              <div style="margin-top: 1.1rem">
+                <button type="submit" class="btn btn--primary btn--full">
+                  Registrar Doação e Atualizar Cupom
+                </button>
               </div>
             </form>
           </section>
 
-          <section class="doacao-card">
-            <h2>Doações Registradas</h2>
-            <div class="filter-bar">
-              <button type="button" class="filter-btn active" data-filter="TODOS">Todas</button>
-              <button type="button" class="filter-btn" data-filter="Aguardando curadoria">Aguardando curadoria</button>
-              <button type="button" class="filter-btn" data-filter="Em lote">Em lote</button>
+          <!-- COLUNA DIREITA: Lista & Fila de Curadoria -->
+          <section class="doacao-card" aria-labelledby="historicoDoacoesTitle">
+            <header class="doacao-card__header">
+              <h2 class="doacao-card__title" id="historicoDoacoesTitle">
+                Doações Registradas
+              </h2>
+              <span class="doacao-card__tag">Fila da loja</span>
+            </header>
+
+            <div class="doacoes-toolbar">
+              <div class="doacoes-search">
+                <input
+                  type="search"
+                  id="searchDoacoes"
+                  placeholder="Buscar por CPF, código ou tipo de peça..."
+                  aria-label="Buscar doações"
+                />
+              </div>
+
+              <div class="filter-bar" role="group" aria-label="Filtrar por situação">
+                <button
+                  type="button"
+                  class="filter-btn active"
+                  data-filter="TODOS"
+                >
+                  Todas
+                </button>
+                <button
+                  type="button"
+                  class="filter-btn"
+                  data-filter="Aguardando curadoria"
+                >
+                  Aguardando curadoria
+                </button>
+                <button
+                  type="button"
+                  class="filter-btn"
+                  data-filter="Em lote"
+                >
+                  Em lote
+                </button>
+              </div>
             </div>
 
-            <div style="overflow-x: auto;">
+            <div class="doacao-table-wrap">
               <table class="doacao-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Data</th>
-                    <th>Tipo de Peça</th>
-                    <th>Qtd / Peso</th>
-                    <th>CPF</th>
-                    <th>Status</th>
+                    <th>ID / Data</th>
+                    <th>Material & Volume</th>
+                    <th>Doador / Cupom</th>
+                    <th>Curadoria</th>
                   </tr>
                 </thead>
                 <tbody id="doacoesListBody"></tbody>
@@ -198,7 +258,7 @@
       </main>
     </div>
 
-    <script type="module" src="../../../components/header/header.js"></script>
+    <script src="../../../components/header/header.js"></script>
     <script type="module" src="script.js"></script>
   </body>
 </html>

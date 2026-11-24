@@ -1,0 +1,503 @@
+/* ==========================================================================
+   CONTINUUM — pages/empresa/doacoes/doacoes.css
+   Registro de Doações & Progresso de Cupom por CPF — CONTINUUM Craft
+   ========================================================================== */
+
+.doacoes-header {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 18px;
+  border: 1px solid rgba(120, 39, 54, 0.12);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88),
+    rgba(253, 242, 244, 0.58)
+  );
+  box-shadow: 0 12px 30px rgba(45, 55, 72, 0.05);
+}
+
+.doacoes-header__eyebrow {
+  font-family: var(--font-detail);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.35rem;
+}
+
+.doacoes-header__title {
+  font-family: var(--font-title);
+  font-size: clamp(1.9rem, 2.8vw, 2.55rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-charcoal-text);
+  margin: 0;
+}
+
+.doacoes-header__subtitle {
+  margin-top: 0.45rem;
+  font-size: 0.9rem;
+  color: var(--color-muted-text);
+  max-width: 64ch;
+}
+
+.doacoes-header__policy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  background: var(--color-charcoal-text);
+  color: var(--color-white);
+  font-family: var(--font-detail);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* KPIs Superiores */
+.doacoes-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.doacoes-kpi {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+.doacoes-kpi--highlight {
+  background: var(--color-primary-light);
+  border-color: rgba(120, 39, 54, 0.3);
+}
+
+.doacoes-kpi__num {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.doacoes-kpi__label {
+  font-family: var(--font-detail);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+  margin-top: 0.3rem;
+}
+
+/* Banner de Cupom Gerado / Feedback */
+.coupon-celebration {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.35rem;
+  margin-bottom: 1.35rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1f4d2e, #2e7d32);
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(46, 125, 50, 0.22);
+}
+
+.coupon-celebration.is-visible {
+  display: flex;
+}
+
+.coupon-celebration__code {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px dashed rgba(255, 255, 255, 0.65);
+  font-family: var(--font-detail);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* Workspace Principal */
+.doacoes-workspace {
+  display: grid;
+  grid-template-columns: 0.98fr 1.22fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.doacao-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+.doacao-card--form {
+  border-top: 4px solid var(--color-primary);
+}
+
+.doacao-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.15rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.doacao-card__title {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-charcoal-text);
+  margin: 0;
+}
+
+.doacao-card__tag {
+  font-family: var(--font-detail);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-text);
+}
+
+/* Card de Vínculo de CPF & Progresso de Cupom */
+.cpf-tracker-box {
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.15rem;
+  border-radius: 12px;
+  background: var(--color-sand-offwhite);
+  border: 1.5px dashed rgba(120, 39, 54, 0.3);
+  transition: all 0.22s ease;
+}
+
+.cpf-tracker-box.is-linked {
+  background: var(--color-primary-light);
+  border-style: solid;
+  border-color: var(--color-primary);
+}
+
+.cpf-tracker-box.is-invalid {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
+
+.cpf-tracker__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.cpf-tracker__donor {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-charcoal-text);
+}
+
+.cpf-tracker__count {
+  font-family: var(--font-detail);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cpf-dots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.55rem;
+}
+
+.cpf-dot {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(45, 55, 72, 0.14);
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.cpf-dot.is-filled {
+  background: var(--color-primary);
+}
+
+.cpf-dot.is-next {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-primary),
+    var(--color-primary) 4px,
+    rgba(120, 39, 54, 0.3) 4px,
+    rgba(120, 39, 54, 0.3) 8px
+  );
+}
+
+.cpf-tracker__hint {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--color-muted-text);
+}
+
+.cpf-tracker__coupons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.mini-coupon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.58rem;
+  border-radius: 6px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-family: var(--font-detail);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+/* Formulário */
+.doacao-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.doacao-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.doacao-field--full {
+  grid-column: 1 / -1;
+}
+
+.doacao-field label {
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--color-charcoal-text);
+}
+
+.doacao-field input,
+.doacao-field select,
+.doacao-field textarea {
+  width: 100%;
+  padding: 0.7rem 0.88rem;
+  border: 1px solid #d6dbe2;
+  border-radius: 9px;
+  background: #fcfcfa;
+  font-family: var(--font-body);
+  font-size: 0.87rem;
+  color: var(--color-charcoal-text);
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.doacao-field input:focus,
+.doacao-field select:focus,
+.doacao-field textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px rgba(120, 39, 54, 0.1);
+}
+
+.doacao-form-error {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.doacao-form-error:empty {
+  display: none;
+}
+
+/* Filtros e Tabela */
+.doacoes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.doacoes-search {
+  flex: 1 1 200px;
+}
+
+.doacoes-search input {
+  width: 100%;
+  padding: 0.58rem 0.9rem;
+  border: 1px solid #d7dce3;
+  border-radius: 999px;
+  background: #faf9f6;
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  outline: none;
+}
+
+.doacoes-search input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.42rem 0.8rem;
+  border: 1px solid #dfe3e8;
+  background: var(--color-white);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-detail);
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+  transition: all 0.18s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filter-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.doacao-table-wrap {
+  overflow-x: auto;
+}
+
+.doacao-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.doacao-table th {
+  text-align: left;
+  padding: 0.68rem 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-detail);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+  white-space: nowrap;
+}
+
+.doacao-table td {
+  padding: 0.85rem 0.6rem;
+  border-bottom: 1px solid #eef0f3;
+  vertical-align: middle;
+}
+
+.doacao-id {
+  font-family: var(--font-detail);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cpf-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cpf-cell__num {
+  font-family: var(--font-detail);
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--color-charcoal-text);
+}
+
+.cpf-cell__prog {
+  font-family: var(--font-detail);
+  font-size: 0.63rem;
+  color: var(--color-primary);
+}
+
+.cpf-cell__empty {
+  font-size: 0.75rem;
+  color: var(--color-muted-text);
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.24rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--font-detail);
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-aguardando {
+  background: var(--color-warning-bg);
+  color: #b25000;
+}
+
+.badge-emlote {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+@media (max-width: 1080px) {
+  .doacoes-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .doacoes-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .doacoes-kpis,
+  .doacao-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .doacoes-header {
+    padding: 1.3rem 1.15rem;
+  }
+}

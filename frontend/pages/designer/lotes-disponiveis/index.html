@@ -1,257 +1,368 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CONTINUUM — Lotes Disponíveis</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="../../../css/global.css">
-  <link rel="stylesheet" href="lotes.css">
-  <link rel="stylesheet" href="../../../components/header/header.css">
-</head>
-<body class="layout-app-scroll">
-  <div class="app-layout">
-    
-    <!-- SIDEBAR PADRÃO NOVO DESIGN -->
-    <div id="appHeader" data-role="designer" data-active="lotes-disponiveis"></div>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lotes Disponíveis | CONTINUUM</title>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="main-content main-content--lotes">
-    
-    <!-- FAIXA DE RESERVA ATIVA (Oculta por padrão) -->
-    <div id="faixa-reserva" class="reserva-banner" hidden>
-      <div class="reserva-banner__info">
-        <strong>Seu lote reservado:</strong>
-        <span id="reserva-banner-texto">#Lote_03 • Ateliê Boreal • retirar até 17/10 (restam 6 dias úteis)</span>
-      </div>
-      <div class="reserva-banner__actions">
-        <button class="btn btn--secondary btn--sm" id="btn-banner-ver">Ver lote</button>
-      </div>
-    </div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <div class="projects-page__header u-mt-lg">
-      <p class="projects-page__eyebrow">LOTES</p>
-      <h1 class="projects-page__title">DISPONÍVEIS</h1>
-    </div>
+    <link rel="stylesheet" href="../../../css/global.css" />
+    <link rel="stylesheet" href="lotes.css" />
+    <link rel="stylesheet" href="../../../components/header/header.css" />
+  </head>
+  <body class="layout-app-scroll">
+    <div class="app-layout">
+      <div
+        id="appHeader"
+        data-role="designer"
+        data-active="lotes-disponiveis"
+      ></div>
 
-    <!-- FAIXA DE LOJAS (Carrossel Horizontal) -->
-    <div class="store-ribbon" id="lojas-ribbon">
-      <!-- Chips injetados via JS -->
-      <button class="chip chip--active">Todas as lojas</button>
-      <button class="chip">Ateliê Boreal (4)</button>
-      <button class="chip">Denim Norte (2)</button>
-    </div>
-
-    <!-- RETÂNGULO DE FUNDO (Board) -->
-    <div class="board-container">
-      
-      <!-- FASHION TICKER (Editorial Marquee) -->
-      <div class="fashion-ticker">
-        <div class="fashion-ticker__track">
-          <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
-          <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
-          <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
-          <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
-        </div>
-      </div>
-
-      <!-- CONTROLES: Busca expansível -->
-      <div class="actions-header actions-header--spread">
-        <div class="search-expandable">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="input-busca" placeholder="Filtrar por material, loja ou nº do lote...">
-        </div>
-        <div class="dropdown-menu dropdown-menu--filter u-relative">
-          <button id="btn-limpar-filtros" class="btn btn--outline btn--filter">Filtros ▼</button>
-          
-          <ul class="filter-menu" id="filter-menu" style="display: none;">
-            <li class="dropdown-item" data-status="ALG">Material: Algodão</li>
-            <li class="dropdown-item" data-status="JEA">Material: Jeans</li>
-            <li class="dropdown-item" data-status="MAL">Material: Malha</li>
-            <li class="dropdown-item" data-status="MET">Material: Metal</li>
-            <li class="dropdown-item dropdown-item--active dropdown-item--separated" data-status="TODOS">Limpar Tudo</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- CHIPS DE FILTROS ATIVOS -->
-      <div class="active-filters" id="filtros-ativos" hidden>
-        <span class="active-filters__label">Filtros ativos:</span>
-        <div class="active-filters__list" id="lista-chips-filtros"></div>
-        <button class="btn-text" id="btn-limpar-filtros">Limpar tudo</button>
-      </div>
-
-      <!-- ABAS -->
-      <div class="tabs">
-        <button class="tab tab--active" data-aba="todos">Todos</button>
-        <button class="tab" data-aba="salvos">Salvos <span class="tab-count" id="count-salvos">0</span></button>
-      </div>
-
-      <!-- GRADE DE LOTES -->
-      <div class="proj-grid" id="lotes-grid" aria-live="polite">
-        <!-- Esqueletos iniciais -->
-        <div class="lote-card skeleton-card"><div class="skeleton-img skeleton"></div><div class="skeleton-line skeleton"></div><div class="skeleton-line skeleton u-w-60"></div></div>
-        <div class="lote-card skeleton-card"><div class="skeleton-img skeleton"></div><div class="skeleton-line skeleton"></div><div class="skeleton-line skeleton u-w-60"></div></div>
-        <div class="lote-card skeleton-card"><div class="skeleton-img skeleton"></div><div class="skeleton-line skeleton"></div><div class="skeleton-line skeleton u-w-60"></div></div>
-      </div>
-      
-      <!-- ESTADO VAZIO -->
-      <div class="empty-state" id="empty-state" hidden>
-        <p>Nenhum lote disponível com esses critérios.</p>
-        <button class="btn btn--secondary" id="btn-empty-limpar">Limpar filtros</button>
-      </div>
-
-    </div>
-    </div>
-  </main>
-  </div> <!-- Fim .app-layout -->
-
-  <!-- P2: MODAL DETALHE DO LOTE (Substitui Drawer) -->
-  <dialog class="modal-form" id="drawer-lote">
-    <div class="modal-form__header">
-      <h2 class="modal-form__title" id="dl-lote-title">DETALHES DO LOTE</h2>
-      <button class="modal-form__close" id="btn-close-lote" aria-label="Fechar">&times;</button>
-    </div>
-    <div id="dl-body">
-      <!-- Injetado via JS -->
-    </div>
-    <div class="modal-form__footer" id="dl-footer">
-      <button class="btn-form-cancel" id="btn-drawer-cancel">Cancelar</button>
-      <button class="btn-form-submit" id="btn-drawer-reservar">Reservar este lote</button>
-      <p class="error-text" id="dl-reserva-hint" hidden>Você já tem um lote reservado</p>
-    </div>
-  </dialog>
-
-  <!-- P3: DRAWER PERFIL DA LOJA -->
-  <aside class="drawer drawer--top" id="drawer-loja" aria-hidden="true">
-    <div class="drawer__header">
-      <h2 class="modal__title" id="dloja-title">Perfil da Loja</h2>
-      <button class="drawer__close" id="btn-close-loja" aria-label="Fechar perfil">&times;</button>
-    </div>
-    <div class="drawer__body">
-      <p id="dloja-sobre" class="briefing-text briefing-text--spaced"></p>
-      
-      <h3 class="briefing-title">Endereço de Retirada</h3>
-      <p id="dloja-endereco" class="briefing-text"></p>
-      
-      <h3 class="briefing-title">Horário de Funcionamento</h3>
-      <p id="dloja-horario" class="briefing-text"></p>
-    </div>
-  </aside>
-
-  <!-- MODAIS DE RESERVA (FASE 3) -->
-
-  <!-- M1: TERMO DE RESPONSABILIDADE -->
-  <dialog class="modal" id="modal-m1">
-    <div class="modal__header">
-      <div class="modal__logo">CONTINUUM</div>
-      <h2 class="modal__title">Termo de responsabilidade</h2>
-      <p class="hint-text">Passo 1 de 3</p>
-    </div>
-    <div class="modal__body u-text-left">
-      <p class="modal__text modal__text--callout">
-        <strong class="u-text-charcoal" id="m1-lote-nome">#Lote</strong><br>
-        <span id="m1-loja-nome">Loja</span>
-      </p>
-      <p class="modal__text u-mb-md">
-        Ao reservar este lote, você se compromete a retirá-lo em até 10 dias úteis (até <strong class="u-text-primary" id="m1-data-limite">--/--</strong>) e a transformá-lo em uma peça conforme termos acordados com a empresa de origem.
-      </p>
-      <p class="modal__text modal__text--emphasis">
-        Dentro do briefing, o projeto é seu.
-      </p>
-      <label class="checkbox-label">
-        <input class="checkbox-label__input" type="checkbox" id="chk-termo">
-        <span class="checkbox-label__text">Li e concordo com o termo</span>
-      </label>
-    </div>
-    <div class="modal__footer">
-      <button class="btn btn--secondary" id="btn-m1-cancelar">Cancelar</button>
-      <button class="btn btn--primary" id="btn-m1-confirmar" disabled title="Você precisa concordar com os termos primeiro">Confirmar reserva</button>
-    </div>
-  </dialog>
-
-  <!-- M2: COMO VOCÊ VAI RECEBER? -->
-  <dialog class="modal" id="modal-m2">
-    <div class="modal__header">
-      <h2 class="modal__title">Como você vai receber?</h2>
-      <p class="hint-text">Passo 2 de 3</p>
-    </div>
-    <div class="modal__body u-text-left">
-      
-      <!-- Opção 1: Retirada -->
-      <label class="radio-card u-mb-md" id="m2-opt-retirada-box">
-        <input type="radio" name="logistica" value="retirada" id="m2-opt-retirada">
-        <div class="radio-card__content">
-          <h4 class="modal__subtitle">Retirar na loja</h4>
-          <p class="modal__text u-text-sm" id="m2-txt-retirada">Endereço e horários da loja.</p>
-        </div>
-      </label>
-
-      <!-- Opção 2: Envio -->
-      <label class="radio-card" id="m2-opt-envio-box">
-        <input type="radio" name="logistica" value="envio" id="m2-opt-envio">
-        <div class="radio-card__content">
-          <div class="modal__row">
-            <h4 class="u-text-charcoal">Receber em casa</h4>
-            <span class="badge badge--success">Frete por conta da loja</span>
+      <main class="main-content main-content--lotes">
+        <!-- FAIXA DE RESERVA ATIVA -->
+        <div id="faixa-reserva" class="reserva-banner" hidden>
+          <div class="reserva-banner__info">
+            <strong>Compromisso ativo:</strong>
+            <span id="reserva-banner-texto"></span>
           </div>
-          <p class="modal__text u-text-sm">O lote será enviado para o seu endereço cadastrado.</p>
+          <div class="reserva-banner__actions">
+            <button class="btn btn--secondary btn--sm" id="btn-banner-ver" type="button">
+              Ir para Meus Lotes →
+            </button>
+          </div>
         </div>
-      </label>
 
-    </div>
-    <div class="modal__footer">
-      <button class="btn btn--secondary" id="btn-m2-depois">Escolher depois</button>
-      <button class="btn btn--primary" id="btn-m2-salvar">Salvar escolha</button>
-    </div>
-  </dialog>
+        <div class="projects-page__header u-mt-lg">
+          <p class="projects-page__eyebrow">VITRINE DE MATÉRIA-PRIMA · SP</p>
+          <h1 class="projects-page__title">LOTES DISPONÍVEIS</h1>
+        </div>
 
-  <!-- M3: RESERVA CONFIRMADA -->
-  <dialog class="modal" id="modal-m3">
-    <div class="modal__body modal__body--centered">
-      <!-- Animação / Selo -->
-      <div class="reservation-tag" id="m3-tag-anim">
-        OK!
+        <!-- FAIXA DE LOJAS -->
+        <div class="store-ribbon" id="lojas-ribbon" aria-label="Filtrar por loja"></div>
+
+        <!-- BOARD PRINCIPAL -->
+        <div class="board-container">
+          <div class="fashion-ticker" aria-hidden="true">
+            <div class="fashion-ticker__track">
+              <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
+              <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
+              <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
+              <span>UPCYCLING • RESSIGNIFICAR • CONTINUUM • ZERO WASTE • DESIGN CIRCULAR • </span>
+            </div>
+          </div>
+
+          <div class="actions-header actions-header--spread">
+            <div class="search-expandable">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                id="input-busca"
+                placeholder="Buscar por material, loja ou código do lote..."
+                aria-label="Buscar lotes disponíveis"
+              />
+            </div>
+
+            <div class="u-relative" id="materialFilterWrap">
+              <button
+                id="btn-abrir-filtros"
+                class="btn btn--outline btn--filter"
+                type="button"
+                aria-expanded="false"
+              >
+                <span id="label-filtro-material">Filtrar material</span> ▾
+              </button>
+
+              <ul class="filter-menu" id="filter-menu" style="display: none">
+                <li class="dropdown-item dropdown-item--active" data-material="TODOS">
+                  Todos os materiais
+                </li>
+                <li class="dropdown-item" data-material="algod">
+                  Algodão
+                </li>
+                <li class="dropdown-item" data-material="jeans">
+                  Jeans / Denim
+                </li>
+                <li class="dropdown-item" data-material="malha">
+                  Malha
+                </li>
+                <li class="dropdown-item" data-material="linho">
+                  Linho / Alfaiataria
+                </li>
+                <li class="dropdown-item dropdown-item--separated" data-material="LIMPAR">
+                  Limpar filtros
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- CHIPS DE FILTROS ATIVOS -->
+          <div class="active-filters" id="filtros-ativos" hidden>
+            <span class="active-filters__label">Filtros ativos:</span>
+            <div class="active-filters__list" id="lista-chips-filtros"></div>
+            <button class="btn-text" id="btn-limpar-filtros" type="button">
+              Limpar tudo
+            </button>
+          </div>
+
+          <!-- ABAS -->
+          <div class="tabs">
+            <button class="tab tab--active" data-aba="todos" type="button">
+              Todos
+            </button>
+            <button class="tab" data-aba="salvos" type="button">
+              Favoritos <span class="tab-count" id="count-salvos">0</span>
+            </button>
+          </div>
+
+          <!-- GRADE DE LOTES -->
+          <div class="proj-grid" id="lotes-grid" aria-live="polite">
+            <div class="lote-card skeleton-card">
+              <div class="skeleton-img skeleton"></div>
+              <div class="skeleton-line skeleton"></div>
+              <div class="skeleton-line skeleton u-w-60"></div>
+            </div>
+            <div class="lote-card skeleton-card">
+              <div class="skeleton-img skeleton"></div>
+              <div class="skeleton-line skeleton"></div>
+              <div class="skeleton-line skeleton u-w-60"></div>
+            </div>
+            <div class="lote-card skeleton-card">
+              <div class="skeleton-img skeleton"></div>
+              <div class="skeleton-line skeleton"></div>
+              <div class="skeleton-line skeleton u-w-60"></div>
+            </div>
+          </div>
+
+          <!-- ESTADO VAZIO -->
+          <div class="empty-state" id="empty-state" hidden>
+            <p>Nenhum lote disponível com esses critérios de filtro.</p>
+            <button class="btn btn--secondary" id="btn-empty-limpar" type="button">
+              Limpar filtros
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- MODAL DETALHE DO LOTE -->
+    <dialog class="modal-form" id="drawer-lote">
+      <div class="modal-form__header">
+        <h2 class="modal-form__title" id="dl-lote-title">DETALHES DO LOTE</h2>
+        <button
+          class="modal-form__close"
+          id="btn-close-lote"
+          type="button"
+          aria-label="Fechar"
+        >
+          &times;
+        </button>
       </div>
-      
-      <h2 class="modal__title u-mb-md">Reserva confirmada!</h2>
-      <p class="modal__text u-mb-sm">Seu compromisso com o <strong><span id="m3-loja-nome">Loja</span></strong> foi firmado.</p>
-      <p class="modal__text modal__text--note" id="m3-resumo-logistica"></p>
-    </div>
-    <div class="modal__footer modal__footer--stacked">
-      <button class="btn btn--primary u-w-full" id="btn-m3-meus-lotes">Ver meus lotes</button>
-      <button class="btn btn--secondary btn--link" id="btn-m3-explorar">Continuar explorando</button>
-    </div>
-  </dialog>
-
-
-
-  <!-- M5: JÁ POSSUI RESERVA -->
-  <dialog class="modal" id="modal-m5">
-    <div class="modal__header">
-      <h2 class="modal__title u-text-error">Reserva bloqueada</h2>
-    </div>
-    <div class="modal__body u-text-left">
-      <p class="modal__text u-mb-md">Você já tem um lote reservado no momento. Como regra do Continuum, permitimos apenas um compromisso por vez para garantir o prazo e a qualidade.</p>
-      <p class="modal__text modal__text--code">
-        Lote atual: <strong id="m5-lote-atual">#LT-00</strong>
+      <div id="dl-body"></div>
+      <div class="modal-form__footer" id="dl-footer">
+        <button class="btn-form-cancel" id="btn-drawer-cancel" type="button">
+          Fechar
+        </button>
+        <button class="btn-form-submit" id="btn-drawer-reservar" type="button">
+          Reservar este lote
+        </button>
+      </div>
+      <p class="error-text" id="dl-reserva-hint" hidden>
+        Você já possui um lote reservado em andamento.
       </p>
-    </div>
-    <div class="modal__footer modal__footer--stacked">
-      <button class="btn btn--primary u-w-full" id="btn-m5-fechar">Entendi, fechar</button>
-      <button class="btn btn--secondary btn--link" id="btn-m5-meu-lote">Ver meu lote reservado</button>
-    </div>
-  </dialog>
+    </dialog>
 
-  <!-- INTERRUPTOR DE DEMONSTRAÇÃO (Oculto / Para Teste) -->
-  <button class="dev-toggle" id="demo-toggle" title="Simular reserva ativa">Demo Reserva</button>
+    <!-- MODAL PERFIL DA LOJA PARCEIRA -->
+    <dialog class="modal-form" id="drawer-loja">
+      <div class="modal-form__header">
+        <h2 class="modal-form__title" id="dloja-title">PERFIL DA LOJA</h2>
+        <button
+          class="modal-form__close"
+          id="btn-close-loja"
+          type="button"
+          aria-label="Fechar perfil"
+        >
+          &times;
+        </button>
+      </div>
+      <div id="dloja-body">
+        <p id="dloja-sobre" class="briefing-text briefing-text--spaced"></p>
 
-  <script type="module" src="lotes-disponiveis.js"></script>
-  <script src="../../../components/header/header.js"></script>
-</body>
+        <div class="dl-briefing-card">
+          <h4>Endereço do Ponto de Coleta</h4>
+          <p id="dloja-endereco" class="briefing-text"></p>
+        </div>
+
+        <div class="dl-briefing-card">
+          <h4>Horário de Retirada & Logística</h4>
+          <p id="dloja-horario" class="briefing-text"></p>
+        </div>
+
+        <div class="dl-briefing-card">
+          <h4>Cartilha Padrão da Loja</h4>
+          <p id="dloja-cartilha" class="briefing-text"></p>
+        </div>
+      </div>
+      <div class="modal-form__footer">
+        <button class="btn-form-cancel" id="btn-voltar-lote" type="button">
+          ← Voltar ao lote
+        </button>
+      </div>
+    </dialog>
+
+    <!-- M1: TERMO DE RESPONSABILIDADE -->
+    <dialog class="modal" id="modal-m1">
+      <div class="modal__header">
+        <div class="modal__logo">CONTINUUM</div>
+        <h2 class="modal__title">Termo de responsabilidade</h2>
+        <p class="hint-text">Passo 1 de 2 · Compromisso Circular</p>
+      </div>
+      <div class="modal__body u-text-left">
+        <div class="modal__text modal__text--callout">
+          <strong class="u-text-charcoal" id="m1-lote-nome">#Lote</strong><br />
+          <span id="m1-loja-nome">Loja</span>
+          <div id="m1-briefing-resumo" style="margin-top: 6px; font-size: 12px; color: var(--color-muted-text);"></div>
+        </div>
+        <p class="modal__text u-mb-md">
+          Ao reservar este lote, você se compromete a retirá-lo ou confirmar seu
+          recebimento em até <strong>10 dias úteis</strong> (até
+          <strong class="u-text-primary" id="m1-data-limite">--/--</strong>) e a
+          transformá-lo respeitando o briefing e a cartilha da loja parceira.
+        </p>
+        <label class="checkbox-label">
+          <input class="checkbox-label__input" type="checkbox" id="chk-termo" />
+          <span class="checkbox-label__text">
+            Li e concordo com o termo de responsabilidade
+          </span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--secondary" id="btn-m1-cancelar" type="button">
+          Cancelar
+        </button>
+        <button
+          class="btn btn--primary"
+          id="btn-m1-confirmar"
+          type="button"
+          disabled
+        >
+          Continuar
+        </button>
+      </div>
+    </dialog>
+
+    <!-- M2: COMO VOCÊ VAI RECEBER? -->
+    <dialog class="modal" id="modal-m2">
+      <div class="modal__header">
+        <h2 class="modal__title">Como você vai receber?</h2>
+        <p class="hint-text">Passo 2 de 2 · Modalidade Logística</p>
+      </div>
+      <div class="modal__body u-text-left">
+        <label class="radio-card u-mb-md" id="m2-opt-retirada-box">
+          <input
+            type="radio"
+            name="logistica"
+            value="retirada"
+            id="m2-opt-retirada"
+            checked
+          />
+          <div class="radio-card__content">
+            <h4 class="modal__subtitle">Retirar presencialmente na loja</h4>
+            <p class="modal__text u-text-sm" id="m2-txt-retirada">
+              Endereço e horários da loja.
+            </p>
+          </div>
+        </label>
+
+        <label class="radio-card" id="m2-opt-envio-box">
+          <input
+            type="radio"
+            name="logistica"
+            value="envio"
+            id="m2-opt-envio"
+          />
+          <div class="radio-card__content">
+            <div class="modal__row">
+              <h4 class="u-text-charcoal">Receber no ateliê (Correios)</h4>
+              <span class="badge badge--success">Custeado na rede SP</span>
+            </div>
+            <p class="modal__text u-text-sm">
+              O lote será despachado para o endereço do seu cadastro.
+            </p>
+          </div>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--secondary" id="btn-m2-depois" type="button">
+          Voltar
+        </button>
+        <button class="btn btn--primary" id="btn-m2-salvar" type="button">
+          Confirmar Reserva
+        </button>
+      </div>
+    </dialog>
+
+    <!-- M3: RESERVA CONFIRMADA -->
+    <dialog class="modal" id="modal-m3">
+      <div class="modal__body modal__body--centered">
+        <div class="reservation-tag" id="m3-tag-anim">OK!</div>
+        <h2 class="modal__title u-mb-md">Reserva confirmada!</h2>
+        <p class="modal__text u-mb-sm">
+          Seu compromisso com <strong><span id="m3-loja-nome">Loja</span></strong>
+          foi registrado.
+        </p>
+        <p class="modal__text modal__text--note" id="m3-resumo-logistica"></p>
+      </div>
+      <div class="modal__footer modal__footer--stacked" style="padding: 0 24px 24px">
+        <button class="btn btn--primary u-w-full" id="btn-m3-meus-lotes" type="button">
+          Ir para Meus Lotes
+        </button>
+        <button class="btn btn--secondary btn--link" id="btn-m3-explorar" type="button">
+          Continuar explorando a vitrine
+        </button>
+      </div>
+    </dialog>
+
+    <!-- M5: JÁ POSSUI RESERVA -->
+    <dialog class="modal" id="modal-m5">
+      <div class="modal__header">
+        <h2 class="modal__title u-text-error">Reserva ativa em andamento</h2>
+      </div>
+      <div class="modal__body u-text-left">
+        <p class="modal__text u-mb-md">
+          Você já possui um lote reservado aguardando recebimento. Confirme o
+          recebimento em <strong>Meus Lotes</strong> para liberar uma nova reserva.
+        </p>
+        <p class="modal__text modal__text--code">
+          Lote reservado: <strong id="m5-lote-atual">#LT-00</strong>
+        </p>
+      </div>
+      <div class="modal__footer modal__footer--stacked" style="padding: 0 24px 24px">
+        <button class="btn btn--primary u-w-full" id="btn-m5-meu-lote" type="button">
+          Ver meu lote reservado
+        </button>
+        <button class="btn btn--secondary btn--link" id="btn-m5-fechar" type="button">
+          Fechar
+        </button>
+      </div>
+    </dialog>
+
+    <script type="module" src="lotes-disponiveis.js"></script>
+    <script src="../../../components/header/header.js"></script>
+  </body>
 </html>

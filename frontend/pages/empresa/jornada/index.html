@@ -3,215 +3,793 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Parceria | CONTINUUM</title>
+    <meta name="theme-color" content="#f5f2eb" />
+    <title>Parceria Corporativa | CONTINUUM</title>
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../../../css/responsive.css" />
-    <style>
-      body {
-        padding: 2rem;
-        background: #eff0e8;
-      }
-      .wizard {
-        max-width: 850px;
-        margin: auto;
-        background: white;
-        padding: 2rem;
-        border-radius: 18px;
-      }
-      .step[hidden] {
-        display: none;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-      }
-      .grid label {
-        display: grid;
-        gap: 0.35rem;
-      }
-      .wizard input,
-      .wizard textarea,
-      .wizard select {
-        padding: 0.8rem;
-        border: 1px solid #aaa;
-        border-radius: 8px;
-      }
-      .actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
-      }
-      .error {
-        color: #a00;
-      }
-      small {
-        display: block;
-      }
-    </style>
+    <link rel="stylesheet" href="../../../css/cadastro-unificado.css" />
+    <link rel="stylesheet" href="jornada.css" />
   </head>
-  <body>
-    <main class="wizard">
-      <p>CONTINUUM · PARCERIA</p>
-      <div id="step1" class="step">
-        <h1>Uma nova vida para os materiais</h1>
-        <p>
-          Acompanhe doações, quilos reaproveitados, peças de upcycling e
-          designers apoiados em um painel de impacto. Receba Certificado de
-          Sustentabilidade e rastreie peças por QR Code.
+  <body class="jornada-page">
+    <div class="jornada-shell">
+      <nav class="jornada-topbar" aria-label="Navegação auxiliar">
+        <a class="jornada-topbar__back" href="../../auth/cadastro/index.html">
+          <span aria-hidden="true">←</span> Voltar à escolha de perfil
+        </a>
+        <p class="jornada-topbar__login">
+          Já possui parceria ativa?
+          <a href="../../auth/login/index.html?perfil=empresa">Entrar ↗</a>
         </p>
-        <p>
-          Plano Parceiro Circular — <strong>R$ 299,90/mês</strong> (valor
-          demonstrativo MVP)
-        </p>
-        <ul>
-          <li>KPIs ambientais e comerciais</li>
-          <li>Certificado oficial de sustentabilidade</li>
-          <li>História do processo criativo em QR Code</li>
-        </ul>
-        <div class="grid">
-          <p>Doações recebidas: <strong id="impactDonations">—</strong></p>
-          <p>Kg reaproveitados: <strong id="impactKg">—</strong></p>
-          <p>Peças finalizadas: <strong id="impactPieces">—</strong></p>
-          <p>Designers apoiados: <strong id="impactDesigners">—</strong></p>
-          <p>
-            Cupons revertidos em vendas: <strong id="impactCoupons">—</strong>
-          </p>
-        </div>
-        <button class="btn btn--primary" data-next="2">Continuar</button>
-      </div>
-      <div id="step2" class="step" hidden>
-        <h1>Vamos conversar?</h1>
-        <p>
-          Tire dúvidas com nosso time ou siga para cadastro e pagamento
-          demonstrativo.
-        </p>
-        <div class="actions">
+      </nav>
+
+      <main class="wizard" id="empresaWizardCard">
+        <header class="wizard__masthead">
           <a
-            class="btn"
-            target="_blank"
-            rel="noopener"
-            href="https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20o%20CONTINUUM%20para%20minha%20loja"
-            >Tirar dúvidas via WhatsApp</a
-          ><button class="btn btn--primary" data-next="3">
-            Seguir para Cadastro e Pagamento
-          </button>
-        </div>
-      </div>
-      <form id="companyForm" class="step" hidden>
-        <h1>Dados da empresa e do ponto de coleta</h1>
-        <div class="grid">
-          <label
-            >CNPJ *<input
-              id="cnpj"
-              required
-              inputmode="numeric"
-              maxlength="18" /></label
-          ><label>Razão Social *<input id="razao" required /></label
-          ><label>Nome Fantasia *<input id="fantasia" required /></label
-          ><label
-            >Nome do administrador *<input id="adminNome" required /></label
-          ><label
-            >E-mail corporativo *<input
-              id="adminEmail"
-              type="email"
-              required /></label
-          ><label
-            >Telefone / WhatsApp *<input id="adminTelefone" required /></label
-          ><label
-            >Senha do administrador *<input
-              id="adminSenha"
-              type="password"
-              minlength="8"
-              required /></label
-          ><label
-            >Confirmar senha *<input
-              id="adminConfirm"
-              type="password"
-              required /></label
-          ><label>CEP *<input id="cep" maxlength="9" required /></label
-          ><label>UF *<input id="uf" maxlength="2" required /></label
-          ><label>Cidade *<input id="cidade" required /></label
-          ><label>Bairro *<input id="bairro" required /></label
-          ><label>Rua / Logradouro *<input id="logradouro" required /></label
-          ><label>Número *<input id="numero" required /></label
-          ><label>Complemento<input id="complemento" /></label
-          ><label
-            >Abertura *<input
-              id="abertura"
-              type="time"
-              value="10:00"
-              required /></label
-          ><label
-            >Fechamento *<input
-              id="fechamento"
-              type="time"
-              value="18:00"
-              required /></label
-          ><label
-            >Horário/observação de retirada<input
-              id="retirada"
-              value="Seg a Sex das 10h às 18h"
-          /></label>
-        </div>
-        <p>
-          O envio via Correios dentro de SP é sempre oferecido e custeado pelo
-          CONTINUUM.
-        </p>
-        <label
-          ><input id="aceitaRetirada" type="checkbox" checked /> Aceita retirada
-          presencial do lote pelo designer na loja?</label
-        >
-        <p>
-          <label
-            ><input id="termos" type="checkbox" required /> Aceito os Termos de
-            Parceria e a Política de Privacidade *</label
+            class="wizard__brand"
+            href="../../../lp.html"
+            aria-label="CONTINUUM — página inicial"
           >
-        </p>
-        <div class="actions">
-          <button type="button" data-next="2">Voltar</button
-          ><button class="btn btn--primary">Continuar ao pagamento</button>
-        </div>
-        <p id="companyError" class="error" role="alert"></p>
-      </form>
-      <form id="paymentForm" class="step" hidden>
-        <h1>Pagamento demonstrativo</h1>
-        <p>Plano Parceiro Circular · R$ 299,90/mês</p>
-        <div class="grid">
-          <label
-            >Nome impresso no cartão *<input id="cardName" required /></label
-          ><label
-            >Número do cartão *<input
-              id="cardNumber"
-              inputmode="numeric"
-              maxlength="19"
-              placeholder="0000 0000 0000 0000"
-              required /></label
-          ><label
-            >Validade (MM/AA) *<input
-              id="expiry"
-              maxlength="5"
-              placeholder="MM/AA"
-              required /></label
-          ><label
-            >CVV *<input id="cvv" inputmode="numeric" maxlength="4" required
-          /></label>
-        </div>
-        <p id="paymentError" class="error" role="alert"></p>
-        <div class="actions">
-          <button type="button" data-next="3">Voltar</button
-          ><button class="btn btn--primary">Ativar assinatura e acessar</button>
-        </div>
-      </form>
-      <section id="step5" class="step" hidden>
-        <h1>Parceria ativada</h1>
-        <p>
-          Sua conta de administradora foi criada. Redirecionando ao Ponto de
-          Coleta…
-        </p>
-      </section>
-    </main>
+            <span class="wizard__brand-name">CONTINUUM</span>
+            <span class="wizard__brand-tag">MODA CIRCULAR · PARCERIA ESG</span>
+          </a>
+
+          <ol class="wizard-stepper" id="wizardStepper" aria-label="Etapas da parceria">
+            <li class="wizard-stepper__item is-active" data-step-indicator="1" aria-current="step">
+              <span class="wizard-stepper__num">01</span>
+              <span class="wizard-stepper__label">Impacto</span>
+            </li>
+            <li class="wizard-stepper__item" data-step-indicator="2">
+              <span class="wizard-stepper__num">02</span>
+              <span class="wizard-stepper__label">Contato</span>
+            </li>
+            <li class="wizard-stepper__item" data-step-indicator="3">
+              <span class="wizard-stepper__num">03</span>
+              <span class="wizard-stepper__label">Cadastro</span>
+            </li>
+            <li class="wizard-stepper__item" data-step-indicator="4">
+              <span class="wizard-stepper__num">04</span>
+              <span class="wizard-stepper__label">Assinatura</span>
+            </li>
+          </ol>
+        </header>
+
+        <!-- ============================================================
+             ETAPA 1 — APRESENTAÇÃO, PLANO & IMPACTO
+             ============================================================ -->
+        <section id="step1" class="step" aria-labelledby="step1Title">
+          <span class="step__eyebrow">
+            <span aria-hidden="true">✳</span> CONTINUUM · PARCERIA
+          </span>
+          <h1 id="step1Title" class="step__title">
+            Uma nova vida para os materiais
+          </h1>
+          <p class="step__lead">
+            Acompanhe doações, quilos reaproveitados, peças de upcycling e
+            designers apoiados em um painel completo de impacto. Receba o
+            Certificado de Sustentabilidade e rastreie cada criação por QR Code.
+          </p>
+
+          <div class="showcase-layout">
+            <article class="plan-card" aria-label="Detalhes do Plano Parceiro Circular">
+              <div>
+                <div class="plan-card__top">
+                  <span class="plan-card__name">Plano Parceiro Circular</span>
+                  <span class="plan-card__badge">Valor demonstrativo MVP</span>
+                </div>
+
+                <div class="plan-card__pricing">
+                  <strong class="plan-card__amount">R$ 299,90</strong>
+                  <span class="plan-card__period">/mês</span>
+                </div>
+                <p class="plan-card__note">
+                  Ponto de coleta homologado + logística reversa em São Paulo
+                </p>
+
+                <ul class="plan-features">
+                  <li class="plan-features__item">
+                    <span class="plan-features__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    <div class="plan-features__text">
+                      <span class="plan-features__title">KPIs ambientais e comerciais</span>
+                      <span class="plan-features__desc">Métricas auditáveis de resíduos têxteis desviados e conversão em loja.</span>
+                    </div>
+                  </li>
+                  <li class="plan-features__item">
+                    <span class="plan-features__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    <div class="plan-features__text">
+                      <span class="plan-features__title">Certificado oficial de sustentabilidade</span>
+                      <span class="plan-features__desc">Selo CONTINUUM para relatórios ESG e comunicação no ponto de venda.</span>
+                    </div>
+                  </li>
+                  <li class="plan-features__item">
+                    <span class="plan-features__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                    <div class="plan-features__text">
+                      <span class="plan-features__title">História do processo criativo em QR Code</span>
+                      <span class="plan-features__desc">Rastreabilidade completa desde o lote doado até a peça autoral finalizada.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </article>
+
+            <aside class="impact-panel" aria-label="Indicadores de impacto da rede">
+              <div>
+                <div class="impact-panel__header">
+                  <span class="impact-panel__title">Impacto da Rede</span>
+                  <span class="impact-panel__live">Tempo real</span>
+                </div>
+
+                <div class="impact-grid">
+                  <div class="impact-stat">
+                    <strong id="impactDonations" class="impact-stat__value">—</strong>
+                    <span class="impact-stat__label">Doações recebidas</span>
+                  </div>
+                  <div class="impact-stat">
+                    <strong id="impactKg" class="impact-stat__value">—</strong>
+                    <span class="impact-stat__label">Kg reaproveitados</span>
+                  </div>
+                  <div class="impact-stat">
+                    <strong id="impactPieces" class="impact-stat__value">—</strong>
+                    <span class="impact-stat__label">Peças finalizadas</span>
+                  </div>
+                  <div class="impact-stat">
+                    <strong id="impactDesigners" class="impact-stat__value">—</strong>
+                    <span class="impact-stat__label">Designers apoiados</span>
+                  </div>
+                  <div class="impact-stat impact-stat--wide">
+                    <span class="impact-stat__label">Cupons revertidos em vendas</span>
+                    <strong id="impactCoupons" class="impact-stat__value">—</strong>
+                  </div>
+                </div>
+              </div>
+
+              <p class="impact-panel__caption">
+                Indicadores consolidados dos pontos de coleta participantes em São Paulo.
+              </p>
+            </aside>
+          </div>
+
+          <footer class="wizard-footer">
+            <span class="wizard-footer__hint">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Envio de lotes dentro de SP custeado pelo CONTINUUM
+            </span>
+            <div class="actions">
+              <button type="button" class="btn btn--primary" data-next="2">
+                Continuar <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </footer>
+        </section>
+
+        <!-- ============================================================
+             ETAPA 2 — ATENDIMENTO CONSULTIVO OU CADASTRO DIRETO
+             ============================================================ -->
+        <section id="step2" class="step" aria-labelledby="step2Title" hidden>
+          <span class="step__eyebrow">
+            <span aria-hidden="true">✳</span> ETAPA 02 · PRÓXIMO PASSO
+          </span>
+          <h1 id="step2Title" class="step__title">Vamos conversar?</h1>
+          <p class="step__lead">
+            Escolha como prefere avançar: tire dúvidas operacionais com nosso
+            time de parcerias ou siga diretamente para o cadastro compacto da sua loja.
+          </p>
+
+          <div class="choice-grid">
+            <article class="choice-card">
+              <div>
+                <div class="choice-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                </div>
+                <p class="choice-card__kicker">Atendimento consultivo</p>
+                <h2 class="choice-card__title">Falar com especialista</h2>
+                <p class="choice-card__desc">
+                  Ideal para redes de lojas, grandes volumes têxteis ou dúvidas
+                  sobre triagem, coleta e certificação ESG.
+                </p>
+              </div>
+              <a
+                class="btn btn--stitched btn--full"
+                target="_blank"
+                rel="noopener"
+                href="https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20o%20CONTINUUM%20para%20minha%20loja"
+              >
+                Tirar dúvidas via WhatsApp <span aria-hidden="true">↗</span>
+              </a>
+            </article>
+
+            <article class="choice-card choice-card--featured">
+              <div>
+                <div class="choice-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4H16C18.2 4 20 5.8 20 8V20H4V4Z" />
+                    <path d="M4 12H20" stroke-dasharray="3 2" />
+                    <path d="M12 4V20" stroke-dasharray="3 2" />
+                  </svg>
+                </div>
+                <p class="choice-card__kicker">Ativação imediata · MVP</p>
+                <h2 class="choice-card__title">Credenciar minha loja</h2>
+                <p class="choice-card__desc">
+                  Cadastre os dados do ponto de coleta em São Paulo em 3 blocos
+                  rápidos e ative sua conta Diretor.
+                </p>
+              </div>
+              <button type="button" class="btn btn--primary btn--full" data-next="3">
+                Seguir para Cadastro <span aria-hidden="true">→</span>
+              </button>
+            </article>
+          </div>
+
+          <footer class="wizard-footer">
+            <span class="wizard-footer__hint">Leva menos de 2 minutos para preencher</span>
+            <div class="actions">
+              <button type="button" class="btn btn--ghost" data-next="1">
+                ← Voltar
+              </button>
+            </div>
+          </footer>
+        </section>
+
+        <!-- ============================================================
+             ETAPA 3 — CADASTRO COMPACTO PADRONIZADO DA EMPRESA (3 SUB-ETAPAS)
+             ============================================================ -->
+        <form id="companyForm" class="step" aria-labelledby="step3Title" hidden novalidate>
+          <div class="company-compact-head">
+            <div>
+              <span class="step__eyebrow">
+                <span aria-hidden="true">✳</span> ETAPA 03 · CREDENCIAMENTO DA LOJA
+              </span>
+              <h1 id="step3Title" class="step__title step__title--compact">
+                Cadastro da Empresa Parceira
+              </h1>
+            </div>
+            <span class="c-field-badge is-warn">Ponto de Coleta · SP</span>
+          </div>
+
+          <!-- Sub-stepper padronizado (mesma linguagem de Doador e Designer) -->
+          <div
+            class="c-stepper company-substepper"
+            id="companySubStepper"
+            role="group"
+            aria-label="Blocos do cadastro corporativo"
+          >
+            <button
+              type="button"
+              class="c-stepper__btn is-active"
+              data-company-substep="1"
+            >
+              <span class="c-stepper__num">01</span>
+              <span>Empresa &amp; Diretor</span>
+            </button>
+            <button
+              type="button"
+              class="c-stepper__btn"
+              data-company-substep="2"
+              disabled
+            >
+              <span class="c-stepper__num">02</span>
+              <span>Endereço (SP)</span>
+            </button>
+            <button
+              type="button"
+              class="c-stepper__btn"
+              data-company-substep="3"
+              disabled
+            >
+              <span class="c-stepper__num">03</span>
+              <span>Operação &amp; Termos</span>
+            </button>
+          </div>
+
+          <!-- Sub-etapa 3.1: Empresa e Conta Diretora -->
+          <div class="c-step-pane" data-company-pane="1">
+            <div class="c-grid">
+              <div class="c-field c-field--4">
+                <div class="c-label-row">
+                  <label class="c-label" for="cnpj">
+                    CNPJ <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="cnpjBadge">Auto</span>
+                </div>
+                <div class="input-lookup-wrap" id="cnpjLookupWrap">
+                  <input
+                    class="c-input"
+                    id="cnpj"
+                    placeholder="00.000.000/0000-00"
+                    required
+                    inputmode="numeric"
+                    maxlength="18"
+                  />
+                  <span class="input-lookup-spinner" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="razao">
+                  Razão Social <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="razao"
+                  placeholder="Ex.: Ateliê Circular Ltda"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="fantasia">
+                  Nome Fantasia <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="fantasia"
+                  placeholder="Nome exibido na vitrine"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="adminNome">
+                  Nome do Diretor <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="adminNome"
+                  placeholder="Nome completo"
+                  autocomplete="name"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="adminEmail">
+                  E-mail corporativo <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="adminEmail"
+                  type="email"
+                  placeholder="contato@empresa.com.br"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="adminTelefone">
+                  Telefone / WhatsApp <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="adminTelefone"
+                  type="tel"
+                  placeholder="(11) 90000-0000"
+                  autocomplete="tel"
+                  required
+                />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="adminSenha">
+                  Senha de acesso <span class="c-req">*</span>
+                </label>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    id="adminSenha"
+                    type="password"
+                    minlength="8"
+                    placeholder="Mínimo de 8 caracteres"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="c-pass-toggle"
+                    data-toggle-password="adminSenha"
+                    aria-label="Mostrar ou ocultar senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="c-strength" id="adminPassStrength" data-tone="idle">
+                  <div class="c-strength__bars" aria-hidden="true">
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                  </div>
+                  <span class="c-strength__label" id="adminPassStrengthLabel">Mín. 8 caracteres</span>
+                </div>
+              </div>
+
+              <div class="c-field">
+                <div class="c-label-row">
+                  <label class="c-label" for="adminConfirm">
+                    Confirmar senha <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="adminMatchBadge" hidden>Coincidem</span>
+                </div>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    id="adminConfirm"
+                    type="password"
+                    placeholder="Repita a senha"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="c-pass-toggle"
+                    data-toggle-password="adminConfirm"
+                    aria-label="Mostrar ou ocultar confirmação de senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-etapa 3.2: Endereço do Ponto de Coleta em SP -->
+          <div class="c-step-pane" data-company-pane="2" hidden>
+            <div class="c-grid">
+              <div class="c-field c-field--3">
+                <div class="c-label-row">
+                  <label class="c-label" for="cep">
+                    CEP (SP) <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="cepEmpresaBadge">Auto</span>
+                </div>
+                <div class="input-lookup-wrap">
+                  <input
+                    class="c-input"
+                    id="cep"
+                    placeholder="00000-000"
+                    inputmode="numeric"
+                    maxlength="9"
+                    required
+                  />
+                  <span class="input-lookup-spinner" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="c-field c-field--2">
+                <label class="c-label" for="uf">
+                  UF <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="uf" placeholder="SP" maxlength="2" required />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="cidade">
+                  Cidade <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="cidade" placeholder="São Paulo" required />
+              </div>
+
+              <div class="c-field c-field--3">
+                <label class="c-label" for="bairro">
+                  Bairro <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="bairro" placeholder="Ex.: Bom Retiro" required />
+              </div>
+
+              <div class="c-field c-field--6">
+                <label class="c-label" for="logradouro">
+                  Rua / Logradouro <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="logradouro"
+                  placeholder="Ex.: Rua José Paulino"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--2">
+                <label class="c-label" for="numero">
+                  Número <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="numero" placeholder="123" required />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="complemento">
+                  Complemento (opcional)
+                </label>
+                <input
+                  class="c-input"
+                  id="complemento"
+                  placeholder="Loja, galpão, andar..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-etapa 3.3: Horários, Logística & Termos -->
+          <div class="c-step-pane" data-company-pane="3" hidden>
+            <div class="c-summary-box">
+              <div class="c-summary-box__main">
+                <span class="c-summary-box__name" id="companySummaryName">Nova Empresa Parceira</span>
+                <span class="c-summary-box__meta" id="companySummaryMeta">CNPJ · Diretor · São Paulo/SP</span>
+              </div>
+              <button type="button" class="c-summary-box__edit" id="companyEditSub1">
+                Revisar dados
+              </button>
+            </div>
+
+            <div class="c-grid">
+              <div class="c-field c-field--3">
+                <label class="c-label" for="abertura">
+                  Abertura <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="abertura" type="time" value="10:00" required />
+              </div>
+
+              <div class="c-field c-field--3">
+                <label class="c-label" for="fechamento">
+                  Fechamento <span class="c-req">*</span>
+                </label>
+                <input class="c-input" id="fechamento" type="time" value="18:00" required />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="retirada">
+                  Janela / observação de retirada
+                </label>
+                <input class="c-input" id="retirada" value="Seg a Sex das 10h às 18h" />
+              </div>
+            </div>
+
+            <div class="logistics-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1" y="3" width="15" height="13" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+              <span>
+                O envio via Correios dentro de SP é sempre oferecido e custeado
+                pelo <strong>CONTINUUM</strong>.
+              </span>
+            </div>
+
+            <div class="c-checks">
+              <label class="c-check-card" for="aceitaRetirada">
+                <input id="aceitaRetirada" type="checkbox" checked />
+                <span>
+                  <strong>Permitir retirada presencial na loja:</strong>
+                  designers podem retirar lotes diretamente no ponto de coleta.
+                </span>
+              </label>
+
+              <label class="c-check-card" for="termos">
+                <input id="termos" type="checkbox" required />
+                <span>
+                  Li e aceito os <strong>Termos de Parceria Circular</strong> e
+                  a <strong>Política de Privacidade</strong> do CONTINUUM
+                  <span class="c-req">*</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <p id="companyError" class="error" role="alert"></p>
+
+          <footer class="wizard-footer">
+            <span class="wizard-footer__hint" id="companySubStepCounter">
+              Bloco 1 de 3 · Dados corporativos
+            </span>
+            <div class="actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                id="companyBtnBackToStep2"
+                data-next="2"
+              >
+                ← Voltar
+              </button>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                id="companyBtnSubPrev"
+                hidden
+              >
+                ← Bloco anterior
+              </button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                id="companyBtnSubNext"
+              >
+                Próximo bloco →
+              </button>
+              <button
+                type="submit"
+                class="btn btn--primary"
+                id="companyBtnSubmit"
+                hidden
+              >
+                Cadastrar e ir ao pagamento <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </footer>
+        </form>
+
+        <!-- ============================================================
+             ETAPA 4 — PAGAMENTO DEMONSTRATIVO
+             ============================================================ -->
+        <form id="paymentForm" class="step" aria-labelledby="step4Title" hidden novalidate>
+          <span class="step__eyebrow">
+            <span aria-hidden="true">✳</span> ETAPA 04 · ATIVAÇÃO DA ASSINATURA
+          </span>
+          <h1 id="step4Title" class="step__title step__title--compact">
+            Pagamento demonstrativo
+          </h1>
+          <p class="step__lead">
+            Finalize a ativação do Plano Parceiro Circular para concluir o
+            cadastro da empresa e acessar imediatamente o painel.
+          </p>
+
+          <div class="checkout-layout">
+            <aside class="order-summary" aria-label="Resumo da assinatura">
+              <p class="order-summary__kicker">Resumo do plano</p>
+              <h2 class="order-summary__plan">Parceiro Circular</h2>
+              <div class="order-summary__price-row">
+                <span class="order-summary__price-label">Assinatura mensal</span>
+                <strong class="order-summary__price-val">R$ 299,90</strong>
+              </div>
+              <ul class="order-summary__perks">
+                <li>Painel ESG e métricas de impacto</li>
+                <li>Gestão de doações, lotes e designers</li>
+                <li>Certificado de Sustentabilidade e tags QR</li>
+                <li>Frete reverso em SP custeado pela rede</li>
+              </ul>
+              <p class="order-summary__demo">
+                Ambiente demonstrativo MVP: nenhuma cobrança real será realizada.
+              </p>
+            </aside>
+
+            <section class="form-section" aria-label="Dados do cartão">
+              <header class="form-section__header">
+                <h2 class="form-section__title">
+                  <span class="form-section__index">💳</span> Cartão de Crédito
+                </h2>
+                <span class="form-section__badge">Simulação segura</span>
+              </header>
+
+              <div class="c-grid">
+                <div class="c-field c-field--12">
+                  <label class="c-label" for="cardName">
+                    Nome impresso no cartão <span class="c-req">*</span>
+                  </label>
+                  <input
+                    class="c-input"
+                    id="cardName"
+                    placeholder="COMO ESTÁ NO CARTÃO"
+                    autocomplete="cc-name"
+                    required
+                  />
+                </div>
+
+                <div class="c-field c-field--12">
+                  <label class="c-label" for="cardNumber">
+                    Número do cartão <span class="c-req">*</span>
+                  </label>
+                  <div class="card-brand-wrap">
+                    <input
+                      class="c-input"
+                      id="cardNumber"
+                      inputmode="numeric"
+                      maxlength="19"
+                      placeholder="0000 0000 0000 0000"
+                      autocomplete="cc-number"
+                      required
+                    />
+                    <span class="card-brand-pill" id="cardBrandBadge">CARTÃO</span>
+                  </div>
+                  <span class="field__hint">Informe 16 dígitos válidos para simulação</span>
+                </div>
+
+                <div class="c-field">
+                  <label class="c-label" for="expiry">
+                    Validade (MM/AA) <span class="c-req">*</span>
+                  </label>
+                  <input
+                    class="c-input"
+                    id="expiry"
+                    inputmode="numeric"
+                    maxlength="5"
+                    placeholder="MM/AA"
+                    autocomplete="cc-exp"
+                    required
+                  />
+                </div>
+
+                <div class="c-field">
+                  <label class="c-label" for="cvv">
+                    CVV <span class="c-req">*</span>
+                  </label>
+                  <input
+                    class="c-input"
+                    id="cvv"
+                    inputmode="numeric"
+                    maxlength="4"
+                    placeholder="123"
+                    autocomplete="cc-csc"
+                    required
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <p id="paymentError" class="error" role="alert"></p>
+
+          <footer class="wizard-footer">
+            <span class="wizard-footer__hint">Cancelamento simples a qualquer momento</span>
+            <div class="actions">
+              <button type="button" class="btn btn--ghost" data-next="3">
+                ← Voltar
+              </button>
+              <button type="submit" class="btn btn--primary" id="paymentBtnSubmit">
+                Finalizar cadastro e ativar <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </footer>
+        </form>
+
+        <!-- ============================================================
+             ETAPA 5 — CONFIRMAÇÃO E REDIRECIONAMENTO
+             ============================================================ -->
+        <section id="step5" class="step" aria-labelledby="step5Title" hidden>
+          <div class="success-state">
+            <div class="success-state__badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="step__eyebrow">CREDENCIAMENTO CONCLUÍDO</span>
+            <h1 id="step5Title" class="step__title">Parceria ativada</h1>
+            <p class="step__lead">
+              Sua conta Diretor foi criada com sucesso. Redirecionando ao Painel
+              do Ponto de Coleta…
+            </p>
+            <div class="success-state__bar" aria-hidden="true">
+              <div class="success-state__bar-fill"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <p class="jornada-signature">
+        <span aria-hidden="true">✳</span> CADA FIBRA MERECE UM NOVO CICLO · SÃO PAULO
+      </p>
+    </div>
+
     <script type="module" src="jornada.js"></script>
   </body>
 </html>

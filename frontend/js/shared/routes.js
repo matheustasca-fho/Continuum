@@ -212,6 +212,8 @@ export function createRoutedApi(mockApi) {
   const syncMethods = new Set([
     "logout",
     "getSessaoAtual",
+    "getPerfilEmpresaAtual",
+    "consultarProgressoCupomCpf",
     "podeExecutar",
     "verificarPermissaoEmpresa",
   ]);

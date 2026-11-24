@@ -1,65 +1,164 @@
-import {api,STATUS_LOTE} from "../../../js/shared/api.js";
+import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+import { dates } from "../../../js/shared/dates.js";
 
-// Elementos da DOM
-const grid = document.getElementById("lotes-grid");
-const lojasRibbon = document.getElementById("lojas-ribbon");
-const countSalvos = document.getElementById("count-salvos");
-const emptyState = document.getElementById("empty-state");
-const bannerReserva = document.getElementById("faixa-reserva");
-const textoReserva = document.getElementById("reserva-banner-texto");
-const demoToggle = document.getElementById("demo-toggle");
+const $ = (id) => document.getElementById(id);
 
-// Estado Local
-let currentAba = "todos"; // todos | salvos
+const grid = $("lotes-grid");
+const lojasRibbon = $("lojas-ribbon");
+const countSalvos = $("count-salvos");
+const emptyState = $("empty-state");
+const bannerReserva = $("faixa-reserva");
+const textoReserva = $("reserva-banner-texto");
+const inputBusca = $("input-busca");
+const btnAbrirFiltros = $("btn-abrir-filtros");
+const filterMenu = $("filter-menu");
+const filtrosAtivosWrap = $("filtros-ativos");
+const listaChipsFiltros = $("lista-chips-filtros");
+const drawerLote = $("drawer-lote");
+const drawerLoja = $("drawer-loja");
+
+let currentAba = "todos";
+let selectedLojaId = "TODAS";
+let selectedMaterial = "TODOS";
+let searchQuery = "";
 let designer = null;
 let lotes = [];
 let lojas = [];
+let loteSelecionado = null;
 
-// Formatação
+const escapeHtml = (v) =>
+  String(v ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[c],
+  );
+
 const fmtTempo = (isoString) => {
-  const diffHoras = Math.floor((new Date() - new Date(isoString)) / 3600000);
-  if (diffHoras < 24) return `há ${diffHoras} h`;
-  return `há ${Math.floor(diffHoras / 24)} dias`;
+  if (!isoString) return "recentemente";
+  const diffHoras = Math.max(
+    0,
+    Math.floor((Date.now() - new Date(isoString).getTime()) / 3600000),
+  );
+  if (diffHoras < 1) return "agora há pouco";
+  if (diffHoras < 24) return `há ${diffHoras}h`;
+  return `há ${Math.floor(diffHoras / 24)} dia(s)`;
 };
 
-// Inicialização
 async function init() {
-  // Simula latência de rede
-  await new Promise((r) => setTimeout(r, 400));
-
   designer = await api.getDesigner();
   lotes = await api.listarLotesVitrineSP();
-  if (designer.reservaAtiva && !lotes.some(l=>l.id===designer.reservaAtiva)) {
-    const reserved=await api.obterLotePorCodigo(designer.reservaAtiva);
-    if(reserved){const companies=await api.listarEmpresas(),e=companies.find(x=>x.id===reserved.empresaId);lotes.push({...reserved,lojaId:e?.id,peso:`${String(reserved.pesoKg).replace('.',',')} kg`,direcao:reserved.briefing?.ideiaMarca||reserved.descricao,logistica_aceita:e?.aceitaRetirada?["retirada","envio"]:["envio"]});}
+
+  if (
+    designer.reservaAtiva &&
+    !lotes.some((l) => l.id === designer.reservaAtiva)
+  ) {
+    const reserved = await api.obterLotePorCodigo(designer.reservaAtiva);
+    if (reserved) {
+      const companies = await api.listarEmpresas();
+      const e = companies.find((x) => x.id === reserved.empresaId);
+      lotes.push({
+        ...reserved,
+        lojaId: e?.id,
+        empresaParceira: e,
+        peso: `${String(reserved.pesoKg).replace(".", ",")} kg`,
+        direcao: reserved.briefing?.ideiaMarca || reserved.descricao,
+        logistica_aceita: e?.aceitaRetirada ? ["retirada", "envio"] : ["envio"],
+      });
+    }
   }
-  lojas = (await api.listarEmpresas()).map(e=>({id:e.id,nome:e.nomeFantasia,sobre:e.perfilLoja,endereco:`${e.logradouro}, ${e.numero} - ${e.bairro}, ${e.cidade} - ${e.uf}`,horario_retirada:e.horarioRetirada}));
+
+  lojas = (await api.listarEmpresas()).map((e) => ({
+    id: e.id,
+    nome: e.nomeFantasia || e.razaoSocial,
+    sobre: e.perfilLoja || "Loja parceira credenciada na rede CONTINUUM.",
+    endereco: [e.logradouro, e.numero, e.bairro, e.cidade, e.uf]
+      .filter(Boolean)
+      .join(", "),
+    horario_retirada: e.horarioRetirada || "Seg a Sex das 10h às 18h",
+    aceitaRetirada: !!e.aceitaRetirada,
+    cartilha:
+      e.cartilhaPadrao?.conteudo ||
+      "Higienização prévia e acabamento limpo padrão ateliê.",
+    cartilhaVersao: e.cartilhaPadrao?.versao || "v1.0",
+  }));
 
   renderLojas();
+  renderActiveFilters();
   renderGrid();
   renderFaixaReserva();
   setupListeners();
 }
 
 function renderLojas() {
-  let html = `<button class="chip chip--active">Todas as lojas</button>`;
+  const disponiveis = lotes.filter(
+    (l) => l.status === STATUS_LOTE.DISPONIVEL && l.id !== designer.reservaAtiva,
+  );
+  let html = `<button type="button" class="chip ${selectedLojaId === "TODAS" ? "chip--active" : ""}" data-loja-id="TODAS">Todas as lojas (${disponiveis.length})</button>`;
+
   lojas.forEach((loja) => {
-    // Conta quantos lotes disponiveis da loja
-    const qtde = lotes.filter(
-      (l) => l.lojaId === loja.id && l.status === STATUS_LOTE.DISPONIVEL,
-    ).length;
+    const qtde = disponiveis.filter((l) => l.lojaId === loja.id).length;
     if (qtde > 0) {
-      html += `<button class="chip">${loja.nome} (${qtde})</button>`;
+      const activeClass = selectedLojaId === loja.id ? "chip--active" : "";
+      html += `<button type="button" class="chip ${activeClass}" data-loja-id="${escapeHtml(loja.id)}">${escapeHtml(loja.nome)} (${qtde})</button>`;
     }
   });
   lojasRibbon.innerHTML = html;
 }
 
+function renderActiveFilters() {
+  const chips = [];
+  if (selectedLojaId !== "TODAS") {
+    const lj = lojas.find((x) => x.id === selectedLojaId);
+    if (lj) chips.push(`Loja: ${lj.nome}`);
+  }
+  if (selectedMaterial !== "TODOS") {
+    chips.push(`Material: ${selectedMaterial}`);
+  }
+  if (searchQuery.trim()) {
+    chips.push(`Busca: "${searchQuery.trim()}"`);
+  }
+
+  if (chips.length === 0) {
+    filtrosAtivosWrap.hidden = true;
+    listaChipsFiltros.innerHTML = "";
+    return;
+  }
+
+  filtrosAtivosWrap.hidden = false;
+  listaChipsFiltros.innerHTML = chips
+    .map((c) => `<span class="filter-chip-active">${escapeHtml(c)}</span>`)
+    .join("");
+}
+
+function clearAllFilters() {
+  selectedLojaId = "TODAS";
+  selectedMaterial = "TODOS";
+  searchQuery = "";
+  if (inputBusca) inputBusca.value = "";
+  if ($("label-filtro-material")) {
+    $("label-filtro-material").textContent = "Filtrar material";
+  }
+  filterMenu
+    ?.querySelectorAll(".dropdown-item")
+    .forEach((li) =>
+      li.classList.toggle("dropdown-item--active", li.dataset.material === "TODOS"),
+    );
+  renderLojas();
+  renderActiveFilters();
+  renderGrid();
+}
+
 function renderFaixaReserva() {
   if (designer.reservaAtiva) {
     const lote = lotes.find((l) => l.id === designer.reservaAtiva);
-    const loja = lojas.find((l) => l.id === lote.lojaId);
-    textoReserva.innerHTML = `${lote.codigo} • ${loja.nome} • retirar em 10 dias úteis`;
+    const loja = lojas.find((l) => l.id === lote?.lojaId);
+    textoReserva.textContent = `${lote?.codigo || designer.reservaAtiva} · ${loja?.nome || "Loja Parceira"} · prazo de 10 dias úteis`;
     bannerReserva.hidden = false;
   } else {
     bannerReserva.hidden = true;
@@ -68,17 +167,36 @@ function renderFaixaReserva() {
 
 function renderGrid() {
   grid.innerHTML = "";
+  const q = searchQuery.trim().toLowerCase();
+  const mat = selectedMaterial.toLowerCase();
 
   const exibirLotes = lotes.filter((l) => {
-    // Se tiver aba salvos, mostra so os favoritos
+    if (l.id === designer.reservaAtiva) return false;
+    if (l.status !== STATUS_LOTE.DISPONIVEL) return false;
     if (currentAba === "salvos" && !designer.favoritos.includes(l.id))
       return false;
-    // Omitir o reservado atual da grade, pois ele fica na faixa de topo
-    if (l.id === designer.reservaAtiva) return false;
-    return l.status === STATUS_LOTE.DISPONIVEL;
+    if (selectedLojaId !== "TODAS" && l.lojaId !== selectedLojaId)
+      return false;
+
+    const loja = lojas.find((lj) => lj.id === l.lojaId);
+    const haystack = [
+      l.codigo,
+      l.titulo,
+      l.composicao,
+      l.material,
+      l.descricao,
+      loja?.nome,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    if (selectedMaterial !== "TODOS" && !haystack.includes(mat)) return false;
+    if (q && !haystack.includes(q)) return false;
+    return true;
   });
 
-  countSalvos.textContent = designer.favoritos.length;
+  countSalvos.textContent = String(designer.favoritos.length);
 
   if (exibirLotes.length === 0) {
     emptyState.hidden = false;
@@ -90,39 +208,37 @@ function renderGrid() {
   exibirLotes.forEach((lote, index) => {
     const loja = lojas.find((lj) => lj.id === lote.lojaId);
     const isFav = designer.favoritos.includes(lote.id);
-    const isNovo = new Date() - new Date(lote.publicado_em) < 172800000; // < 48h
+    const isNovo =
+      Date.now() - new Date(lote.publicado_em || lote.criadoEm).getTime() <
+      172800000;
 
-    // Icone de logística (ilustrativo sem emoji)
-    const iconEnvio = lote.logistica_aceita.includes("envio")
-      ? `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" title="Entrega disponível"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`
+    const div = document.createElement("article");
+    div.className = "lote-card";
+    div.dataset.lotId = lote.id;
+    div.style.animationDelay = `${index * 0.05}s`;
+
+    const headerStyle = lote.image
+      ? `style="background-image:url('${lote.image}')"`
       : "";
 
-    const div = document.createElement("div");
-    div.className = "lote-card";
-    div.style.animationDelay = `${index * 0.08}s`; // Delightful UX: Entrada Coreografada
-
     div.innerHTML = `
-      <div class="lote-card__header">
-        ${isNovo ? `<span class="lote-card__badge-novo">Novo</span>` : `<div></div>`}
-        <button class="lote-card__btn-fav ${isFav ? "lote-card__btn-fav--active" : ""}" data-id="${lote.id}" aria-label="Favoritar lote" aria-pressed="${isFav}">
+      <div class="lote-card__header ${lote.image ? "lote-card__header--photo" : ""}" ${headerStyle}>
+        ${isNovo ? `<span class="lote-card__badge-novo">Novo</span>` : `<span></span>`}
+        <button type="button" class="lote-card__btn-fav ${isFav ? "lote-card__btn-fav--active" : ""}" data-id="${escapeHtml(lote.id)}" aria-label="Favoritar lote" aria-pressed="${isFav}">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
       </div>
       <div class="lote-card__body">
-        <h3 class="lote-card__title">${lote.titulo}</h3>
-        <p class="lote-card__tech">${lote.peso} • ${loja.nome}</p>
-        <p style="font-size: 11px; color: var(--color-muted-text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <span style="display:flex; align-items:center; gap:4px;">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
-            a ${lote.distancia} 
-            ${iconEnvio}
-          </span>
-          <span>Publicado ${fmtTempo(lote.publicado_em)}</span>
-        </p>
+        <h3 class="lote-card__title">${escapeHtml(lote.titulo)}</h3>
+        <p class="lote-card__tech">${escapeHtml(lote.codigo)} • ${escapeHtml(lote.peso)} • ${escapeHtml(loja?.nome || "Loja Parceira")}</p>
+        <div class="lote-card__meta-row">
+          <span>${escapeHtml(lote.composicao || lote.material || "Tecido selecionado")}</span>
+          <span>${escapeHtml(fmtTempo(lote.publicado_em || lote.criadoEm))}</span>
+        </div>
         <div class="lote-card__footer">
-          <button class="btn btn--secondary" style="width: 100%">Ver detalhes</button>
-          <button class="btn btn--primary lote-card__btn-reservar" 
-                  ${designer.reservaAtiva ? 'aria-disabled="true" title="Você já tem um lote reservado"' : ""}>
+          <button type="button" class="btn btn--secondary lote-card__btn-detalhes">Detalhes</button>
+          <button type="button" class="btn btn--primary lote-card__btn-reservar"
+            ${designer.reservaAtiva ? 'aria-disabled="true" title="Você já possui uma reserva ativa"' : ""}>
             Reservar
           </button>
         </div>
@@ -132,11 +248,6 @@ function renderGrid() {
   });
 }
 
-// Variáveis de Painel
-const drawerLote = document.getElementById("drawer-lote");
-const drawerLoja = document.getElementById("drawer-loja");
-let loteSelecionado = null;
-
 function openDrawerLote(id) {
   const lote = lotes.find((l) => l.id === id);
   if (!lote) return;
@@ -144,50 +255,75 @@ function openDrawerLote(id) {
   if (!loja) return;
 
   loteSelecionado = lote;
+  $("dl-lote-title").textContent = lote.titulo || "DETALHES DO LOTE";
 
-  const body = document.getElementById("dl-body");
+  const photoMarkup = lote.image
+    ? `<img src="${lote.image}" alt="${escapeHtml(lote.titulo)}" class="dl-photo" />`
+    : "";
+
+  const briefing = lote.briefing || {};
+  const body = $("dl-body");
   body.innerHTML = `
-    <div class="form-group">
-      <label>Código do Lote</label>
-      <input type="text" class="form-control" value="${lote.codigo}" readonly>
-      <span class="form-helper">Gerado automaticamente pelo sistema.</span>
-    </div>
-    <div class="form-group">
-      <label>Descrição e Direção</label>
-      <textarea class="form-control" rows="3" readonly>${lote.direcao}</textarea>
-    </div>
-    <div class="form-group">
-      <label>Peso / Quantidade</label>
-      <input type="text" class="form-control" value="${lote.peso}" readonly>
-    </div>
-    <div class="form-group">
-      <label>Logística e Origem</label>
-      <div class="form-control" style="background:var(--color-sand-offwhite); display:flex; flex-direction:column; gap:4px; height:auto;">
-         <strong style="color:var(--color-charcoal-text);">${loja.nome}</strong>
-         <span style="font-size:11px; color:var(--color-muted-text);">Aprox. ${lote.distancia} • ${lote.logistica_aceita.includes("envio") ? "Aceita Envio ou Retirada" : "Somente Retirada"}</span>
+    ${photoMarkup}
+    <div class="dl-specs-grid">
+      <div class="dl-spec-box">
+        <span class="dl-spec-box__label">Código</span>
+        <span class="dl-spec-box__val">${escapeHtml(lote.codigo)}</span>
+      </div>
+      <div class="dl-spec-box">
+        <span class="dl-spec-box__label">Peso / Volume</span>
+        <span class="dl-spec-box__val">${escapeHtml(lote.peso)}${lote.quantidadePecas ? ` · ${lote.quantidadePecas} pçs` : ""}</span>
+      </div>
+      <div class="dl-spec-box">
+        <span class="dl-spec-box__label">Material</span>
+        <span class="dl-spec-box__val">${escapeHtml(lote.composicao || lote.material || "Têxtil")}</span>
       </div>
     </div>
-    <button type="button" class="btn btn--secondary" id="btn-ver-loja" style="width:100%">Ver perfil da loja</button>
+
+    <div class="dl-briefing-card">
+      <h4>Briefing Criativo da Loja</h4>
+      <div class="dl-briefing-list">
+        <div><strong>Descrição:</strong> ${escapeHtml(lote.descricao || lote.direcao || "Sem descrição adicional.")}</div>
+        ${briefing.ideiaMarca ? `<div><strong>Ideia da marca:</strong> ${escapeHtml(briefing.ideiaMarca)}</div>` : ""}
+        ${briefing.expectativa ? `<div><strong>Expectativa:</strong> ${escapeHtml(briefing.expectativa)}</div>` : ""}
+        ${briefing.liberdadeCriativa ? `<div><strong>Liberdade criativa:</strong> ${escapeHtml(briefing.liberdadeCriativa)}</div>` : ""}
+        <div><strong>Prazo de produção sugerido:</strong> ${Number(briefing.prazoProducaoDias || 30)} dias</div>
+      </div>
+    </div>
+
+    <div class="dl-briefing-card">
+      <h4>Cartilha Padrão (${escapeHtml(loja.cartilhaVersao)}) · ${escapeHtml(loja.nome)}</h4>
+      <p style="font-size:13px; color:var(--color-muted-text); line-height:1.5;">${escapeHtml(loja.cartilha)}</p>
+    </div>
+
+    <div class="store-minicard">
+      <div>
+        <h4>${escapeHtml(loja.nome)}</h4>
+        <span style="font-size:12px; color:var(--color-muted-text);">
+          ${lote.logistica_aceita.includes("retirada") ? "Aceita Envio (Correios) ou Retirada na loja" : "Envio via Correios"}
+        </span>
+      </div>
+      <button type="button" class="btn btn--secondary btn--sm" id="btn-ver-loja">
+        Perfil da loja
+      </button>
+    </div>
   `;
-  document.getElementById("btn-ver-loja").addEventListener("click", () => {
+
+  $("btn-ver-loja")?.addEventListener("click", () => {
     drawerLote.close();
     openDrawerLoja(loja);
   });
 
-  const btnReserva = document.getElementById("btn-drawer-reservar");
-  const hintReserva = document.getElementById("dl-reserva-hint");
+  const btnReserva = $("btn-drawer-reservar");
+  const hintReserva = $("dl-reserva-hint");
 
   if (designer.reservaAtiva) {
-    btnReserva.disabled = true;
-    btnReserva.textContent = "Indisponível (Você já possui reserva)";
-    btnReserva.style.background = "var(--color-border)";
-    btnReserva.style.color = "var(--color-muted-text)";
+    btnReserva.disabled = false;
+    btnReserva.textContent = "Já possui reserva ativa";
     if (hintReserva) hintReserva.hidden = false;
   } else {
     btnReserva.disabled = false;
     btnReserva.textContent = "Reservar este lote";
-    btnReserva.style.background = "var(--color-primary)";
-    btnReserva.style.color = "var(--color-white)";
     if (hintReserva) hintReserva.hidden = true;
   }
 
@@ -195,65 +331,130 @@ function openDrawerLote(id) {
 }
 
 function openDrawerLoja(loja) {
-  document.getElementById("dloja-title").textContent = loja.nome;
-  document.getElementById("dloja-sobre").textContent = loja.sobre;
-  document.getElementById("dloja-endereco").textContent = loja.endereco;
-  document.getElementById("dloja-horario").textContent = loja.horario_retirada;
-  drawerLoja.classList.add("drawer--open");
-  drawerLoja.setAttribute("aria-hidden", "false");
-}
-
-function closeDrawerLoja() {
-  drawerLoja.classList.remove("drawer--open");
-  drawerLoja.setAttribute("aria-hidden", "true");
+  $("dloja-title").textContent = loja.nome;
+  $("dloja-sobre").textContent = loja.sobre;
+  $("dloja-endereco").textContent = loja.endereco;
+  $("dloja-horario").textContent = loja.aceitaRetirada
+    ? `Retirada presencial: ${loja.horario_retirada} · Envio via Correios disponível.`
+    : "Somente envio via Correios (custeado na rede SP).";
+  if ($("dloja-cartilha")) {
+    $("dloja-cartilha").textContent = `[${loja.cartilhaVersao}] ${loja.cartilha}`;
+  }
+  drawerLoja.showModal();
 }
 
 function closeDrawers() {
-  if (drawerLote && drawerLote.open) drawerLote.close();
-  closeDrawerLoja();
+  if (drawerLote?.open) drawerLote.close();
+  if (drawerLoja?.open) drawerLoja.close();
 }
 
-// Inicia o fluxo de reserva (M5 se já houver reserva; senão M1) para o lote em loteSelecionado
 function iniciarReserva() {
-  const m1 = document.getElementById("modal-m1");
-  const m5 = document.getElementById("modal-m5");
+  const m1 = $("modal-m1");
+  const m5 = $("modal-m5");
   if (!loteSelecionado) return;
 
-  // Regra R1: Se já tem reserva, abre M5
+  closeDrawers();
+
   if (designer.reservaAtiva) {
-    document.getElementById("m5-lote-atual").textContent =
-      `#${designer.reservaAtiva}`;
+    const atual = lotes.find((l) => l.id === designer.reservaAtiva);
+    $("m5-lote-atual").textContent = atual?.codigo || `#${designer.reservaAtiva}`;
     m5.showModal();
     return;
   }
 
-  // Calcula 10 dias úteis para o M1
-  const hoje = new Date();
-  let diasAdicionados = 0;
-  while (diasAdicionados < 10) {
-    hoje.setDate(hoje.getDate() + 1);
-    if (hoje.getDay() !== 0 && hoje.getDay() !== 6) diasAdicionados++;
-  }
-  const dataFormatada = hoje.toLocaleDateString("pt-BR", {
+  const limite = dates.addBusinessDays(new Date().toISOString(), 10);
+  const dataFormatada = limite.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
+    year: "numeric",
   });
 
-  // Prepara M1
-  document.getElementById("m1-lote-nome").textContent = loteSelecionado.titulo;
-  document.getElementById("m1-loja-nome").textContent = lojas.find(
-    (l) => l.id === loteSelecionado.lojaId,
-  ).nome;
-  document.getElementById("m1-data-limite").textContent = dataFormatada;
+  const loja = lojas.find((l) => l.id === loteSelecionado.lojaId);
+  $("m1-lote-nome").textContent = `${loteSelecionado.codigo} — ${loteSelecionado.titulo}`;
+  $("m1-loja-nome").textContent = loja?.nome || "Loja Parceira";
+  if ($("m1-briefing-resumo")) {
+    const dir =
+      loteSelecionado.briefing?.ideiaMarca ||
+      loteSelecionado.direcao ||
+      "Criação autoral livre dentro da cartilha da loja.";
+    $("m1-briefing-resumo").textContent = `Direcionamento: ${dir}`;
+  }
+  $("m1-data-limite").textContent = dataFormatada;
 
-  document.getElementById("chk-termo").checked = false;
-  document.getElementById("btn-m1-confirmar").disabled = true;
+  $("chk-termo").checked = false;
+  $("btn-m1-confirmar").disabled = true;
 
   m1.showModal();
 }
 
 function setupListeners() {
-  // ... Listeners anteriores
+  // Filtro por Loja (Ribbon)
+  lojasRibbon.addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-loja-id]");
+    if (!chip) return;
+    selectedLojaId = chip.dataset.lojaId;
+    renderLojas();
+    renderActiveFilters();
+    renderGrid();
+  });
+
+  // Busca por texto
+  inputBusca?.addEventListener("input", () => {
+    searchQuery = inputBusca.value;
+    renderActiveFilters();
+    renderGrid();
+  });
+
+  // Menu de filtro de material
+  btnAbrirFiltros?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = filterMenu.style.display === "block";
+    filterMenu.style.display = isOpen ? "none" : "block";
+    btnAbrirFiltros.setAttribute("aria-expanded", String(!isOpen));
+  });
+
+  filterMenu?.addEventListener("click", (e) => {
+    const item = e.target.closest("[data-material]");
+    if (!item) return;
+    const val = item.dataset.material;
+    filterMenu.style.display = "none";
+    btnAbrirFiltros?.setAttribute("aria-expanded", "false");
+
+    if (val === "LIMPAR") {
+      clearAllFilters();
+      return;
+    }
+
+    selectedMaterial = val;
+    filterMenu
+      .querySelectorAll(".dropdown-item")
+      .forEach((li) => li.classList.toggle("dropdown-item--active", li === item));
+    if ($("label-filtro-material")) {
+      $("label-filtro-material").textContent =
+        val === "TODOS" ? "Filtrar material" : item.textContent.trim();
+    }
+    renderActiveFilters();
+    renderGrid();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (
+      filterMenu &&
+      filterMenu.style.display === "block" &&
+      !e.target.closest("#materialFilterWrap")
+    ) {
+      filterMenu.style.display = "none";
+      btnAbrirFiltros?.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  $("btn-limpar-filtros")?.addEventListener("click", clearAllFilters);
+  $("btn-empty-limpar")?.addEventListener("click", clearAllFilters);
+  $("btn-banner-ver")?.addEventListener("click", () => {
+    location.href = "../meus-lotes/index.html";
+  });
+
+  // Abas Todos / Favoritos
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", (e) => {
       document
@@ -265,161 +466,132 @@ function setupListeners() {
     });
   });
 
+  // Cliques na Grade
   grid.addEventListener("click", async (e) => {
-    // Favo
     const btnFav = e.target.closest(".lote-card__btn-fav");
     if (btnFav) {
+      e.stopPropagation();
       const id = btnFav.dataset.id;
       designer.favoritos = await api.alternarFavorito(id);
       renderGrid();
-      if (loteSelecionado && loteSelecionado.id === id) {
-        openDrawerLote(id); // atualiza estado no drawer
-      }
       return;
     }
 
     const card = e.target.closest(".lote-card");
     if (!card) return;
-    const title = card.querySelector(".lote-card__title").textContent;
-    const lote = lotes.find((l) => l.titulo === title); // Busca pelo titulo (simplificado pro mock)
+    const lote = lotes.find((l) => l.id === card.dataset.lotId);
     if (!lote) return;
 
-    // Botão "Reservar" do card: inicia direto o fluxo de reserva
     if (e.target.closest(".lote-card__btn-reservar")) {
       loteSelecionado = lote;
       iniciarReserva();
       return;
     }
 
-    // Clique no Card (Ver detalhes)
     openDrawerLote(lote.id);
   });
 
-  // Drawer Lote Fechar
-  document
-    .getElementById("btn-close-lote")
-    .addEventListener("click", closeDrawers);
-  const btnDrawerCancel = document.getElementById("btn-drawer-cancel");
-  if (btnDrawerCancel) btnDrawerCancel.addEventListener("click", closeDrawers);
-
-  // Teclado (Acessibilidade)
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawers();
+  $("btn-close-lote")?.addEventListener("click", closeDrawers);
+  $("btn-drawer-cancel")?.addEventListener("click", closeDrawers);
+  $("btn-close-loja")?.addEventListener("click", () => drawerLoja.close());
+  $("btn-voltar-lote")?.addEventListener("click", () => {
+    drawerLoja.close();
+    if (loteSelecionado) openDrawerLote(loteSelecionado.id);
   });
 
-  // ==========================================
-  // FLUXO DE RESERVA (Modais M1, M2, M3, M5)
-  // ==========================================
-
-  const m1 = document.getElementById("modal-m1");
-  const m2 = document.getElementById("modal-m2");
-  const m3 = document.getElementById("modal-m3");
-  const m5 = document.getElementById("modal-m5");
-
-  // Abre M1 ou M5
-  document
-    .getElementById("btn-drawer-reservar")
-    .addEventListener("click", iniciarReserva);
-
-  // Drawer do perfil da loja
-  document
-    .getElementById("btn-close-loja")
-    .addEventListener("click", closeDrawerLoja);
-
-  // M1: Validar Checkbox
-  document.getElementById("chk-termo").addEventListener("change", (e) => {
-    document.getElementById("btn-m1-confirmar").disabled = !e.target.checked;
+  drawerLote?.addEventListener("click", (e) => {
+    if (e.target === drawerLote) drawerLote.close();
+  });
+  drawerLoja?.addEventListener("click", (e) => {
+    if (e.target === drawerLoja) drawerLoja.close();
   });
 
-  // M1 -> M2
-  document.getElementById("btn-m1-confirmar").addEventListener("click", () => {
+  // Modais de Reserva (M1, M2, M3, M5)
+  const m1 = $("modal-m1");
+  const m2 = $("modal-m2");
+  const m3 = $("modal-m3");
+  const m5 = $("modal-m5");
+
+  $("btn-drawer-reservar")?.addEventListener("click", iniciarReserva);
+
+  $("chk-termo")?.addEventListener("change", (e) => {
+    $("btn-m1-confirmar").disabled = !e.target.checked;
+  });
+
+  $("btn-m1-confirmar")?.addEventListener("click", () => {
     m1.close();
-
-    // Configura opções de logística no M2
-    const aceitaEnvio = loteSelecionado.logistica_aceita.includes("envio");
-    const boxEnvio = document.getElementById("m2-opt-envio-box");
-    const inputEnvio = document.getElementById("m2-opt-envio");
-    const txtRetirada = document.getElementById("m2-txt-retirada");
-
+    const aceitaRetirada = loteSelecionado.logistica_aceita.includes("retirada");
+    const boxRetirada = $("m2-opt-retirada-box");
+    const inputRetirada = $("m2-opt-retirada");
+    const inputEnvio = $("m2-opt-envio");
     const loja = lojas.find((l) => l.id === loteSelecionado.lojaId);
-    txtRetirada.textContent = `${loja.endereco} (${loja.horario_retirada})`;
 
-    if (!aceitaEnvio) {
-      boxEnvio.style.opacity = "0.5";
-      inputEnvio.disabled = true;
-      document.getElementById("m2-opt-retirada").checked = true;
+    $("m2-txt-retirada").textContent = `${loja?.endereco || ""} (${loja?.horario_retirada || ""})`;
+
+    if (!aceitaRetirada) {
+      boxRetirada.style.opacity = "0.5";
+      inputRetirada.disabled = true;
+      inputEnvio.checked = true;
     } else {
-      boxEnvio.style.opacity = "1";
-      inputEnvio.disabled = false;
+      boxRetirada.style.opacity = "1";
+      inputRetirada.disabled = false;
+      inputRetirada.checked = true;
     }
 
     m2.showModal();
   });
 
-  // M2 -> M3 (E salva no banco falso)
-  document.getElementById("btn-m2-salvar").addEventListener("click", async () => {
+  $("btn-m2-depois")?.addEventListener("click", () => {
+    m2.close();
+    m1.showModal();
+  });
+
+  $("btn-m2-salvar")?.addEventListener("click", async () => {
     const modo = document.querySelector('input[name="logistica"]:checked');
-    if (!modo) return;
+    if (!modo || !loteSelecionado) return;
+
+    try {
+      await api.reservarLote(
+        loteSelecionado.codigo || loteSelecionado.id,
+        designer.id,
+        modo.value === "retirada" ? "RETIRADA" : "ENVIO",
+      );
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
 
     m2.close();
-
-    // Efetiva reserva
-    try { await api.reservarLote(loteSelecionado.codigo || loteSelecionado.id, designer.id, modo.value === "retirada" ? "RETIRADA" : "ENVIO"); }
-    catch (error) { alert(error.message); return; }
     designer.reservaAtiva = loteSelecionado.id;
 
-    // Prepara M3
-    document.getElementById("m3-loja-nome").textContent = lojas.find(
-      (l) => l.id === loteSelecionado.lojaId,
-    ).nome;
-    const txtLog =
+    const loja = lojas.find((l) => l.id === loteSelecionado.lojaId);
+    $("m3-loja-nome").textContent = loja?.nome || "Loja Parceira";
+    $("m3-resumo-logistica").innerHTML =
       modo.value === "retirada"
-        ? "Você escolheu <strong>Retirar na loja</strong>. Organize-se para o prazo."
-        : "Você escolheu <strong>Receber em casa</strong>. A loja enviará em breve.";
-    document.getElementById("m3-resumo-logistica").innerHTML = txtLog;
+        ? `Modalidade escolhida: <strong>Retirada presencial na loja</strong> (${escapeHtml(loja?.horario_retirada || "horário comercial")}).`
+        : "Modalidade escolhida: <strong>Envio via Correios</strong> para o endereço do seu ateliê.";
 
-    // Dispara animação
-    const tagAnim = document.getElementById("m3-tag-anim");
+    const tagAnim = $("m3-tag-anim");
     tagAnim.classList.remove("anim-drop-tag");
-    void tagAnim.offsetWidth; // trigger reflow
+    void tagAnim.offsetWidth;
     tagAnim.classList.add("anim-drop-tag");
 
+    renderFaixaReserva();
+    renderLojas();
+    renderGrid();
     m3.showModal();
   });
 
-  // Fechamentos M1, M2, M5
-  document
-    .getElementById("btn-m1-cancelar")
-    .addEventListener("click", () => m1.close());
-    document.getElementById("btn-m2-depois").addEventListener("click", async () => {
-    try { await api.reservarLote(loteSelecionado.codigo || loteSelecionado.id, designer.id, "ENVIO"); } catch (error) { alert(error.message); return; }
-    location.reload();
+  $("btn-m1-cancelar")?.addEventListener("click", () => m1.close());
+  $("btn-m5-fechar")?.addEventListener("click", () => m5.close());
+  $("btn-m5-meu-lote")?.addEventListener("click", () => {
+    location.href = "../meus-lotes/index.html";
   });
-  document
-    .getElementById("btn-m5-fechar")
-    .addEventListener("click", () => m5.close());
-  document.getElementById("btn-m5-meu-lote").addEventListener("click", () => {
-    m5.close();
-    closeDrawers();
-    location.reload(); // abriria o detalhe da reserva atual
+  $("btn-m3-meus-lotes")?.addEventListener("click", () => {
+    location.href = "../meus-lotes/index.html";
   });
-
-  // Final M3
-  document
-    .getElementById("btn-m3-meus-lotes")
-    .addEventListener(
-      "click",
-      () => (location.href = "../meus-lotes/index.html"),
-    );
-  document
-    .getElementById("btn-m3-explorar")
-    .addEventListener("click", () => location.reload());
-
-  // Demo Switch
-  demoToggle.addEventListener("click", () => {
-    if (designer.reservaAtiva) alert("A reserva ativa deve ser concluída pela jornada do lote.");
-    else alert("Reserve um lote pela vitrine para atualizar seus lotes.");
-    location.reload();
+  $("btn-m3-explorar")?.addEventListener("click", () => {
+    m3.close();
   });
 }
 

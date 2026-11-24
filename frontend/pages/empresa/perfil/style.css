@@ -1,0 +1,702 @@
+/* ==========================================================================
+   CONTINUUM — pages/empresa/perfil/style.css
+   Perfil Corporativo, Logística & Cartilha Padrão — Identidade CONTINUUM Craft
+   ========================================================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.eyebrow-label {
+  display: block;
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.page-header__subtitle {
+  color: var(--color-muted-text);
+  margin-top: 6px;
+  max-width: 62ch;
+}
+
+/* Etiqueta Corporativa Pendurada */
+.header-tag-container {
+  position: relative;
+  width: 136px;
+  height: 230px;
+  margin-top: -12px;
+  flex-shrink: 0;
+  transform-origin: top center;
+  animation: swingTag 5s ease-in-out infinite;
+}
+
+.header-tag-container:hover {
+  animation-play-state: paused;
+  transform: rotate(-3deg) scale(1.04);
+}
+
+@keyframes swingTag {
+  0%,
+  100% {
+    transform: rotate(3.5deg);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+}
+
+.safety-pin {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 116px;
+  height: 38px;
+  z-index: 5;
+}
+
+.clothing-tag {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 108px;
+  height: 196px;
+  background-color: var(--color-charcoal-text);
+  color: var(--color-white);
+  border: 1px solid #1a202c;
+  box-shadow:
+    2px 6px 14px rgba(0, 0, 0, 0.16),
+    inset 0 0 36px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clothing-tag::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 34px;
+  background-color: var(--color-charcoal-text);
+  border-radius: 50%;
+  border: 1px solid #1a202c;
+  border-bottom: none;
+  z-index: -1;
+}
+
+.clothing-tag__hole {
+  width: 11px;
+  height: 11px;
+  background-color: var(--color-sand-offwhite);
+  border-radius: 50%;
+  margin-top: -5px;
+  box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.clothing-tag__content {
+  margin-top: 34px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.clothing-tag__title {
+  font-family: var(--font-title);
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  transform: scaleY(1.25);
+  margin-bottom: 10px;
+  color: var(--color-primary-light);
+}
+
+.clothing-tag__subtitle {
+  font-family: var(--font-detail);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* Faixa de Identidade Corporativa */
+.company-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    var(--color-white) 0%,
+    rgba(253, 242, 244, 0.68) 100%
+  );
+  border: 1px solid rgba(120, 39, 54, 0.16);
+  box-shadow: var(--shadow-card);
+}
+
+.company-hero-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.company-monogram {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-title);
+  font-size: 1.65rem;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  box-shadow: 0 8px 18px rgba(120, 39, 54, 0.22);
+}
+
+.company-hero-card__name {
+  font-family: var(--font-title);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-charcoal-text);
+  line-height: 1.1;
+}
+
+.company-hero-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  font-family: var(--font-detail);
+  font-size: 0.72rem;
+  color: var(--color-muted-text);
+}
+
+.company-hero-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.plan-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--color-charcoal-text);
+  color: var(--color-white);
+  font-family: var(--font-detail);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.plan-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #68d391;
+}
+
+/* Alert Banner */
+.alert-banner {
+  padding: 0.9rem 1.15rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: none;
+}
+
+.alert-banner.success {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.alert-banner.error {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+/* Grid Principal do Formulário */
+.perfil-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.perfil-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Cards Craft com Fita Métrica e Costura */
+.perfil-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 1.75rem 1.75rem 2.35rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.25s ease;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      rgba(45, 55, 72, 0.35) 0,
+      rgba(45, 55, 72, 0.35) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(45, 55, 72, 0.55) 0,
+      rgba(45, 55, 72, 0.55) 1.5px,
+      transparent 1.5px,
+      transparent 50px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.06) 0%,
+      rgba(0, 0, 0, 0.06) 1px,
+      #faf9f5 1px,
+      #faf9f5 100%
+    );
+  background-size:
+    10px 7px,
+    50px 14px,
+    100% 18px;
+  background-position:
+    bottom left,
+    bottom left,
+    bottom left;
+  background-repeat: repeat-x, repeat-x, no-repeat;
+}
+
+.perfil-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.perfil-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1.75rem;
+  right: 1.75rem;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-primary) 0px,
+    var(--color-primary) 6px,
+    transparent 6px,
+    transparent 11px
+  );
+  opacity: 0.24;
+}
+
+.perfil-card--full {
+  grid-column: 1 / -1;
+}
+
+.perfil-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.perfil-card__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.perfil-card__icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.perfil-card__icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.perfil-card__title {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-charcoal-text);
+  margin: 0;
+}
+
+.perfil-card__tag {
+  font-family: var(--font-detail);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+}
+
+/* Campos de formulário */
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.f-col-12 {
+  grid-column: 1 / -1;
+}
+.f-col-8 {
+  grid-column: span 8;
+}
+.f-col-6 {
+  grid-column: span 6;
+}
+.f-col-4 {
+  grid-column: span 4;
+}
+.f-col-3 {
+  grid-column: span 3;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  margin-bottom: 0;
+}
+
+.form-group label {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-charcoal-text);
+}
+
+.form-group input:not([type="checkbox"]),
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border: 1px solid #d7dce3;
+  border-radius: 9px;
+  background: var(--color-white);
+  color: var(--color-charcoal-text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.form-group input:not([type="checkbox"]):hover,
+.form-group textarea:hover,
+.form-group select:hover {
+  border-color: #b8c1cc;
+}
+
+.form-group input:not([type="checkbox"]):focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(120, 39, 54, 0.11);
+}
+
+.form-group input:disabled {
+  background: #f1efe9;
+  color: var(--color-muted-text);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+.form-group textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-detail);
+  font-size: 0.66rem;
+  color: var(--color-muted-text);
+}
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  margin: 1.35rem 0 1.15rem;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(120, 39, 54, 0.28) 0,
+    rgba(120, 39, 54, 0.28) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+.subsection-label {
+  font-family: var(--font-detail);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.9rem;
+}
+
+/* Nota logística e Switch Card */
+.logistics-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  background: var(--color-sand-offwhite);
+  border-left: 3px solid var(--color-primary);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--color-charcoal-text);
+  margin-bottom: 1rem;
+}
+
+.logistics-callout svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.pickup-toggle-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.95rem 1rem;
+  border-radius: 11px;
+  border: 1.5px solid #dfe3e8;
+  background: #fcfcfa;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.pickup-toggle-card:hover {
+  border-color: rgba(120, 39, 54, 0.45);
+}
+
+.pickup-toggle-card:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.pickup-toggle-card input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.pickup-toggle-card__title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-charcoal-text);
+}
+
+.pickup-toggle-card__desc {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-muted-text);
+  margin-top: 0.15rem;
+}
+
+/* Cartilha Padrão da Empresa */
+.cartilha-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: var(--color-sand-offwhite);
+  border: 1px dashed rgba(120, 39, 54, 0.3);
+}
+
+.badge-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-detail);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.cartilha-updated {
+  font-family: var(--font-detail);
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+}
+
+.cartilha-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cartilha-tip {
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: #f3f1ea;
+  border: 1px solid #e2dfd5;
+  font-family: var(--font-detail);
+  font-size: 0.65rem;
+  color: var(--color-charcoal-text);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.cartilha-tip:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Barra de Ações Inferior */
+.perfil-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.perfil-actions__hint {
+  font-family: var(--font-detail);
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+}
+
+.perfil-actions__buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Animação de Entrada */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.45s var(--ease-out) both;
+}
+
+@media (max-width: 980px) {
+  .perfil-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .header-tag-container {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .f-col-8,
+  .f-col-6,
+  .f-col-4,
+  .f-col-3 {
+    grid-column: 1 / -1;
+  }
+
+  .perfil-card {
+    padding: 1.3rem 1.15rem 2rem;
+  }
+
+  .perfil-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .perfil-actions__buttons {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .perfil-actions__buttons .btn {
+    width: 100%;
+  }
+}

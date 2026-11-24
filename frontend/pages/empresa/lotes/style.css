@@ -2236,3 +2236,172 @@ textarea.form-input {
     max-height: calc(100vh - 430px);
   }
 }
+
+
+/* ==========================================================================
+   REFINAMENTOS DO CABEÇALHO E MODAL DE CRIAÇÃO/EDIÇÃO DE LOTE
+   ========================================================================== */
+
+.lots-page-heading__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.modal-box--lot {
+  width: min(100%, 720px);
+}
+
+.lot-modal-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  font: 700 11px var(--font-detail);
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.lot-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.lot-form-row--code {
+  grid-template-columns: 0.8fr 1.2fr;
+}
+
+.lot-form-row--3 {
+  grid-template-columns: 1.3fr 0.85fr 0.85fr;
+}
+
+.lot-form-row .form-group input[type="number"] {
+  max-width: none;
+}
+
+.lot-fieldset {
+  border: 1px solid #e3e0d6;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 0 0 18px;
+  background: #fbfaf7;
+}
+
+.lot-fieldset__legend {
+  padding: 0 8px;
+  font: 700 11px var(--font-detail);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.lot-cartilha-box {
+  background: var(--color-sand-offwhite);
+  border: 1px dashed rgba(120, 39, 54, 0.28);
+  border-radius: 9px;
+  padding: 10px 12px;
+}
+
+.lot-cartilha-box__label {
+  display: block;
+  margin-bottom: 4px;
+  font: 700 11px var(--font-detail);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-charcoal-text);
+}
+
+.lot-cartilha-box__body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted-text);
+  white-space: pre-wrap;
+}
+
+.curadoria-list {
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.curadoria-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #fff;
+  border: 1px solid #e3e5ea;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-charcoal-text);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.curadoria-item:hover {
+  border-color: var(--color-primary);
+}
+
+.curadoria-item:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.curadoria-item input[type="checkbox"] {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+}
+
+.curadoria-empty {
+  font-size: 13px;
+  color: var(--color-muted-text);
+  padding: 6px 2px;
+}
+
+.curadoria-summary {
+  font: 700 11px var(--font-detail);
+  color: var(--color-charcoal-text);
+}
+
+.lot-form-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fdecec;
+  border: 1px solid rgba(180, 35, 24, 0.25);
+  color: var(--color-error);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lot-form-error:empty {
+  display: none;
+}
+
+.card-lote__meta {
+  margin-top: 4px;
+  font: 700 11px var(--font-detail);
+  color: var(--color-primary);
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 640px) {
+  .lot-form-row,
+  .lot-form-row--code,
+  .lot-form-row--3 {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+
+.card-lote__thumb--readonly,
+.card-lote__body--readonly {
+  cursor: default !important;
+}
