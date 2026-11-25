@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     <p class="detail__heading">Briefing Criativo</p>
                     <p style="font-size:13px; color:var(--color-charcoal-text); line-height:1.55;">
-                      ${escapeHtml(l.briefing?.ideiaMarca || l.descricao || "Criação autoral livre respeitando a cartilha da loja.")}
+                      ${escapeHtml(l.briefing?.ideiaMarca || l.descricao || "—")}
                     </p>
                   </div>
 
@@ -231,13 +231,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                       <dt>Código</dt>
                       <dd class="code">${escapeHtml(l.codigo)}</dd>
                       <dt>Composição</dt>
-                      <dd>${escapeHtml(l.composicao || l.material || "Tecido selecionado")}</dd>
+                      <dd>${escapeHtml(l.composicao || l.material || "—")}</dd>
                       <dt>Peso</dt>
                       <dd>${escapeHtml(String(l.pesoKg).replace(".", ","))} kg</dd>
                       <dt>Loja</dt>
                       <dd>${escapeHtml(l.empresaParceira)}</dd>
                       <dt>Endereço</dt>
-                      <dd>${escapeHtml(enderecoLoja || "São Paulo - SP")} (${escapeHtml(emp.horarioRetirada || "10h às 18h")})</dd>
+                      <dd>${escapeHtml(enderecoLoja || "—")}${emp.horarioRetirada ? ` (${escapeHtml(emp.horarioRetirada)})` : ""}</dd>
                     </dl>
                   </div>
                 </div>

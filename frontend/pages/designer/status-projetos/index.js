@@ -83,11 +83,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     try {
       const updated = await api.finalizarProjetoDesigner(project.id, {
-        tituloPeca: project.tituloPeca || "Peça Autoral",
+        tituloPeca: project.tituloPeca || undefined,
         descricao: processoCriativo,
         processoCriativo,
         quantidadePecas: project.quantidadePecas || 1,
-        fotos: ["peca-concluida.jpg"],
       });
       project.status = updated?.status || STATUS_LOTE.ENVIADO_LOJA;
       done = true;

@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               <span class="lote-id">${l.codigo || `LOTE #${l.id}`}</span>
               <h4 class="lote-title">${l.titulo || l.descricao}</h4>
               <div class="lote-meta">
-                <span>${l.nomeEmpresa || "Empresa Parceira"} (${l.distancia || "SP"})</span>
+                <span>${l.nomeEmpresa || "—"}${l.distancia ? ` (${l.distancia})` : ""}</span>
                 <span>${l.peso || `${l.pesoKg} kg`}</span>
               </div>
             </div>

@@ -112,6 +112,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     consent.setAttribute("aria-hidden", "false");
   };
 
+  const lerComoDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("Não foi possível ler a foto."));
+      reader.readAsDataURL(file);
+    });
+
   $("consentCancel").onclick = () => {
     consent.classList.remove("consent-dialog--visible");
     consent.setAttribute("aria-hidden", "true");
@@ -119,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   $("consentConfirm").onclick = async () => {
     const processoCriativo = $("pecaProcessoCriativo")?.value.trim() || "";
-    const tituloPeca = $("pecaTitulo")?.value.trim() || selected?.tituloPeca || "Peça Autoral";
+    const tituloPeca = $("pecaTitulo")?.value.trim() || selected?.tituloPeca || undefined;
     const quantidadePecas = Math.max(1, Number($("pecaQuantidade")?.value) || 1);
 
     if (!processoCriativo) {
@@ -136,13 +144,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
+      const foto = file ? await lerComoDataUrl(file) : null;
       await api.finalizarProjetoDesigner(selected.id, {
         tituloPeca,
         descricao: processoCriativo,
         processoCriativo,
         quantidadePecas,
-        materiais: [selected.lote?.material || "algodão"],
-        fotos: file ? [file.name] : ["peca-autoral.jpg"],
+        materiais: selected.lote?.material ? [selected.lote.material] : undefined,
+        ...(foto ? { fotos: [foto] } : {}),
       });
       all = await api.getMeusProjetos(designer.id);
       consent.classList.remove("consent-dialog--visible");

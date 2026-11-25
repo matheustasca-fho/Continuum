@@ -2,13 +2,17 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 import { dates } from "../../../js/shared/dates.js";
 
 // Elementos da DOM
+const $ = (id) => document.getElementById(id);
+const drawerLote = $("drawer-lote");
+const drawerLoja = $("drawer-loja");
+const filtrosAtivosWrap = $("filtros-ativos");
+const listaChipsFiltros = $("lista-chips-filtros");
 const grid = document.getElementById("lotes-grid");
 const lojasRibbon = document.getElementById("lojas-ribbon");
 const countSalvos = document.getElementById("count-salvos");
 const emptyState = document.getElementById("empty-state");
 const bannerReserva = document.getElementById("faixa-reserva");
 const textoReserva = document.getElementById("reserva-banner-texto");
-const demoToggle = document.getElementById("demo-toggle");
 const inputBusca = document.getElementById("input-busca");
 const filterMenu = document.getElementById("filter-menu");
 
@@ -63,14 +67,17 @@ async function init() {
     }
   }
   lojas = (await api.listarEmpresas())
-    .filter((e) => (e.uf || "SP").toUpperCase() === "SP" && e.assinatura?.status === "ATIVA")
+    .filter((e) => (e.uf || "").toUpperCase() === "SP" && e.assinatura?.status === "ATIVA")
     .map((e) => ({
       id: e.id,
       nome: e.nomeFantasia,
       sobre: e.perfilLoja,
       endereco: `${e.logradouro}, ${e.numero} - ${e.bairro}, ${e.cidade} - ${e.uf}`,
       horario_retirada: e.horarioRetirada,
+      aceitaRetirada: e.aceitaRetirada,
       cartilhaPadrao: e.cartilhaPadrao,
+      cartilhaVersao: e.cartilhaPadrao?.versao || "—",
+      cartilha: e.cartilhaPadrao?.conteudo || "—",
     }));
 
   renderLojas();
@@ -96,15 +103,15 @@ function renderLojas() {
 
 function renderActiveFilters() {
   const chips = [];
-  if (selectedLojaId !== "TODAS") {
-    const lj = lojas.find((x) => x.id === selectedLojaId);
+  if (filtroLojaId !== "todas") {
+    const lj = lojas.find((x) => x.id === filtroLojaId);
     if (lj) chips.push(`Loja: ${lj.nome}`);
   }
-  if (selectedMaterial !== "TODOS") {
-    chips.push(`Material: ${selectedMaterial}`);
+  if (filtroMaterial !== "TODOS") {
+    chips.push(`Material: ${filtroMaterial}`);
   }
-  if (searchQuery.trim()) {
-    chips.push(`Busca: "${searchQuery.trim()}"`);
+  if (termoBusca.trim()) {
+    chips.push(`Busca: "${termoBusca.trim()}"`);
   }
 
   if (chips.length === 0) {
@@ -120,9 +127,9 @@ function renderActiveFilters() {
 }
 
 function clearAllFilters() {
-  selectedLojaId = "TODAS";
-  selectedMaterial = "TODOS";
-  searchQuery = "";
+  filtroLojaId = "todas";
+  filtroMaterial = "TODOS";
+  termoBusca = "";
   if (inputBusca) inputBusca.value = "";
   if ($("label-filtro-material")) {
     $("label-filtro-material").textContent = "Filtrar material";
@@ -152,9 +159,6 @@ function renderFaixaReserva() {
 
 function renderGrid() {
   grid.innerHTML = "";
-  const q = searchQuery.trim().toLowerCase();
-  const mat = selectedMaterial.toLowerCase();
-
   const exibirLotes = lotes.filter((l) => {
     if (currentAba === "salvos" && !designer.favoritos.includes(l.id))
       return false;
@@ -195,7 +199,7 @@ function renderGrid() {
   exibirLotes.forEach((lote, index) => {
     const loja = lojas.find((lj) => lj.id === lote.lojaId) || {
       id: lote.empresaId,
-      nome: lote.nomeEmpresa || "Empresa Parceira",
+      nome: lote.nomeEmpresa || "—",
     };
     const isFav = designer.favoritos.includes(lote.id);
     const isNovo = new Date() - new Date(lote.publicado_em) < 172800000;
@@ -204,6 +208,9 @@ function renderGrid() {
       ? `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" title="Entrega disponível"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`
       : "";
 
+    const headerStyle = lote.image
+      ? `style="background-image:url('${escapeHtml(lote.image)}')"`
+      : "";
     const div = document.createElement("article");
     div.className = "lote-card";
     div.dataset.id = lote.id;
@@ -218,9 +225,9 @@ function renderGrid() {
       </div>
       <div class="lote-card__body">
         <h3 class="lote-card__title">${escapeHtml(lote.titulo)}</h3>
-        <p class="lote-card__tech">${escapeHtml(lote.codigo)} • ${escapeHtml(lote.peso)} • ${escapeHtml(loja?.nome || "Loja Parceira")}</p>
+        <p class="lote-card__tech">${escapeHtml(lote.codigo)} • ${escapeHtml(lote.peso)} • ${escapeHtml(loja?.nome || "—")}</p>
         <div class="lote-card__meta-row">
-          <span>${escapeHtml(lote.composicao || lote.material || "Tecido selecionado")}</span>
+          <span>${escapeHtml(lote.composicao || lote.material || "—")}</span>
           <span>${escapeHtml(fmtTempo(lote.publicado_em || lote.criadoEm))}</span>
         </div>
         <div class="lote-card__footer">
@@ -241,10 +248,10 @@ function openDrawerLote(id) {
   if (!lote) return;
   const loja = lojas.find((l) => l.id === lote.lojaId) || {
     id: lote.empresaId,
-    nome: lote.nomeEmpresa || "Empresa Parceira",
+    nome: lote.nomeEmpresa || "—",
     sobre: lote.perfil_loja || "",
-    endereco: lote.loja?.endereco || "São Paulo - SP",
-    horario_retirada: lote.loja?.horarioRetirada || "Seg a Sex das 10h às 18h",
+    endereco: lote.loja?.endereco || "—",
+    horario_retirada: lote.loja?.horarioRetirada || "—",
   };
 
   loteSelecionado = lote;
@@ -252,6 +259,9 @@ function openDrawerLote(id) {
 
   const briefing = lote.briefing || {};
   const body = $("dl-body");
+  const photoMarkup = lote.image
+    ? `<img class="dl-photo" src="${escapeHtml(lote.image)}" alt="">`
+    : "";
   body.innerHTML = `
     ${photoMarkup}
     <div class="dl-specs-grid">
@@ -326,6 +336,10 @@ function openDrawerLoja(loja) {
     $("dloja-cartilha").textContent = `[${loja.cartilhaVersao}] ${loja.cartilha}`;
   }
   drawerLoja.showModal();
+}
+
+function closeDrawerLoja() {
+  if (drawerLoja?.open) drawerLoja.close();
 }
 
 function closeDrawers() {
@@ -474,13 +488,20 @@ function setupListeners() {
       loteSelecionado.logistica_aceita.includes("envio") &&
       loteSelecionado.envioDisponivel !== false;
 
+    const aceitaRetirada = loteSelecionado.logistica_aceita.includes("retirada");
+    const boxRetirada = $("m2-opt-retirada-box");
+    const inputRetirada = $("m2-opt-retirada");
     const boxEnvio = document.getElementById("m2-opt-envio-box");
     const inputEnvio = document.getElementById("m2-opt-envio");
     const txtRetirada = document.getElementById("m2-txt-retirada");
 
     const loja = lojas.find((l) => l.id === loteSelecionado.lojaId);
-    txtRetirada.textContent = `${loja?.endereco || "São Paulo - SP"} (${loja?.horario_retirada || "10h às 18h"})`;
+    txtRetirada.textContent = `${loja?.endereco || "—"} (${loja?.horario_retirada || "—"})`;
 
+    // BE-21.5/21.6: designer fora de SP (ou loja sem envio) só enxerga a retirada
+    boxEnvio.style.opacity = aceitaEnvio ? "1" : "0.5";
+    boxEnvio.hidden = !aceitaEnvio;
+    inputEnvio.disabled = !aceitaEnvio;
     if (!aceitaRetirada) {
       boxRetirada.style.opacity = "0.5";
       inputRetirada.disabled = true;
@@ -497,17 +518,6 @@ function setupListeners() {
   document.getElementById("btn-m2-salvar").addEventListener("click", async () => {
     const modo = document.querySelector('input[name="logistica"]:checked');
     if (!modo || !loteSelecionado) return;
-
-    try {
-      await api.reservarLote(
-        loteSelecionado.codigo || loteSelecionado.id,
-        designer.id,
-        modo.value === "retirada" ? "RETIRADA" : "ENVIO",
-      );
-    } catch (error) {
-      alert(error.message);
-      return;
-    }
 
     m2.close();
 
@@ -581,13 +591,6 @@ function setupListeners() {
   document
     .getElementById("btn-m3-explorar")
     .addEventListener("click", () => location.reload());
-
-  demoToggle.addEventListener("click", () => {
-    if (designer.reservaAtiva)
-      alert("A reserva ativa deve ser concluída pela jornada do lote.");
-    else alert("Reserve um lote pela vitrine para atualizar seus lotes.");
-    location.reload();
-  });
 }
 
 init();

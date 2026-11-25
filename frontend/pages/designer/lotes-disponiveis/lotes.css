@@ -1039,3 +1039,8 @@
   accent-color: var(--color-primary);
   flex-shrink: 0;
 }
+
+/* O atributo hidden precisa vencer o display do estado vazio */
+.empty-state[hidden] {
+  display: none;
+}

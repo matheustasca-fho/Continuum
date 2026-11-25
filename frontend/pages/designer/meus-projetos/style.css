@@ -1077,3 +1077,12 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* Em telas baixas o diálogo rola, em vez de esconder o botão de confirmar */
+.project-dialog .consent-dialog {
+  overflow-y: auto;
+  place-items: start center;
+}
+.project-dialog .consent-dialog__panel {
+  margin: auto;
+}
