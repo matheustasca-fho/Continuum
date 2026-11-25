@@ -1,22 +1,21 @@
-﻿# Contratos de API do CONTINUUM
+# Contratos de API do CONTINUUM
 
 ## O que foi preparado
 
 O arquivo js/shared/routes.js centraliza verbos HTTP, caminhos e JSONs de 
 envio. js/shared/api.js mantém a interface já usada pelas páginas, mas
-encaminha as operações pela camada de rotas.
+encaminha todas as operações diretamente pela camada HTTP para a API PHP (sem dados mockados locais).
 
-- USem CONTINUM_API_URL, o adaptador local executa as operações sobre o store
-  compartilhado e mantém a demonstração funcional.
-- Com CONTINUUM_API_URL, as chamadas usam fetch real.
+- Por padrão, a URL base da API aponta para `http://localhost:8000/api` (podendo ser sobrescrita via `window.CONTINUUM_API_URL`).
+- Todas as chamadas usam `fetch` real contra o backend PHP + Oracle.
 - O último método, URL e corpo ficam em window.**CONTINUUM_LAST_REQUEST** para
   inspeção durante a integração; campos de senha/CVV são ocultados nesse registro.
 
-Defina a URL antes de carregar os módulos JavaScript:
+Para sobrescrever a URL padrão antes de carregar os módulos JavaScript:
 
 ```html
 <script>
-  window.CONTINUUM_API_URL = "http://localhost:3000/api";
+  window.CONTINUUM_API_URL = "http://localhost:8000/api";
 </script>
 <script type="module" src="caminho/da/pagina.js"></script>
 ```
@@ -55,6 +54,7 @@ Requisições GET não enviam corpo.
 | listarMeusLotesDesigner                          | GET    | /designers/{id}/lotes             |
 | listarLotesEmpresa                               | GET    | /empresas/{id}/lotes              |
 | confirmarRecebimentoDesigner                     | PATCH  | /lotes/{id}/recebimento           |
+| cancelarLoteDesigner                             | POST   | /lotes/{id}/cancelamento          |
 | listarProjetosEmpresa                            | GET    | /empresas/projetos                |
 | alterarStatusProjeto                             | PATCH  | /projetos/{id}/status             |
 | buscarCep                                        | GET    | /enderecos/cep/{cep}              |
@@ -68,6 +68,8 @@ Requisições GET não enviam corpo.
 | getDesigner                                      | GET    | /designers/me                     |
 | alternarFavorito                                 | PUT    | /designers/me/favoritos/{loteId}  |
 | getEmpresaDashboardStats                         | GET    | /empresas/me/dashboard            |
+| listarDoacoesEmpresa                             | GET    | /empresas/me/doacoes              |
+| registrarDoacaoEmpresa                           | POST   | /empresas/me/doacoes              |
 | listarUsuariosEmpresa                            | GET    | /empresas/me/usuarios             |
 | salvarUsuarioEmpresa                             | POST   | /empresas/me/usuarios             |
 | alternarAtivoUsuario                             | PATCH  | /empresas/me/usuarios/{id}/status |

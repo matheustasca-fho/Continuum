@@ -70,9 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.setItem(
           "continuum_sessao",
           JSON.stringify({
+            ...session,
             perfil,
-            nome: session.usuario?.nome || session.usuarioEmpresa?.nome,
-            perfilEmpresa: session.usuarioEmpresa?.perfil,
+            nome: session.usuario?.nome || session.usuarioEmpresa?.nome || session.nome,
+            perfilEmpresa: session.usuarioEmpresa?.perfil || session.perfilEmpresa,
           }),
         );
       } catch {}

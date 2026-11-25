@@ -31,7 +31,7 @@
 
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="lotes"></div>
-      <main class="main-content">
+      <main data-skeleton class="main-content">
         <header class="page-header animate-slide-up">
           <div class="lots-page-heading">
             <div class="lots-page-heading__row">
@@ -174,7 +174,7 @@
                 type="text"
                 id="lotCode"
                 class="form-input"
-                required
+                placeholder="Gerado ao salvar"
                 autocomplete="off"
                 readonly
                 aria-describedby="lotCodeHint"

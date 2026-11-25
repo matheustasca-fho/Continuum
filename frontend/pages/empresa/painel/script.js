@@ -1,15 +1,31 @@
 import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const data = await api.getEmpresaDashboardStats(),
     counters = [...document.querySelectorAll(".counter")],
-    targets = [data.doacoes.length, data.projetos.length, data.kg, data.pecas];
+    imp = data.impactoAmbiental || {},
+    targets = [
+      data.doacoes.length,
+      data.projetos.length,
+      data.kg,
+      data.pecas,
+      imp.toneladasRedirecionadas ?? 0,
+      imp.aguaEconomizadaLitros ?? 0,
+      imp.co2EvitadoKg ?? 0,
+      imp.marcasFomentadas ?? 0,
+    ];
+
   counters.forEach((counter, index) => {
-    counter.dataset.target = String(targets[index] ?? 0);
-    counter.textContent = String(targets[index] ?? 0);
+    if (targets[index] !== undefined) {
+      counter.dataset.target = String(targets[index] ?? 0);
+      counter.textContent = String(targets[index] ?? 0);
+    }
   });
+
   const title = document.querySelector(".page-header__title");
-  if (title)
-    title.textContent = `OLÁ, ${data.empresa?.nomeFantasia || "PONTO DE COLETA"}`;
+  if (title && data.empresa?.nomeFantasia)
+    title.textContent = `OLÁ, ${data.empresa.nomeFantasia}`;
+
   const list = document.querySelector(".status-list");
   if (list) {
     list.replaceChildren();
@@ -22,6 +38,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       row.querySelector(".status-item__title").textContent = status;
       row.querySelector(".status-item__count").textContent = `${count} lotes`;
       list.appendChild(row);
+    });
+  }
+
+  // Botão "Baixar Relatório Mensal" / Certificado de Sustentabilidade ESG (BE-22.2 e BE-22.3)
+  const btnRelatorio = document.querySelector(".impact-banner .btn");
+  if (btnRelatorio) {
+    btnRelatorio.addEventListener("click", async () => {
+      try {
+        const cert = await api.obterCertificadoEmpresa();
+        if (cert?.svg) {
+          const blob = new Blob([cert.svg], { type: "image/svg+xml;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          window.open(url, "_blank");
+        } else {
+          window.print();
+        }
+      } catch (err) {
+        alert(err.message || "Erro ao gerar certificado de sustentabilidade.");
+      }
     });
   }
 });

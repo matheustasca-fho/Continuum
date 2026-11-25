@@ -35,10 +35,10 @@
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="doacoes"></div>
 
-      <main class="main-content">
+      <main data-skeleton class="main-content">
         <header class="doacoes-header animate-slide-up">
           <div>
-            <p class="doacoes-header__eyebrow">PONTO DE COLETA · BALCÃO</p>
+            <p class="doacoes-header__eyebrow">DOAÇÕES DA LOJA</p>
             <h1 class="doacoes-header__title">REGISTRO DE DOAÇÕES</h1>
             <p class="doacoes-header__subtitle">
               Cadastre as peças entregues na loja, vincule o CPF do doador para
@@ -46,7 +46,7 @@
             </p>
           </div>
           <div class="doacoes-header__policy" id="storeCouponPolicyBadge">
-            5 doações = Cupom 15% OFF
+            Política de cupom da loja
           </div>
         </header>
 
@@ -194,6 +194,19 @@
                 </button>
               </div>
             </form>
+
+            <div class="cupom-resgate">
+              <h3 class="cupom-resgate__title">Resgatar cupom do doador</h3>
+              <div class="doacao-field doacao-field--full">
+                <label for="cupomCodigo">Código do cupom</label>
+                <input id="cupomCodigo" type="text" placeholder="CONT-000000" autocomplete="off" />
+              </div>
+              <div class="cupom-resgate__actions">
+                <button type="button" class="btn btn--secondary" id="btnValidarCupom">Validar</button>
+                <button type="button" class="btn btn--primary" id="btnUsarCupom" disabled>Marcar como utilizado</button>
+              </div>
+              <p class="cupom-resgate__result" id="cupomResultado" role="status" aria-live="polite"></p>
+            </div>
           </section>
 
           <!-- COLUNA DIREITA: Lista & Fila de Curadoria -->

@@ -1,7 +1,10 @@
-// Lógica do Checklist para habilitar o botão Finalizar
+import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+
 const checkboxes = document.querySelectorAll(".chk-inspecao");
 const btnAprovar = document.getElementById("btn-aprovar");
 const helperAprovar = document.getElementById("helper-aprovar");
+
+let projetoAtual = null;
 
 function verificarChecklist() {
   const todosMarcados = Array.from(checkboxes).every((chk) => chk.checked);
@@ -16,7 +19,6 @@ function verificarChecklist() {
 
 checkboxes.forEach((chk) => chk.addEventListener("change", verificarChecklist));
 
-// Lógica dos Modais
 const modalFinalizar = document.getElementById("modal-finalizar");
 const modalAjuste = document.getElementById("modal-ajuste");
 
@@ -24,12 +26,91 @@ btnAprovar.onclick = () => modalFinalizar.showModal();
 document.getElementById("btn-cancela-fim").onclick = () =>
   modalFinalizar.close();
 
-// Simula finalização e redirecionamento para Fase 4 (Tag QR Code)
-document.getElementById("btn-confirma-fim").onclick = () => {
-  modalFinalizar.close();
-  window.location.href = "../projeto-tag/index.html";
+document.getElementById("btn-confirma-fim").onclick = async () => {
+  try {
+    const checklist = Array.from(checkboxes).map((chk) => chk.checked);
+    if (projetoAtual?.id) {
+      await api.alterarStatusProjeto(projetoAtual.id, STATUS_LOTE.FINALIZADO, {
+        checklist,
+      });
+    }
+    modalFinalizar.close();
+    if (!projetoAtual?.id) return;
+    const targetId = encodeURIComponent(projetoAtual.id);
+    window.location.href = `../projeto-tag/index.html?id=${targetId}`;
+  } catch (err) {
+    alert(err.message);
+  }
 };
 
-document.getElementById("btn-ajuste").onclick = () => modalAjuste.showModal();
-document.getElementById("btn-cancela-ajuste").onclick = () =>
-  modalAjuste.close();
+const btnAjuste = document.getElementById("btn-ajuste");
+if (btnAjuste && modalAjuste) {
+  btnAjuste.onclick = () => modalAjuste.showModal();
+}
+const btnCancelaAjuste = document.getElementById("btn-cancela-ajuste");
+if (btnCancelaAjuste && modalAjuste) {
+  btnCancelaAjuste.onclick = () => modalAjuste.close();
+}
+const btnConfirmaAjuste = document.getElementById("btn-confirma-ajuste");
+if (btnConfirmaAjuste && modalAjuste) {
+  btnConfirmaAjuste.onclick = async () => {
+    const motivo = document.getElementById("motivo-ajuste")?.value.trim() || "";
+    if (!motivo) {
+      alert("Informe o motivo para solicitar ajuste na peça.");
+      return;
+    }
+    try {
+      if (projetoAtual?.id) {
+        await api.alterarStatusProjeto(projetoAtual.id, "EM AJUSTE", {
+          motivo,
+        });
+      }
+      modalAjuste.close();
+      window.location.href = `../projeto-detalhe/index.html?id=${encodeURIComponent(projetoAtual.id)}`;
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const id = new URLSearchParams(location.search).get("id");
+  if (!id) return;
+  try {
+    projetoAtual = await api.getProjeto(id);
+    if (!projetoAtual) return;
+
+    const bc = document.querySelector(".breadcrumb");
+    if (bc) {
+      bc.textContent = `Projetos › PRJ-${String(projetoAtual.id).padStart(2, "0")} › Revisão de Peça`;
+    }
+    const backBtn = document.querySelector(
+      'a[href*="../projeto-detalhe/index.html"]',
+    );
+    if (backBtn) {
+      backBtn.href = `../projeto-detalhe/index.html?id=${encodeURIComponent(projetoAtual.id)}`;
+    }
+
+    const boxes = document.querySelectorAll(".content-box");
+    if (boxes[0]) {
+      boxes[0].innerHTML = `
+        <strong>Material Origem</strong>
+        ${projetoAtual.lote?.descricao || "—"} (${projetoAtual.codigoLote || `Lote #${projetoAtual.idLote}`})
+
+        <strong>Perfil da Loja</strong>
+        ${projetoAtual.lote?.perfil_loja || "—"}
+
+        <strong>Expectativas e Diretrizes</strong>
+        ${projetoAtual.lote?.briefing?.ideiaMarca || projetoAtual.lote?.descricao || ""}
+      `;
+    }
+    if (boxes[1]) {
+      boxes[1].innerHTML = `
+        <strong>Processo Criativo do Designer (${projetoAtual.designer_nome || "—"})</strong>
+        "${projetoAtual.processoCriativo || projetoAtual.ds_descricao || ""}"
+      `;
+    }
+  } catch (err) {
+    console.error("Erro ao carregar revisão do projeto:", err);
+  }
+});

@@ -27,7 +27,7 @@
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="usuarios"></div>
 
-      <main class="main-content">
+      <main data-skeleton class="main-content">
         <header class="team-header animate-slide-up">
           <div>
             <p class="team-header__eyebrow">GESTÃO CORPORATIVA · ACESSOS</p>
@@ -63,7 +63,7 @@
           <article class="team-kpi">
             <div>
               <div class="team-kpi__num" id="kpiManagers">0</div>
-              <div class="team-kpi__label">Diretor & Gerenciadores</div>
+              <div class="team-kpi__label">Administradores</div>
             </div>
             <div class="team-kpi__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -75,7 +75,7 @@
           <article class="team-kpi">
             <div>
               <div class="team-kpi__num" id="kpiRegistradores">0</div>
-              <div class="team-kpi__label">Registradores ativos</div>
+              <div class="team-kpi__label">Operadores ativos</div>
             </div>
             <div class="team-kpi__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -121,14 +121,11 @@
                 <button type="button" class="role-pill is-active" data-role-filter="ALL">
                   Todos
                 </button>
-                <button type="button" class="role-pill" data-role-filter="DIRETOR">
-                  Diretor
+                <button type="button" class="role-pill" data-role-filter="ADMIN">
+                  Administrador
                 </button>
-                <button type="button" class="role-pill" data-role-filter="GERENCIADOR">
-                  Gerenciador
-                </button>
-                <button type="button" class="role-pill" data-role-filter="REGISTRADOR">
-                  Registrador
+                <button type="button" class="role-pill" data-role-filter="OPERADOR">
+                  Operador
                 </button>
               </div>
             </div>
@@ -186,17 +183,15 @@
               <label class="user-field user-field--full" for="role">
                 <span class="user-field__label">Cargo de acesso *</span>
                 <select id="role">
-                  <option value="REGISTRADOR">Registrador — Balcão & Doações</option>
-                  <option value="GERENCIADOR" id="optRoleGerenciador">
-                    Gerenciador — Lotes, Projetos & Perfil
-                  </option>
+                  <option value="OPERADOR">Operador — Doações & Lotes</option>
+                  <option value="ADMIN">Administrador — Acesso total</option>
                 </select>
               </label>
 
               <div class="role-guide-box user-field--full" id="roleGuideBox">
-                <strong>REGISTRADOR:</strong> registra doações recebidas com
-                vínculo de CPF ao cupom e consulta lotes e projetos (sem criar
-                lotes nem alterar fotos).
+                <strong>OPERADOR:</strong> registra doações e cadastra lotes; não
+                edita nem exclui lotes, não finaliza peças, não altera o perfil
+                da loja e não gerencia a equipe.
               </div>
 
               <div class="user-field user-field--full">
@@ -267,8 +262,8 @@
         <label class="user-field" for="editUserRole" id="editUserRoleField">
           <span class="user-field__label">Cargo de acesso *</span>
           <select id="editUserRole">
-            <option value="REGISTRADOR">Registrador — Balcão & Doações</option>
-            <option value="GERENCIADOR">Gerenciador — Lotes, Projetos & Perfil</option>
+            <option value="OPERADOR">Operador — Doações & Lotes</option>
+            <option value="ADMIN">Administrador — Acesso total</option>
           </select>
         </label>
 

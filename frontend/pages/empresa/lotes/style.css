@@ -767,48 +767,11 @@ textarea.form-input {
   background: #ffb5b5;
 }
 
-.password-field {
-  position: relative;
-}
-
-.password-field .form-input {
-  padding-right: 76px;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 0;
-  background: transparent;
-  color: var(--color-primary);
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 700;
-}
-
 .consent-copy {
   margin-bottom: 22px;
   color: var(--color-muted-text);
   font-size: 14px;
   line-height: 1.6;
-}
-
-.consent-check {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
-  color: var(--color-charcoal-text);
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.form-message {
-  display: block;
-  min-height: 16px;
-  color: var(--color-error);
-  font-size: 11px;
 }
 
 /* ==========================================================================
@@ -1992,7 +1955,7 @@ textarea.form-input {
 }
 
 /* ==========================================================================
-   MODAL DE AVISO DE CONSENTIMENTO
+   EDITOR DE STATUS
    ========================================================================== */
 
 .modal-box--status-expanded {
@@ -2001,96 +1964,8 @@ textarea.form-input {
   overscroll-behavior: contain;
 }
 
-.modal-box--notice {
-  width: min(100%, 460px);
-  min-height: 450px;
-  padding: 44px 44px 30px;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-}
-
-.notice-brand {
-  color: #d40020;
-  font: 400 1.35rem/1 var(--font-title);
-}
-
-.notice-title {
-  max-width: 340px;
-  margin-top: 28px;
-  color: #5a5a5a;
-  font: 600 1.5rem/1.2 var(--font-body);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.notice-copy {
-  max-width: 340px;
-  margin-top: 20px;
-  color: #686868;
-  font: 400 1rem/1.45 var(--font-body);
-}
-
-.notice-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 100%;
-  margin-top: auto;
-  padding: 6px;
-  border-radius: 5px;
-  background: #f0f0e9;
-}
-
-.notice-actions button {
-  min-height: 44px;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
-  font: 600 12px var(--font-body);
-  transition:
-    background 0.18s,
-    transform 0.18s;
-}
-
-.notice-actions button:hover {
-  transform: translateY(-1px);
-}
-
-.notice-confirm {
-  background: #d40020;
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(120, 39, 54, 0.18);
-}
-
-.notice-confirm:hover {
-  background: #b9001b;
-}
-
-.notice-cancel {
-  background: transparent;
-  color: #777;
-}
-
-.notice-cancel:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-
-@media (max-width: 640px) {
-  .modal-box--notice {
-    min-height: 400px;
-    padding: 34px 24px 24px;
-  }
-
-  .notice-title {
-    font-size: 1.3rem;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .filter-search-input,
-  .notice-actions button {
+  .filter-search-input {
     transition: none;
   }
 }
@@ -2127,41 +2002,6 @@ textarea.form-input {
   font-size: 13px;
   font-weight: 700;
   cursor: default;
-}
-
-.modal-box--notice {
-  position: relative;
-  overflow: hidden;
-}
-
-.modal-box--notice::after {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 6px;
-  background: var(--color-primary);
-  content: "";
-}
-
-.notice-brand {
-  color: var(--color-primary);
-}
-
-.notice-actions {
-  background: var(--color-sand-offwhite);
-}
-
-.notice-confirm {
-  background: var(--color-primary);
-}
-
-.notice-confirm:hover {
-  background: var(--color-primary-hover);
-}
-
-.notice-cancel {
-  color: var(--color-muted-text);
 }
 
 .main-content {
@@ -2404,4 +2244,9 @@ textarea.form-input {
 .card-lote__thumb--readonly,
 .card-lote__body--readonly {
   cursor: default !important;
+}
+
+/* Linhas da grade com a altura do card: com overflow:hidden o card encolhia e cortava o corpo */
+.lots-grid {
+  grid-auto-rows: max-content;
 }

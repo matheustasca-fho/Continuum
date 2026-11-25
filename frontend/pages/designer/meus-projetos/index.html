@@ -37,7 +37,7 @@
         data-active="meus-projetos"
       ></div>
 
-      <main class="main-content">
+      <main data-skeleton class="main-content">
         <section class="projects-page" aria-labelledby="projectsTitle">
           <header class="projects-page__header">
             <p class="projects-page__eyebrow">CRIAÇÕES AUTORAIS · UPCYCLING</p>
@@ -221,42 +221,9 @@
         </div>
       </section>
 
-      <div class="consent-dialog" id="consentDialog" aria-hidden="true">
-        <section
-          class="consent-dialog__panel"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="consentTitle"
-          aria-describedby="consentDescription"
-        >
-          <span class="consent-dialog__brand">CONTINUUM</span>
-          <p class="consent-dialog__eyebrow">CONFIRMAÇÃO DO DESIGNER</p>
-          <h2 id="consentTitle">Enviar peça para revisão da loja?</h2>
-          <p id="consentDescription">
-            Ao confirmar, os dados da criação serão salvos e a loja parceira
-            poderá aprovar a peça e emitir a Tag QR Code oficial.
-          </p>
-          <div class="consent-dialog__actions">
-            <button
-              type="button"
-              class="consent-dialog__cancel"
-              id="consentCancel"
-            >
-              Voltar e revisar
-            </button>
-            <button
-              type="button"
-              class="consent-dialog__confirm"
-              id="consentConfirm"
-            >
-              Confirmar envio
-            </button>
-          </div>
-        </section>
-      </div>
+    <div class="consent-dialog" id="consentDialog" aria-hidden="true"><section class="consent-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="consentTitle" aria-describedby="consentDescription"><span class="consent-dialog__brand">CONTINUUM</span><span class="consent-dialog__mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span><p class="consent-dialog__eyebrow">CONFIRMA&Ccedil;&Atilde;O DO DESIGNER</p><h2 id="consentTitle">Finalizar este projeto?</h2><p id="consentDescription">Ao confirmar, o projeto ser&aacute; marcado como conclu&iacute;do e o rastreio do lote ser&aacute; atualizado.</p><div style="display:flex;flex-direction:column;gap:0.6rem;margin:0.75rem 0;text-align:left;"><label style="font-size:0.85rem;font-weight:600;">Nome da Pe&ccedil;a *<input id="pecaTitulo" type="text" required placeholder="Ex: Jaqueta Patchwork Autoral" style="width:100%;padding:0.45rem;margin-top:0.2rem;border:1px solid #ccc;border-radius:6px;" /></label><label style="font-size:0.85rem;font-weight:600;">Processo Criativo *<textarea id="pecaProcessoCriativo" rows="3" required placeholder="Relate como os materiais foram transformados..." style="width:100%;padding:0.45rem;margin-top:0.2rem;border:1px solid #ccc;border-radius:6px;"></textarea></label><label style="font-size:0.85rem;font-weight:600;">Quantidade Produzida *<input id="pecaQuantidade" type="number" min="1" value="1" required style="width:100%;padding:0.45rem;margin-top:0.2rem;border:1px solid #ccc;border-radius:6px;" /></label><label style="font-size:0.85rem;font-weight:600;">Foto da Pe&ccedil;a (JPG/PNG at&eacute; 2MB)<input id="pecaFotoInput" type="file" accept="image/jpeg,image/png" style="width:100%;margin-top:0.2rem;" /></label></div><div class="consent-dialog__actions"><button type="button" class="consent-dialog__cancel" id="consentCancel">Revisar projeto</button><button type="button" class="consent-dialog__confirm" id="consentConfirm">Confirmar finaliza&ccedil;&atilde;o</button></div></section></div>
     </div>
-
-    <script type="module" src="index.js"></script>
-    <script src="../../../components/header/header.js"></script>
-  </body>
+  <script type="module" src="index.js"></script>
+  <script src="../../../components/header/header.js"></script>
+</body>
 </html>

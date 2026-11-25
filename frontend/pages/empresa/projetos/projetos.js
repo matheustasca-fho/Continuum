@@ -36,17 +36,19 @@ const STATUS_OPCOES_PROJETO = Object.values(STATUS_LOTE).map((value) => ({
   color: "#4f8a47",
 }));
 
-// Lógica da equipe: Gera um código falso para o lote baseado no ID e na data
-function gerarCodigoLote(id) {
+function gerarCodigoLote(p) {
+  if (typeof p === "object" && p?.codigoLote) return p.codigoLote;
+  const id = typeof p === "object" ? p?.cd_projeto : p;
   const date = new Date();
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   return `L${String(id).padStart(3, "0")}${day}${month}${year}`;
 }
-function getDataMock() {
-  const date = new Date();
-  return `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+function formatarDataProjeto(p) {
+  const iso = p?.lote?.criadoEm || p?.criadoEm;
+  const date = iso ? new Date(iso) : new Date();
+  return date.toLocaleDateString("pt-BR");
 }
 
 function renderGrid() {
@@ -92,8 +94,8 @@ function renderGrid() {
       </div>
       <div class="proj-card__body">
         <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-          <h3 class="proj-card__designer" style="font-size: 14px; font-weight: bold; color: var(--color-charcoal-text); margin: 0;">${gerarCodigoLote(p.cd_projeto)}</h3>
-          <span style="font-size: 11px; color: var(--color-muted-text);">${getDataMock()}</span>
+          <h3 class="proj-card__designer" style="font-size: 14px; font-weight: bold; color: var(--color-charcoal-text); margin: 0;">${gerarCodigoLote(p)}</h3>
+          <span style="font-size: 11px; color: var(--color-muted-text);">${formatarDataProjeto(p)}</span>
         </div>
         <p style="font-size: 11px; font-weight: bold; color: var(--color-primary); margin-bottom: 8px; text-transform: uppercase;">DESIGNER: ${p.designer_nome}</p>
         <p class="proj-card__desc" style="font-size: 12px; color: #596579; margin-bottom: 16px; min-height: 36px; line-height: 1.5;">${p.ds_descricao}</p>
@@ -228,14 +230,19 @@ function abrirDrawer(p) {
     }
   });
 
-  statusOptions.addEventListener("click", (e) => {
+  statusOptions.addEventListener("click", async (e) => {
     const opt = e.target.closest(".status-menu__option");
     if (!opt) return;
     const newStatus = opt.dataset.status;
+    statusOptions.classList.remove("is-open");
+    statusTrigger.setAttribute("aria-expanded", "false");
+    try {
+      await api.alterarStatusProjeto(p.cd_projeto, newStatus);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     p.status = newStatus;
-    api
-      .alterarStatusProjeto(p.cd_projeto, newStatus)
-      .catch((error) => alert(error.message));
 
     statusTrigger.querySelector(".status-menu__label").textContent =
       getBadgeConfig(newStatus).text;
@@ -250,8 +257,9 @@ function abrirDrawer(p) {
     renderGrid();
   });
 
+  const projIdParam = encodeURIComponent(p.cd_projeto || p.id || "1");
   const footer = document.getElementById("drawer-footer");
-  let acaoEsquerda = `<button class="btn-form-cancel" style="border:none; color:var(--color-primary); background:transparent; padding:0; box-shadow:none;" onclick="window.location.href='../projeto-detalhe/index.html'">Acessar Histórico</button>`;
+  let acaoEsquerda = `<button class="btn-form-cancel" style="border:none; color:var(--color-primary); background:transparent; padding:0; box-shadow:none;" onclick="window.location.href='../projeto-detalhe/index.html?id=${projIdParam}'">Acessar Histórico</button>`;
   let acaoDireita = "";
 
   if (!api.podeExecutar("FINALIZAR_PECA_QR")) {
@@ -265,12 +273,12 @@ function abrirDrawer(p) {
   ) {
     acaoDireita = `
       <button class="btn-form-cancel" id="btn-cancelar-modal-form">Cancelar</button>
-      <button class="btn-form-submit" onclick="window.location.href='../projeto-revisao/index.html'">Avançar e Concluir</button>
+      <button class="btn-form-submit" onclick="window.location.href='../projeto-revisao/index.html?id=${projIdParam}'">Avançar e Concluir</button>
     `;
   } else if (p.status === STATUS_LOTE.FINALIZADO) {
     acaoDireita = `
       <button class="btn-form-cancel" id="btn-cancelar-modal-form">Fechar</button>
-      <button class="btn-form-submit" style="background:var(--color-charcoal-text);" onclick="window.location.href='../projeto-tag/index.html'">Imprimir Tag</button>
+      <button class="btn-form-submit" style="background:var(--color-charcoal-text);" onclick="window.location.href='../projeto-tag/index.html?id=${projIdParam}'">Imprimir Tag</button>
     `;
   } else {
     acaoDireita = `<button class="btn-form-cancel" id="btn-cancelar-modal-form">Fechar</button>`;

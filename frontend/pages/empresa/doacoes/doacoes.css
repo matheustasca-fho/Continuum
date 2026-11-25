@@ -501,3 +501,29 @@
     padding: 1.3rem 1.15rem;
   }
 }
+
+/* Resgate de cupom na loja */
+.cupom-resgate {
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(45, 55, 72, 0.12);
+}
+.cupom-resgate__title {
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+}
+.cupom-resgate__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}
+.cupom-resgate__result {
+  margin: 0.7rem 0 0;
+  font-size: 0.88rem;
+}
+.cupom-resgate__result.is-error {
+  color: var(--color-error);
+}
+.cupom-resgate__result.is-ok {
+  color: #1f4d2e;
+}

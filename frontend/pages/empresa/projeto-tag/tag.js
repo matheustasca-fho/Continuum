@@ -1,63 +1,93 @@
-// Referências DOM
+import { api } from "../../../js/shared/api.js";
+
+const QR_IMG_URL = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=";
 const canvas = document.getElementById("canvas-area");
 const sizeSelect = document.getElementById("tag-size");
 const qtyInput = document.getElementById("tag-qty");
 const showDesignerCheck = document.getElementById("tag-show-designer");
 
-// Dados Mock do Projeto #PRJ-05
-const projeto = {
-  peca: "Jaqueta Upcycling",
-  designer: "Samuel Pires",
-  material: "Jeans lavado / Retalhos 100% Algodão",
+let projeto = {
+  id: "",
+  peca: "—",
+  designer: "—",
+  material: "—",
+  codigoQr: "",
+  urlPublica: "",
 };
 
-// Função de Renderização
 function renderTags() {
   const sizeParts = sizeSelect.value.split("x");
   const width = `${sizeParts[0]}mm`;
   const height = `${sizeParts[1]}mm`;
-  const qty = parseInt(qtyInput.value) || 1;
+  const qty = parseInt(qtyInput.value, 10) || 1;
   const showDesigner = showDesignerCheck.checked;
 
-  // Gera os "quadradinhos" pro QR fake
-  let qrDivs = "";
-  for (let i = 0; i < 64; i++) {
-    qrDivs += `<div></div>`;
-  }
+  // O QR é uma imagem de serviço externo que só recebe a URL pública da peça (sem dado pessoal)
+  const qrContent = projeto.urlPublica
+    ? `<img class="qr-img" src="${QR_IMG_URL}${encodeURIComponent(projeto.urlPublica)}" alt="QR Code ${projeto.codigoQr}" width="96" height="96" style="display:block;margin:0 auto;">`
+    : `<div class="qr-code-label">${projeto.codigoQr}</div>`;
 
   const tagHTML = `
     <div class="tag-container" style="width: ${width}; height: ${height};">
       <div class="tag-hole"></div>
-      
       <div class="tag-brand">CONTINUUM</div>
-      
       <div class="tag-info">
         <div class="tag-piece">${projeto.peca}</div>
         ${showDesigner ? `<div class="tag-designer">por ${projeto.designer}</div>` : ""}
         <div class="tag-material">${projeto.material}</div>
       </div>
-      
-      <!-- Mock QR (Placeholder exigido pelo Guard-rail) -->
-      <div class="qr-mock">
-        ${qrDivs}
-        <div class="qr-warning">QR DEMO<br>Não escaneável</div>
+      <div class="qr-box">
+        ${qrContent}
+        <div class="qr-warning">${projeto.codigoQr || "QR TAG"}</div>
       </div>
-      
       <div class="tag-footer">Escaneie e conheça a<br>história desta peça</div>
     </div>
   `;
 
-  // Limpa e injeta N cópias
   canvas.innerHTML = "";
   for (let i = 0; i < qty; i++) {
     canvas.innerHTML += tagHTML;
   }
 }
 
-// Listeners
 sizeSelect.addEventListener("change", renderTags);
 qtyInput.addEventListener("input", renderTags);
 showDesignerCheck.addEventListener("change", renderTags);
 
-// Initial render
-renderTags();
+document.addEventListener("DOMContentLoaded", async () => {
+  const id = new URLSearchParams(location.search).get("id");
+  try {
+    const p = id ? await api.getProjeto(id) : null;
+    if (p) {
+      const codigoQr = p.codigoPublicoQr || `CNT-QR-${String(p.id).padStart(4, "0")}`;
+      let qrInfo = null;
+      try {
+        qrInfo = await api.obterQrCodeProjeto(codigoQr);
+      } catch {
+        /* fallback */
+      }
+
+      projeto = {
+        id: p.id,
+        peca: p.tituloPeca || p.lote_nome || `Projeto #${p.id}`,
+        designer: p.designer_nome || "—",
+        material: p.lote?.descricao || "—",
+        codigoQr,
+        urlPublica: qrInfo?.urlPublica || "",
+      };
+      const bc = document.querySelector(".breadcrumb");
+      if (bc) {
+        bc.innerHTML = `<a href="../projetos/index.html">Projetos</a> › PRJ-${String(p.id).padStart(2, "0")}`;
+      }
+      const qrLink = document.querySelector(
+        'a[href*="../peca-publica/index.html"]',
+      );
+      if (qrLink) {
+        qrLink.href = `../peca-publica/index.html?codigo=${encodeURIComponent(codigoQr)}&id=${encodeURIComponent(p.id)}`;
+      }
+    }
+  } catch (err) {
+    console.error("Erro ao carregar projeto para a Tag:", err);
+  }
+  renderTags();
+});

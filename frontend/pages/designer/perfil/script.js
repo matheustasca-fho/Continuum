@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ...document.querySelectorAll('input[name="especialidades"]:checked'),
     ].map((x) => x.value);
 
-    const [cidade = "São Paulo", uf = "SP"] = $("cidadeEstado")
+    const [cidade = "", uf = ""] = $("cidadeEstado")
       .value.split("/")
       .map((s) => s.trim());
 
@@ -189,8 +189,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         email: $("email").value.trim(),
         telefone: onlyDigits($("telefone").value),
         cep: onlyDigits($("cep").value),
-        cidade,
-        uf,
+        ...(cidade ? { cidade } : {}),
+        ...(uf ? { uf: uf.toUpperCase() } : {}),
         logradouro: $("logradouro").value.trim(),
         sobreMim: $("sobreMim").value.trim(),
         manifesto: $("manifesto").value.trim(),

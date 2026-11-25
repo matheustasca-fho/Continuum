@@ -1,6 +1,5 @@
 import { api, STATUS_LOTE, STATUS_RESERVA } from "../../../js/shared/api.js";
 import { dates } from "../../../js/shared/dates.js";
-import { store } from "../../../js/shared/store.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const $ = (s) => document.querySelector(s);
@@ -222,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     <p class="detail__heading">Briefing Criativo</p>
                     <p style="font-size:13px; color:var(--color-charcoal-text); line-height:1.55;">
-                      ${escapeHtml(l.briefing?.ideiaMarca || l.descricao || "Criação autoral livre respeitando a cartilha da loja.")}
+                      ${escapeHtml(l.briefing?.ideiaMarca || l.descricao || "—")}
                     </p>
                   </div>
 
@@ -232,13 +231,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                       <dt>Código</dt>
                       <dd class="code">${escapeHtml(l.codigo)}</dd>
                       <dt>Composição</dt>
-                      <dd>${escapeHtml(l.composicao || l.material || "Tecido selecionado")}</dd>
+                      <dd>${escapeHtml(l.composicao || l.material || "—")}</dd>
                       <dt>Peso</dt>
                       <dd>${escapeHtml(String(l.pesoKg).replace(".", ","))} kg</dd>
                       <dt>Loja</dt>
                       <dd>${escapeHtml(l.empresaParceira)}</dd>
                       <dt>Endereço</dt>
-                      <dd>${escapeHtml(enderecoLoja || "São Paulo - SP")} (${escapeHtml(emp.horarioRetirada || "10h às 18h")})</dd>
+                      <dd>${escapeHtml(enderecoLoja || "—")}${emp.horarioRetirada ? ` (${escapeHtml(emp.horarioRetirada)})` : ""}</dd>
                     </dl>
                   </div>
                 </div>
@@ -322,47 +321,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const texto = $("#cancelTexto").value.trim();
     if (!motivo || !texto) return;
 
-    const allLots = store.get("lotes") || [];
-    const lot = allLots.find((x) => x.id === selected);
-    const jaRecebido = lot && lot.status === STATUS_LOTE.EM_PRODUCAO;
-    if (lot) {
-      lot.status = STATUS_LOTE.INTERROMPIDO;
-      lot.status_lote = STATUS_LOTE.INTERROMPIDO;
-      lot.cancelamento = { motivo, texto, data: new Date().toISOString() };
-      store.set("lotes", allLots);
+    try {
+      await api.cancelarLoteDesigner(selected, { motivo, texto });
+      lots = await api.listarMeusLotesDesigner(designer.id);
+      cancelModal.close();
+      render();
+    } catch (err) {
+      alert(err.message);
     }
-
-    const reservas = store.get("reservas") || [];
-    reservas.forEach((r) => {
-      if (
-        (r.idLote === selected || r.loteId === selected) &&
-        r.status === STATUS_RESERVA.ATIVA
-      ) {
-        r.status = STATUS_RESERVA.CANCELADA;
-      }
-    });
-    store.set("reservas", reservas);
-
-    const projetos = store.get("projetos") || [];
-    projetos.forEach((p) => {
-      if (p.idLote === selected && p.status !== STATUS_LOTE.FINALIZADO) {
-        p.status = STATUS_LOTE.INTERROMPIDO;
-      }
-    });
-    store.set("projetos", projetos);
-
-    const designers = store.get("confeccionistas") || [];
-    const d = designers.find((x) => x.id === designer.id);
-    if (d) {
-      d.nota = Math.max(1, Number(((Number(d.nota) || 5) - 0.5).toFixed(1)));
-      if (jaRecebido) d.restricaoAtiva = true;
-      store.set("confeccionistas", designers);
-    }
-
-    lots = await api.listarMeusLotesDesigner(designer.id);
-    cancelModal.close();
-    render();
-    showToast("Compromisso cancelado e loja notificada.");
   });
 
   render();

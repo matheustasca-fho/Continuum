@@ -1,160 +1,166 @@
 import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 import { dates } from "../../../js/shared/dates.js";
 
+// Thread trail cursor
+const trail = document.getElementById("threadTrail");
+const dots = [];
+const numDots = 8;
+if (trail) {
+  for (let i = 0; i < numDots; i++) {
+    const d = document.createElement("div");
+    d.className = "thread-dot";
+    trail.appendChild(d);
+    dots.push({ x: 0, y: 0, node: d });
+  }
+}
+
+let mouseX = 0,
+  mouseY = 0;
+window.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+function animateTrail() {
+  let x = mouseX,
+    y = mouseY;
+  dots.forEach((dot, index) => {
+    dot.x += (x - dot.x) * 0.4;
+    dot.y += (y - dot.y) * 0.4;
+    dot.node.style.transform = `translate(${dot.x}px, ${dot.y}px) scale(${1 - index * 0.08})`;
+    x = dot.x;
+    y = dot.y;
+  });
+  requestAnimationFrame(animateTrail);
+}
+if (trail) animateTrail();
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const $ = (id) => document.getElementById(id);
+  try {
+    const designer = await api.getDesigner();
+    const [dashboard, vitrine, projetos, meusLotes] = await Promise.all([
+      api.getDashboardStats(designer?.id || ""),
+      api.listarLotesVitrineSP(),
+      api.getMeusProjetos(designer?.id || ""),
+      api.listarMeusLotesDesigner(designer?.id || ""),
+    ]);
 
-  const escapeHtml = (v) =>
-    String(v ?? "").replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;",
-        })[c],
-    );
-
-  const designer = await api.getDesigner();
-  const dash = await api.getDashboardStats(designer.id);
-  const vitrine = await api.listarLotesVitrineSP();
-  const meusLotes = await api.listarMeusLotesDesigner(designer.id);
-  const meusProjetos = await api.getMeusProjetos(designer.id);
-
-  // Saudação e data real
-  const displayName = (designer.nomeProfissional || designer.nome || "Designer")
-    .split(" ")
-    .slice(0, 2)
-    .join(" ")
-    .toUpperCase();
-  if ($("designerGreeting")) {
-    $("designerGreeting").textContent = `OLÁ, ${displayName}`;
-  }
-  if ($("designerDateSubtitle")) {
-    const todayStr = dates.today();
-    const capDate = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
-    $("designerDateSubtitle").textContent = `Bem-vindo(a) ao seu ateliê circular · ${capDate}.`;
-  }
-
-  // Impacto e reputação
-  const stats = dash.stats || {};
-  if ($("impactKgSaved")) {
-    $("impactKgSaved").textContent = String(
-      Number(stats.kgSalvos || 0).toFixed(1).replace(".0", ""),
-    );
-  }
-  if ($("impactPiecesCreated")) {
-    $("impactPiecesCreated").textContent = String(stats.pecasGeradas || 0);
-  }
-  if ($("impactRating")) {
-    $("impactRating").textContent = Number(designer.nota ?? 5).toFixed(1);
-  }
-
-  // Cards operacionais
-  const pad2 = (n) => String(n || 0).padStart(2, "0");
-  if ($("statReservados")) $("statReservados").textContent = pad2(stats.reservados);
-  if ($("statEmAndamento")) $("statEmAndamento").textContent = pad2(stats.em_andamento);
-  if ($("statFinalizados")) $("statFinalizados").textContent = pad2(stats.finalizados);
-
-  // Atualiza badge da sidebar quando pronta
-  const syncBadge = () => {
-    const badge = document.getElementById("navBadge");
-    if (badge && stats.reservados > 0) {
-      badge.textContent = String(stats.reservados);
-      badge.style.display = "inline-flex";
+    const titleEl = document.querySelector(".page-header__title");
+    if (titleEl && designer?.nome) {
+      titleEl.textContent = `OLÁ, ${designer.nome.toUpperCase()}`;
     }
-  };
-  syncBadge();
-  document.addEventListener("header:ready", syncBadge);
 
-  // Vitrine de Lotes (Matches)
-  const matchesContainer = $("matchesContainer");
-  if (matchesContainer) {
-    const topMatches = vitrine.slice(0, 3);
-    const swatches = ["swatch-denim", "swatch-cotton", "swatch-leather"];
+    const subtitleEl = document.querySelector(".page-header__subtitle");
+    if (subtitleEl) {
+      subtitleEl.textContent = `Bem-vindo(a) ao seu ateliê circular. ${dates.today()}.`;
+    }
 
-    if (topMatches.length === 0) {
-      matchesContainer.innerHTML = `
-        <div class="panel-card" style="grid-column: 1 / -1; text-align: center; padding: 28px;">
-          <strong style="display:block; margin-bottom:6px;">Nenhum lote disponível na vitrine agora</strong>
-          <span style="font-size:13px; color:var(--color-muted-text);">Assim que as lojas parceiras publicarem novos lotes em SP, eles aparecerão aqui.</span>
-        </div>
-      `;
-    } else {
-      matchesContainer.innerHTML = topMatches
-        .map((lote, idx) => {
-          const swatchClass = swatches[idx % swatches.length];
-          const swatchStyle = lote.image
-            ? `style="background-image:url('${lote.image}');"`
-            : "";
-          return `
-            <a href="../lotes-disponiveis/index.html" class="lote-card">
-              <div class="lote-swatch ${lote.image ? "" : swatchClass}" ${swatchStyle}></div>
-              <div class="lote-info">
-                <span class="lote-id">${escapeHtml(lote.codigo)}</span>
-                <h3 class="lote-title">${escapeHtml(lote.titulo)}</h3>
-                <div class="lote-meta">
-                  <span>${escapeHtml(lote.nomeEmpresa || "Loja Parceira")}</span>
-                  <span>·</span>
-                  <span>${escapeHtml(lote.peso)}</span>
-                </div>
+    // Métricas de impacto ambiental baseadas nos projetos/lotes da API
+    const kgSalvos = Math.round(
+      (projetos || []).reduce((acc, p) => acc + (Number(p.pesoKg) || 0), 0),
+    );
+    const pecasRessignificadas = (projetos || []).reduce(
+      (acc, p) => acc + (Number(p.quantidadePecas) || 0),
+      0,
+    );
+    const totalProjetos = (projetos || []).length;
+    const projetosNoPrazo = (projetos || []).filter((p) => !p.atrasado).length;
+    const confiabilidadeSla = Math.round(
+      (projetosNoPrazo / Math.max(1, totalProjetos)) * 100,
+    );
+
+    const impactNumbers = document.querySelectorAll(".impact-metrics .impact-number");
+    if (impactNumbers[0]) impactNumbers[0].textContent = String(kgSalvos);
+    if (impactNumbers[1]) impactNumbers[1].textContent = String(pecasRessignificadas);
+    if (impactNumbers[2]) impactNumbers[2].textContent = String(confiabilidadeSla);
+
+    // Contadores operacionais
+    const dashNumbers = document.querySelectorAll(".dash-cards .dash-card__number");
+    const stats = dashboard?.stats || {
+      reservados: 0,
+      em_andamento: 0,
+      finalizados: 0,
+    };
+    if (dashNumbers[0])
+      dashNumbers[0].textContent = String(stats.reservados ?? 0).padStart(2, "0");
+    if (dashNumbers[1])
+      dashNumbers[1].textContent = String(stats.em_andamento ?? 0).padStart(2, "0");
+    if (dashNumbers[2])
+      dashNumbers[2].textContent = String(stats.finalizados ?? 0).padStart(2, "0");
+
+    // Matches perfeitos (lotes disponíveis da vitrine)
+    const loteCardsContainer = document.querySelector(".lote-cards");
+    if (loteCardsContainer) {
+      const swatches = ["swatch-denim", "swatch-cotton", "swatch-leather"];
+      const disponiveis = (vitrine || []).slice(0, 3);
+      if (disponiveis.length === 0) {
+        loteCardsContainer.innerHTML =
+          '<p style="color:var(--color-muted-text);">Nenhum lote disponível no momento.</p>';
+      } else {
+        loteCardsContainer.innerHTML = disponiveis
+          .map(
+            (l, idx) => `
+          <a href="../lotes-disponiveis/index.html" class="lote-card">
+            <div class="lote-swatch ${swatches[idx % swatches.length]}"></div>
+            <div class="lote-info">
+              <span class="lote-id">${l.codigo || `LOTE #${l.id}`}</span>
+              <h4 class="lote-title">${l.titulo || l.descricao}</h4>
+              <div class="lote-meta">
+                <span>${l.nomeEmpresa || "—"}${l.distancia ? ` (${l.distancia})` : ""}</span>
+                <span>${l.peso || `${l.pesoKg} kg`}</span>
               </div>
-            </a>
-          `;
-        })
-        .join("");
-    }
-  }
-
-  // Pendências reais
-  const tasksContainer = $("tasksContainer");
-  if (tasksContainer) {
-    const tasks = [];
-
-    meusLotes
-      .filter(
-        (l) =>
-          l.status === STATUS_LOTE.RESERVADO ||
-          l.status === STATUS_LOTE.EM_TRANSPORTE,
-      )
-      .forEach((l) => {
-        const prazo = dates.getPrazoStatus(l.reservadoEm || l.criadoEm);
-        tasks.push({
-          text: `Lote "${l.titulo}" (${l.empresaParceira}) aguardando confirmação de recebimento até ${dates.formatShort(prazo.prazoISO)}`,
-          href: "../meus-lotes/index.html",
-          cta: "Ver lote",
-        });
-      });
-
-    meusProjetos
-      .filter((p) => p.status === STATUS_LOTE.EM_PRODUCAO)
-      .forEach((p) => {
-        tasks.push({
-          text: `Projeto "${p.tituloPeca || p.lote_nome}" em produção — registre o processo criativo e envie à loja`,
-          href: "../meus-projetos/index.html",
-          cta: "Abrir",
-        });
-      });
-
-    if (tasks.length === 0) {
-      tasks.push({
-        text: "Tudo em dia! Explore a vitrine para reservar um novo lote de matéria-prima.",
-        href: "../lotes-disponiveis/index.html",
-        cta: "Explorar",
-      });
+            </div>
+          </a>
+        `,
+          )
+          .join("");
+      }
     }
 
-    tasksContainer.innerHTML = tasks
-      .map(
-        (t) => `
-        <div class="task-item">
-          <span class="task-item__text">${escapeHtml(t.text)}</span>
-          <a href="${t.href}" class="btn btn--outline btn--sm btn--compact">${escapeHtml(t.cta)}</a>
-        </div>
-      `,
-      )
-      .join("");
+    // Pendências reais (lotes aguardando confirmação de recebimento e projetos em andamento)
+    const taskList = document.querySelector(".task-list");
+    if (taskList) {
+      const pendencias = [];
+      (meusLotes || [])
+        .filter((l) => l.status === STATUS_LOTE.RESERVADO)
+        .forEach((l) => {
+          pendencias.push({
+            texto: `Lote "${l.titulo}" (${l.codigo}) aguardando confirmação de recebimento`,
+            href: "../meus-lotes/index.html",
+          });
+        });
+      (projetos || [])
+        .filter((p) => p.status === STATUS_LOTE.EM_PRODUCAO)
+        .forEach((p) => {
+          pendencias.push({
+            texto: `Projeto "${p.tituloPeca || p.lote_nome}" em produção`,
+            href: `../status-projetos/index.html?project=${encodeURIComponent(p.id)}`,
+          });
+        });
+
+      if (pendencias.length === 0) {
+        taskList.innerHTML =
+          '<div class="task-item"><span class="task-item__text">Nenhuma pendência no momento.</span></div>';
+      } else {
+        taskList.innerHTML = pendencias
+          .map(
+            (item) => `
+          <div class="task-item">
+            <span class="task-item__text">${item.texto}</span>
+            <a href="${item.href}" class="btn btn--outline btn--sm btn--compact">Ver</a>
+          </div>
+        `,
+          )
+          .join("");
+      }
+    }
+
+    const quickBtn = document.querySelector(".btn--roomy");
+    if (quickBtn) {
+      quickBtn.addEventListener("click", () => {
+        location.href = "../lotes-disponiveis/index.html";
+      });
+    }
+  } catch (err) {
+    console.error("Erro ao carregar painel do designer:", err);
   }
 });

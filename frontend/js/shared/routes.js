@@ -1,17 +1,22 @@
 /*
- * Camada HTTP do front-end. Configure window.CONTINUUM_API_URL para enviar
- * requisições ao servidor; sem essa configuração, os handlers de demonstração
- * mantêm a UI ligada ao store local compartilhado.
+ * Camada HTTP central do front-end.
+ * Todas as operações são executadas diretamente contra a API PHP (sem fallback mock local).
  */
-const route = (method, path, payload = (args) => ({ args })) => ({
+import { SESSION_STORAGE_KEY } from "./store.js";
+
+export const DEFAULT_API_URL = "http://localhost:8000/api";
+
+const route = (method, path, payload = () => undefined) => ({
   method,
   path,
   payload,
 });
+
 const credentialsForRequest = (value = {}) => {
   const { senhaHash, ...rest } = value;
   return { ...rest, ...(senhaHash ? { senha: senhaHash } : {}) };
 };
+
 const hideSecrets = (value) => {
   if (Array.isArray(value)) return value.map(hideSecrets);
   if (!value || typeof value !== "object") return value;
@@ -23,15 +28,23 @@ const hideSecrets = (value) => {
   );
 };
 
-export const ROUTES = { 
+export const ROUTES = {
   registrarDoador: route("POST", "/doadores", ([dados]) =>
     credentialsForRequest(dados),
   ),
+  buscarDoador: route("GET", "/doadores/:cpf"),
+  buscarDoadorPorEmail: route("GET", "/doadores?email=:email"),
   atualizarPerfilDoador: route("PATCH", "/doadores/:cpf", ([cpf, dados]) => ({
     cpf,
     ...dados,
   })),
-  getPerfilDoador: route("GET", "/doadores/me", () => undefined),
+  getPerfilDoador: route("GET", "/doadores/me"),
+  validarCupom: route("GET", "/cupons/:codigo"),
+  utilizarCupom: route(
+    "POST",
+    "/cupons/:codigo/utilizacao",
+    ([codigo]) => ({ codigo }),
+  ),
   registrarConfeccionista: route("POST", "/designers", ([dados]) =>
     credentialsForRequest(dados),
   ),
@@ -45,6 +58,7 @@ export const ROUTES = {
     identificador,
     senha,
   })),
+  logoutSessao: route("DELETE", "/auth/logout"),
   redefinirSenha: route(
     "PATCH",
     "/auth/senha",
@@ -57,7 +71,7 @@ export const ROUTES = {
   finalizarProjetoDesigner: route(
     "PATCH",
     "/projetos/:id/finalizacao",
-    ([id]) => ({ id }),
+    ([id, dados = {}]) => ({ id, ...dados }),
   ),
   guardarEmpresaPendente: route(
     "POST",
@@ -80,16 +94,14 @@ export const ROUTES = {
     id,
     ...dados,
   })),
-  listarLotesVitrineSP: route("GET", "/lotes/vitrine?uf=SP", () => undefined),
-  obterLotePorCodigo: route("GET", "/lotes/:codigo", ([codigo]) => ({
-    codigo,
-  })),
+  listarLotesVitrineSP: route("GET", "/lotes/vitrine?uf=SP"),
+  obterLotePorCodigo: route("GET", "/lotes/:codigo"),
   criarLote: route("POST", "/lotes", ([dados]) => dados),
   atualizarLote: route("PATCH", "/lotes/:id", ([id, dados]) => ({
     id,
     ...dados,
   })),
-  excluirLote: route("DELETE", "/lotes/:id", ([id]) => ({ id })),
+  excluirLote: route("DELETE", "/lotes/:id"),
   validarSenhaAdmin: route(
     "POST",
     "/empresas/sessao/validar-admin",
@@ -98,55 +110,72 @@ export const ROUTES = {
   reservarLote: route(
     "POST",
     "/lotes/:codigo/reservas",
-    ([codigo, designerId, tipoLogistica]) => ({
+    ([codigo, designerId, tipoLogistica, opcoes = {}]) => ({
       codigo,
       designerId,
       tipoLogistica,
+      termoAceito: opcoes.termoAceito ?? true,
+      ...opcoes,
     }),
   ),
-  listarMeusLotesDesigner: route("GET", "/designers/:id/lotes", ([id]) => ({
-    id,
-  })),
-  listarLotesEmpresa: route("GET", "/empresas/:id/lotes", ([id]) => ({ id })),
+  confirmarRetiradaLote: route(
+    "PATCH",
+    "/lotes/:id/retirada",
+    ([id, dados = {}]) => ({ id, ...dados }),
+  ),
+  registrarEnvioLote: route(
+    "PATCH",
+    "/lotes/:id/envio",
+    ([id, codigoRastreio, dataEnvio]) => ({ id, codigoRastreio, dataEnvio }),
+  ),
+  listarMeusLotesDesigner: route("GET", "/designers/:id/lotes"),
+  listarLotesEmpresa: route("GET", "/empresas/:id/lotes"),
   confirmarRecebimentoDesigner: route(
     "PATCH",
     "/lotes/:id/recebimento",
     ([id]) => ({ id }),
   ),
-  listarProjetosEmpresa: route("GET", "/empresas/projetos", () => undefined),
+  cancelarLoteDesigner: route(
+    "POST",
+    "/lotes/:id/cancelamento",
+    ([id, dados]) => ({ id, ...dados }),
+  ),
+  listarProjetosEmpresa: route("GET", "/empresas/projetos"),
   alterarStatusProjeto: route(
     "PATCH",
     "/projetos/:id/status",
-    ([id, status]) => ({ id, status }),
+    ([id, status, dados = {}]) => ({ id, status, ...dados }),
   ),
-  buscarCep: route("GET", "/enderecos/cep/:cep", ([cep]) => ({ cep })),
-  consultarCNPJ: route("GET", "/empresas/consulta-cnpj/:cnpj", ([cnpj]) => ({
-    cnpj,
-  })),
-  getMeusProjetos: route("GET", "/designers/:id/projetos", ([id]) => ({ id })),
-  getProjeto: route("GET", "/projetos/:id", ([id]) => ({ id })),
-  getDashboardStats: route("GET", "/designers/:id/dashboard", ([id]) => ({
-    id,
-  })),
-  getEmpresa: route("GET", "/empresas/me", () => undefined),
-  getDoadorStats: route("GET", "/doadores/me/estatisticas", () => undefined),
-  listarEmpresas: route("GET", "/empresas", () => undefined),
-  getDesigner: route("GET", "/designers/me", () => undefined),
+  obterQrCodeProjeto: route("GET", "/projetos/:id/qrcode"),
+  obterPecaPublica: route("GET", "/publico/pecas/:codigo"),
+  buscarCep: route("GET", "/enderecos/cep/:cep"),
+  consultarCNPJ: route("GET", "/empresas/consulta-cnpj/:cnpj"),
+  getMeusProjetos: route("GET", "/designers/:id/projetos"),
+  getProjeto: route("GET", "/projetos/:id"),
+  getDashboardStats: route("GET", "/designers/:id/dashboard"),
+  getEmpresa: route("GET", "/empresas/me"),
+  getDoadorStats: route("GET", "/doadores/me/estatisticas"),
+  listarEmpresas: route("GET", "/empresas"),
+  getDesigner: route("GET", "/designers/me"),
   alternarFavorito: route(
     "PUT",
     "/designers/me/favoritos/:loteId",
     ([loteId]) => ({ loteId }),
   ),
-  getEmpresaDashboardStats: route(
-    "GET",
-    "/empresas/me/dashboard",
-    () => undefined,
+  getEmpresaDashboardStats: route("GET", "/empresas/me/dashboard"),
+  obterCertificadoEmpresa: route("GET", "/empresas/me/certificado"),
+  listarNotificacoes: route("GET", "/notificacoes"),
+  listarDoacoesEmpresa: route("GET", "/empresas/me/doacoes"),
+  registrarDoacaoEmpresa: route(
+    "POST",
+    "/empresas/me/doacoes",
+    ([dados]) => dados,
   ),
-  listarUsuariosEmpresa: route("GET", "/empresas/me/usuarios", () => undefined),
+  listarUsuariosEmpresa: route("GET", "/empresas/me/usuarios"),
   salvarUsuarioEmpresa: route(
     "POST",
     "/empresas/me/usuarios",
-    ([dados]) => dados,
+    ([dados]) => credentialsForRequest(dados),
   ),
   alternarAtivoUsuario: route(
     "PATCH",
@@ -156,15 +185,13 @@ export const ROUTES = {
   atualizarUsuarioEmpresa: route(
     "PATCH",
     "/empresas/me/usuarios/:id",
-    ([id, dados]) => ({ id, ...dados }),
+    ([id, dados]) => ({ id, ...credentialsForRequest(dados) }),
   ),
 };
 
 const endpointFor = (definition, args) => {
   let path = definition.path;
   const values = Array.isArray(args) ? args : [];
-  // Troca cada segmento nomeado pelo ID correspondente aos argumentos.
-  // Substitui parâmetros na mesma ordem em que aparecem no payload documentado.
   const candidates = values.flatMap((value) =>
     value && typeof value === "object"
       ? [value.id, value.codigo, value.cpf]
@@ -177,54 +204,106 @@ const endpointFor = (definition, args) => {
   return path;
 };
 
-export async function requestRoute(name, args, mockHandler) {
+const readCurrentToken = () => {
+  try {
+    const raw = globalThis.sessionStorage?.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.token || null;
+  } catch {
+    return null;
+  }
+};
+
+// Skeleton de carga inicial: <main data-skeleton> fica em skeleton até as primeiras requisições GET da página terminarem.
+const SKELETON_IGNORAR = new Set(["buscarCep", "consultarCNPJ"]);
+let skeletonPendentes = 0;
+let skeletonConcluido = false;
+let skeletonTimer = null;
+
+function skeletonConcluir() {
+  if (skeletonConcluido) return;
+  skeletonConcluido = true;
+  clearTimeout(skeletonTimer);
+  globalThis.document
+    ?.querySelector("main[data-skeleton]")
+    ?.setAttribute("data-skeleton", "done");
+}
+
+function skeletonAgendar(ms) {
+  clearTimeout(skeletonTimer);
+  skeletonTimer = setTimeout(() => {
+    if (skeletonPendentes === 0) skeletonConcluir();
+  }, ms);
+}
+
+// Página sem GET inicial não pode ficar em skeleton; o teto de 10 s cobre requisição pendurada.
+if (globalThis.document) {
+  skeletonAgendar(1500);
+  setTimeout(skeletonConcluir, 10000);
+}
+
+export async function requestRoute(name, args = []) {
+  const rastrear =
+    ROUTES[name]?.method === "GET" &&
+    !SKELETON_IGNORAR.has(name) &&
+    !skeletonConcluido;
+  if (rastrear) {
+    skeletonPendentes++;
+    clearTimeout(skeletonTimer);
+  }
+  try {
+    return await executarRota(name, args);
+  } finally {
+    if (rastrear) {
+      skeletonPendentes--;
+      skeletonAgendar(150);
+    }
+  }
+}
+
+async function executarRota(name, args) {
   const definition = ROUTES[name];
-  if (!definition) return mockHandler(...args);
-  const base = String(globalThis.CONTINUUM_API_URL || "").replace(/\/$/, "");
+  if (!definition) {
+    throw new Error(`Rota não configurada na camada de API: ${name}`);
+  }
+  const base = String(globalThis.CONTINUUM_API_URL || DEFAULT_API_URL).replace(
+    /\/$/,
+    "",
+  );
   const body = definition.payload(args);
+  const hasBody =
+    body !== undefined &&
+    !["GET", "HEAD", "DELETE"].includes(definition.method);
   const path = endpointFor(definition, args);
-  // Permite inspeção dos exemplos JSON durante integração e desenvolvimento.
+  const token = readCurrentToken();
+
   globalThis.__CONTINUUM_LAST_REQUEST__ = {
     method: definition.method,
     url: `${base}${path}`,
-    body: body === undefined ? null : hideSecrets(body),
+    body: hasBody ? hideSecrets(body) : null,
+    hasAuthToken: Boolean(token),
   };
-  // Sem URL de backend, executa o adaptador local da demonstração.
-  if (!base) return mockHandler(...args);
+
   const response = await fetch(`${base}${path}`, {
     method: definition.method,
     headers: {
       Accept: "application/json",
-      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(hasBody ? { "Content-Type": "application/json" } : {}),
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    ...(hasBody ? { body: JSON.stringify(body) } : {}),
   });
-  const result = response.status === 204 ? null : await response.json();
-  if (!response.ok)
-    throw new Error(result?.message || `Falha HTTP ${response.status}`);
-  const data = result?.data ?? result;
-  if (name === "validarSenhaAdmin" && typeof data?.valido === "boolean")
-    return data.valido;
-  return data;
-}
 
-export function createRoutedApi(mockApi) {
-  const syncMethods = new Set([
-    "logout",
-    "getSessaoAtual",
-    "podeExecutar",
-    "verificarPermissaoEmpresa",
-  ]);
-  // Mantém os métodos usados pelas páginas e centraliza HTTP/fallback local.
-  return new Proxy(mockApi, {
-    get(target, property, receiver) {
-      const value = Reflect.get(target, property, receiver);
-      if (typeof value !== "function" || syncMethods.has(property))
-        return value;
-      return (...args) =>
-        requestRoute(property, args, (...mockArgs) =>
-          value.apply(target, mockArgs),
-        );
-    },
-  });
+  const result = response.status === 204 ? null : await response.json();
+  if (!response.ok) {
+    throw new Error(
+      result?.erro || result?.message || `Falha HTTP ${response.status}`,
+    );
+  }
+  const data = result?.data ?? result;
+  if (name === "validarSenhaAdmin" && typeof data?.valido === "boolean") {
+    return data.valido;
+  }
+  return data;
 }

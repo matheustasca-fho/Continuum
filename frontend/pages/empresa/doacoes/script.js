@@ -1,336 +1,225 @@
-import {
-  api,
-  cpfValido,
-  STATUS_CURADORIA,
-  consultarProgressoCupomCpf,
-  registrarDoacaoEmpresa,
-} from "../../../js/shared/api.js";
-import { store } from "../../../js/shared/store.js";
-import { onlyDigits, mascaraCPF } from "../../../js/shared/validators.js";
-import { runWithDynamicLoading } from "../../../js/shared/loader.js";
+import { api, STATUS_CURADORIA } from "../../../js/shared/api.js";
+import { onlyDigits, mascaraCPF, validarCPF } from "../../../js/shared/validators.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const $ = (id) => document.getElementById(id);
+const META_CICLO = 5;
+const $ = (id) => document.getElementById(id);
+const form = $("registroDoacaoForm");
+const cpfEl = $("cpfDoador");
+const tipoPecaEl = $("tipoPeca");
+const qtdEl = $("quantidadePecas");
+const pesoEl = $("pesoEstimado");
+const obsEl = $("observacoesDoacao");
+const errEl = $("doacaoFormError");
+const listBody = $("doacoesListBody");
+const searchEl = $("searchDoacoes");
+const filterBtns = document.querySelectorAll(".filter-btn");
 
-  const form = $("registroDoacaoForm");
-  const cpfEl = $("cpfDoador");
-  const tipoPecaEl = $("tipoPeca");
-  const qtdEl = $("quantidadePecas");
-  const pesoEl = $("pesoEstimado");
-  const obsEl = $("observacoesDoacao");
-  const errorEl = $("doacaoFormError");
-  const searchEl = $("searchDoacoes");
-  const listBody = $("doacoesListBody");
-  const filterBtns = document.querySelectorAll(".filter-btn");
+let filtroAtual = "TODOS";
+let busca = "";
+let doacoesCache = [];
+let politicaPct = null;
+let trackerSeq = 0;
 
-  const trackerBox = $("cpfTrackerBox");
-  const trackerDonor = $("cpfTrackerDonor");
-  const trackerCount = $("cpfTrackerCount");
-  const trackerDots = [...document.querySelectorAll("#cpfTrackerDots .cpf-dot")];
-  const trackerHint = $("cpfTrackerHint");
-  const trackerCoupons = $("cpfTrackerCoupons");
+const setErro = (msg) => (errEl.textContent = msg || "");
 
-  const celebration = $("couponCelebration");
-  const celebrationTitle = $("couponCelebrationTitle");
-  const celebrationDesc = $("couponCelebrationDesc");
-  const celebrationCode = $("couponCelebrationCode");
+function renderKpis(cupons) {
+  $("kpiTotalDoacoes").textContent = String(doacoesCache.length);
+  $("kpiAguardando").textContent = String(
+    doacoesCache.filter((d) => d.statusCuradoria === STATUS_CURADORIA.AGUARDANDO).length,
+  );
+  $("kpiComCpf").textContent = String(doacoesCache.filter((d) => d.cpfInformado).length);
+  if (cupons !== undefined) $("kpiCuponsAtivos").textContent = String(cupons);
+}
 
-  const toast = $("doacaoToast");
-  const toastMsg = $("doacaoToastMsg");
+function renderDoacoes() {
+  const q = busca.trim().toLowerCase();
+  const filtradas = doacoesCache.filter(
+    (d) =>
+      (filtroAtual === "TODOS" || d.statusCuradoria === filtroAtual) &&
+      (!q || `${d.cpfInformado || ""} ${d.id} ${d.tipoPeca || d.tipo || ""}`.toLowerCase().includes(q)),
+  );
 
-  let filtroAtual = "TODOS";
-  let buscaAtual = "";
-  let toastTimer = null;
-  const empresa = await api.getEmpresa();
-  const empId = empresa?.id || "EMP-01";
-  const pctDesconto = empresa?.politicaCupom?.percentual || 15;
-
-  if ($("storeCouponPolicyBadge")) {
-    $("storeCouponPolicyBadge").textContent = `5 doações = Cupom ${pctDesconto}% OFF`;
+  if (filtradas.length === 0) {
+    listBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#666;padding:1.5rem;">Nenhuma doação encontrada para este filtro.</td></tr>`;
+    return;
   }
 
-  const showToast = (text) => {
-    if (!toast || !toastMsg) return;
-    toastMsg.textContent = text;
-    toast.classList.add("toast--visible");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      toast.classList.remove("toast--visible");
-    }, 3200);
-  };
+  listBody.innerHTML = filtradas
+    .map((d) => {
+      const dt = d.criadoEm ? new Date(d.criadoEm).toLocaleDateString("pt-BR") : "—";
+      const badgeClass =
+        d.statusCuradoria === STATUS_CURADORIA.AGUARDANDO ? "badge-aguardando" : "badge-emlote";
+      return `
+        <tr>
+          <td><strong>${d.id}</strong></td>
+          <td>${dt}</td>
+          <td>${d.tipoPeca || d.tipo || "—"}</td>
+          <td>${d.pecas || 1} pç(s) · ${Number(d.pesoKg || 0).toFixed(1)} kg</td>
+          <td>${d.cpfInformado ? d.cpfInformado : "<span style='color:#999'>Sem CPF</span>"}</td>
+          <td><span class="badge-status ${badgeClass}">${d.statusCuradoria}</span></td>
+        </tr>
+      `;
+    })
+    .join("");
+}
 
-  const escapeHtml = (str) =>
-    String(str ?? "").replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;",
-        })[c],
-    );
+async function carregarDoacoes() {
+  try {
+    doacoesCache = (await api.listarDoacoesEmpresa()) || [];
+  } catch {
+    doacoesCache = [];
+  }
+  renderKpis();
+  renderDoacoes();
+}
 
-  const renderTracker = () => {
-    const digits = onlyDigits(cpfEl.value);
-    trackerCoupons.innerHTML = "";
-    trackerBox.classList.remove("is-linked", "is-invalid");
-
-    if (!digits) {
-      trackerDonor.textContent = "Vínculo de Fidelidade Circular";
-      trackerCount.textContent = "0 / 5 doações";
-      trackerDots.forEach((d) => d.classList.remove("is-filled", "is-next"));
-      trackerHint.textContent =
-        "Digite o CPF para consultar o progresso atual do doador. Sem CPF, a doação entra na curadoria normalmente, mas não conta para cupom.";
-      return;
+async function carregarContexto() {
+  try {
+    const [empresa, dash] = await Promise.all([api.getEmpresa(), api.getEmpresaDashboardStats()]);
+    politicaPct = empresa?.politicaCupom?.percentual ?? null;
+    if (politicaPct !== null) {
+      $("storeCouponPolicyBadge").textContent = `${META_CICLO} doações = Cupom ${politicaPct}% OFF`;
     }
+    renderKpis(dash?.cupons ?? 0);
+  } catch {
+    /* KPI de cupons e badge ficam como estão se a API falhar */
+  }
+}
 
-    if (digits.length < 11) {
-      trackerDonor.textContent = "Digitando CPF…";
-      trackerCount.textContent = `${digits.length} / 11 dígitos`;
-      trackerDots.forEach((d) => d.classList.remove("is-filled", "is-next"));
-      trackerHint.textContent =
-        "Complete os 11 dígitos do CPF para verificar doações acumuladas e cupons ativos.";
-      return;
-    }
+/* Rastreador do ciclo de 5 doações por CPF nesta loja */
+const TRACKER_HINT_PADRAO = $("cpfTrackerHint").textContent;
+function resetTracker() {
+  const box = $("cpfTrackerBox");
+  box.classList.remove("is-linked", "is-invalid");
+  $("cpfTrackerDonor").textContent = "Vínculo de Fidelidade Circular";
+  $("cpfTrackerCount").textContent = `0 / ${META_CICLO} doações`;
+  document.querySelectorAll("#cpfTrackerDots .cpf-dot").forEach((d) => d.classList.remove("is-filled", "is-next"));
+  $("cpfTrackerHint").textContent = TRACKER_HINT_PADRAO;
+}
 
-    if (!cpfValido(digits)) {
-      trackerBox.classList.add("is-invalid");
-      trackerDonor.textContent = "CPF inválido";
-      trackerCount.textContent = "Verifique os dígitos";
-      trackerDots.forEach((d) => d.classList.remove("is-filled", "is-next"));
-      trackerHint.textContent =
-        "Este CPF não passou na validação de dígitos verificadores.";
-      return;
-    }
-
-    const info = consultarProgressoCupomCpf(digits, empId);
-    trackerBox.classList.add("is-linked");
-    trackerDonor.textContent = info.doador
-      ? `Doador(a): ${info.doador.nome}`
-      : "CPF válido (será vinculado automaticamente ao cadastro)";
-
-    const atual = info.contandoNaLoja;
-    const aposEsta = atual + 1;
-    trackerCount.textContent = `${atual} / 5 no ciclo atual`;
-
-    trackerDots.forEach((dot, idx) => {
-      dot.classList.toggle("is-filled", idx < atual);
-      dot.classList.toggle("is-next", idx === atual);
-    });
-
-    if (aposEsta >= 5) {
-      trackerHint.innerHTML = `<strong>Esta doação completará 5/5!</strong> Um cupom de <strong>${pctDesconto}% OFF</strong> será gerado imediatamente ao salvar.`;
-    } else {
-      trackerHint.innerHTML = `Com esta doação, o CPF ficará em <strong>${aposEsta}/5</strong> (faltarão ${5 - aposEsta} para liberar o próximo cupom de ${pctDesconto}% OFF).`;
-    }
-
-    if (info.cuponsAtivosLoja.length > 0) {
-      trackerCoupons.innerHTML = info.cuponsAtivosLoja
-        .map(
-          (c) =>
-            `<span class="mini-coupon-pill">🎟 ${escapeHtml(c.codigo)} (${c.percentual}% OFF ativo)</span>`,
-        )
-        .join("");
-    }
-  };
-
-  const updateKpis = (doacoesLoja) => {
-    const cuponsLoja = (store.get("cupons") || []).filter(
-      (c) => c.empresaId === empId,
-    );
-    if ($("kpiTotalDoacoes")) {
-      $("kpiTotalDoacoes").textContent = String(doacoesLoja.length);
-    }
-    if ($("kpiAguardando")) {
-      $("kpiAguardando").textContent = String(
-        doacoesLoja.filter(
-          (d) => d.statusCuradoria === STATUS_CURADORIA.AGUARDANDO,
-        ).length,
-      );
-    }
-    if ($("kpiComCpf")) {
-      $("kpiComCpf").textContent = String(
-        doacoesLoja.filter((d) => onlyDigits(d.cpfInformado).length === 11)
-          .length,
-      );
-    }
-    if ($("kpiCuponsAtivos")) {
-      $("kpiCuponsAtivos").textContent = String(cuponsLoja.length);
-    }
-  };
-
-  const renderDoacoes = () => {
-    const todas = (store.get("doacoes") || [])
-      .filter((d) => !d.empresaId || d.empresaId === empId)
-      .slice()
-      .reverse();
-
-    updateKpis(todas);
-
-    const q = buscaAtual.trim().toLowerCase();
-    const qDigits = onlyDigits(buscaAtual);
-
-    const filtradas = todas.filter((d) => {
-      if (filtroAtual !== "TODOS" && d.statusCuradoria !== filtroAtual) {
-        return false;
-      }
-      if (!q) return true;
-      const matchText =
-        String(d.id || "").toLowerCase().includes(q) ||
-        String(d.tipoPeca || d.tipo || "").toLowerCase().includes(q);
-      const matchCpf =
-        qDigits.length > 0 && onlyDigits(d.cpfInformado).includes(qDigits);
-      return matchText || matchCpf;
-    });
-
-    if (filtradas.length === 0) {
-      listBody.innerHTML =
-        '<tr><td colspan="4" style="text-align:center;color:var(--color-muted-text);padding:2rem;">Nenhuma doação encontrada para este filtro.</td></tr>';
-      return;
-    }
-
-    const doadores = store.get("doadores") || [];
-
-    listBody.innerHTML = filtradas
-      .map((d) => {
-        const dt = d.criadoEm
-          ? new Date(d.criadoEm).toLocaleDateString("pt-BR")
-          : "—";
-        const badgeClass =
-          d.statusCuradoria === STATUS_CURADORIA.AGUARDANDO
-            ? "badge-aguardando"
-            : "badge-emlote";
-
-        const cpfDigits = onlyDigits(d.cpfInformado);
-        let cpfMarkup = '<span class="cpf-cell__empty">Sem CPF · Sem cupom</span>';
-        if (cpfDigits.length === 11) {
-          const donor = doadores.find((u) => onlyDigits(u.cpf) === cpfDigits);
-          const prog = consultarProgressoCupomCpf(cpfDigits, empId);
-          const statusProg =
-            d.statusContagem === "EM_CUPOM"
-              ? `Convertida em cupom (${prog.cuponsAtivosLoja.length} ativo(s))`
-              : `Ciclo atual: ${prog.contandoNaLoja}/5 doações`;
-          cpfMarkup = `
-            <div class="cpf-cell">
-              <span class="cpf-cell__num">${escapeHtml(mascaraCPF(cpfDigits))}${donor ? ` · ${escapeHtml(donor.nome.split(" ")[0])}` : ""}</span>
-              <span class="cpf-cell__prog">${escapeHtml(statusProg)}</span>
-            </div>
-          `;
-        }
-
-        return `
-          <tr>
-            <td>
-              <div class="doacao-id">${escapeHtml(d.id)}</div>
-              <div style="font-size:0.75rem;color:var(--color-muted-text);">${escapeHtml(dt)}</div>
-            </td>
-            <td>
-              <div style="font-weight:600;">${escapeHtml(d.tipoPeca || d.tipo || "Peças diversas")}</div>
-              <div style="font-size:0.76rem;color:var(--color-muted-text);">${Number(d.pecas || 1)} pç(s) · ${Number(d.pesoKg || 0).toFixed(1).replace(".", ",")} kg</div>
-            </td>
-            <td>${cpfMarkup}</td>
-            <td><span class="badge-status ${badgeClass}">${escapeHtml(d.statusCuradoria)}</span></td>
-          </tr>
-        `;
-      })
-      .join("");
-  };
-
-  cpfEl.addEventListener("input", () => {
-    cpfEl.value = mascaraCPF(cpfEl.value);
-    errorEl.textContent = "";
-    renderTracker();
+async function atualizarTracker() {
+  const cpf = onlyDigits(cpfEl.value);
+  const seq = ++trackerSeq;
+  resetTracker();
+  if (cpf.length < 11) return;
+  const box = $("cpfTrackerBox");
+  if (!validarCPF(cpf)) {
+    box.classList.add("is-invalid");
+    $("cpfTrackerHint").textContent = "CPF inválido. Confira os números digitados.";
+    return;
+  }
+  let doador = null;
+  try {
+    doador = await api.buscarDoador(cpf);
+  } catch {
+    doador = null;
+  }
+  if (seq !== trackerSeq) return; // o usuário já digitou outro CPF
+  const contando = doacoesCache.filter((d) => d.cpfInformado === cpf && d.statusContagem === "CONTANDO").length;
+  const n = Math.min(contando, META_CICLO);
+  box.classList.add("is-linked");
+  $("cpfTrackerDonor").textContent = doador?.nome || "Doador ainda sem conta";
+  $("cpfTrackerCount").textContent = `${n} / ${META_CICLO} doações`;
+  document.querySelectorAll("#cpfTrackerDots .cpf-dot").forEach((dot, i) => {
+    dot.classList.toggle("is-filled", i < n);
+    dot.classList.toggle("is-next", i === n);
   });
+  const faltam = META_CICLO - n;
+  const cupom = politicaPct !== null ? ` de ${politicaPct}%` : "";
+  $("cpfTrackerHint").textContent = `${
+    doador ? "" : "Sem conta ainda: as doações ficam vinculadas e contam quando o doador se cadastrar. "
+  }${faltam === META_CICLO ? `Faltam ${META_CICLO} doações nesta loja para o cupom${cupom}.` : `Falta${faltam === 1 ? "" : "m"} ${faltam} doaç${faltam === 1 ? "ão" : "ões"} nesta loja para o cupom${cupom}.`}`;
+}
 
-  searchEl?.addEventListener("input", () => {
-    buscaAtual = searchEl.value;
-    renderDoacoes();
-  });
+function mostrarCupomGerado(res) {
+  const novo = (res?.cuponsGerados || [])[0];
+  if (!novo) return;
+  $("couponCelebrationCode").textContent = novo.codigo || "";
+  $("couponCelebration").classList.add("is-visible");
+}
 
-  filterBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      filterBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      filtroAtual = btn.dataset.filter;
-      renderDoacoes();
-    });
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    errorEl.textContent = "";
-    celebration.classList.remove("is-visible");
-
-    const tipo = tipoPecaEl.value.trim();
-    if (!tipo) {
-      errorEl.textContent = "Informe o tipo de peça ou material doado.";
-      tipoPecaEl.focus();
-      return;
-    }
-
-    const cpfDigits = onlyDigits(cpfEl.value);
-    if (cpfDigits.length > 0 && !cpfValido(cpfDigits)) {
-      errorEl.textContent =
-        "O CPF digitado é inválido. Corrija os 11 dígitos ou limpe o campo para registrar sem CPF.";
-      cpfEl.focus();
-      return;
-    }
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const formCard = form.closest(".doacao-card");
-
-    try {
-      const { doacao, progresso } = await runWithDynamicLoading({
-        button: submitBtn,
-        container: formCard,
-        title: "Registrando doação no balcão",
-        steps: [
-          "Catalogando peças na fila de curadoria…",
-          cpfDigits.length === 11
-            ? "Atualizando ciclo de fidelidade do CPF…"
-            : "Sincronizando estoque têxtil da loja…",
-        ],
-        buttonLabel: "Registrando…",
-        successText: "Doação registrada!",
-        minDuration: 720,
-        task: () =>
-          registrarDoacaoEmpresa({
-            empresaId: empId,
-            cpfInformado: cpfDigits,
-            tipoPeca: tipo,
-            pecas: Number(qtdEl.value) || 1,
-            pesoKg: Number(pesoEl.value) || 1,
-            observacoes: obsEl.value.trim(),
-          }),
-      });
-
-      form.reset();
-      qtdEl.value = "1";
-      pesoEl.value = "1.0";
-      renderTracker();
-      renderDoacoes();
-
-      if (progresso?.novosCupons?.length > 0) {
-        const cupom = progresso.novosCupons[0];
-        celebrationTitle.textContent = `🎉 5/5 Doações! Cupom de ${cupom.percentual}% OFF liberado`;
-        celebrationDesc.textContent = `O CPF ${mascaraCPF(cpfDigits)} completou o ciclo na loja e já pode usar o cupom abaixo no painel do doador.`;
-        celebrationCode.textContent = cupom.codigo;
-        celebration.classList.add("is-visible");
-        showToast(`Doação ${doacao.id} salva e cupom ${cupom.codigo} emitido!`);
-      } else if (progresso) {
-        showToast(
-          `Doação ${doacao.id} vinculada ao CPF (${progresso.contandoNaLoja}/5 para cupom)!`,
-        );
-      } else {
-        showToast(`Doação ${doacao.id} enviada para curadoria!`);
-      }
-    } catch (err) {
-      errorEl.textContent = err.message || "Erro ao registrar doação.";
-    }
-  });
-
-  renderTracker();
+cpfEl.addEventListener("input", () => {
+  cpfEl.value = mascaraCPF(cpfEl.value);
+  atualizarTracker();
+});
+searchEl?.addEventListener("input", () => {
+  busca = searchEl.value;
   renderDoacoes();
 });
+filterBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    filterBtns.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    filtroAtual = btn.dataset.filter;
+    renderDoacoes();
+  });
+});
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  setErro("");
+  const cpf = onlyDigits(cpfEl.value);
+  const tipoPeca = tipoPecaEl.value.trim();
+  const peso = Number(String(pesoEl.value).replace(",", "."));
+  const pecas = Number(qtdEl.value);
+
+  if (!tipoPeca) return setErro("Informe o tipo de peça / material.");
+  if (!Number.isInteger(pecas) || pecas < 1) return setErro("Informe ao menos 1 peça.");
+  if (!(peso > 0)) return setErro("Informe um peso maior que zero.");
+
+  try {
+    const res = await api.registrarDoacaoEmpresa({
+      cpfInformado: cpf,
+      tipoPeca,
+      pecas,
+      pesoKg: peso,
+      observacoes: obsEl.value.trim(),
+    });
+    form.reset();
+    qtdEl.value = "1";
+    pesoEl.value = "1.0";
+    resetTracker();
+    await carregarDoacoes();
+    mostrarCupomGerado(res);
+    carregarContexto();
+  } catch (err) {
+    setErro(err.message);
+  }
+});
+
+/* Resgate de cupom */
+const cupomResultado = $("cupomResultado");
+const btnUsarCupom = $("btnUsarCupom");
+const mostrarCupom = (msg, tipo) => {
+  cupomResultado.textContent = msg;
+  cupomResultado.className = `cupom-resgate__result ${tipo ? `is-${tipo}` : ""}`;
+};
+
+$("btnValidarCupom").addEventListener("click", async () => {
+  const codigo = $("cupomCodigo").value.trim().toUpperCase();
+  btnUsarCupom.disabled = true;
+  if (!codigo) return mostrarCupom("Informe o código do cupom.", "error");
+  try {
+    const c = await api.validarCupom(codigo);
+    const validade = c.validade ? new Date(`${c.validade}T00:00:00`).toLocaleDateString("pt-BR") : "sem validade";
+    const ativo = c.status === "Ativo";
+    mostrarCupom(`${c.codigo} · ${c.percentual}% OFF · validade ${validade} · ${c.status}`, ativo ? "ok" : "error");
+    btnUsarCupom.disabled = !ativo;
+  } catch (err) {
+    mostrarCupom(err.message, "error");
+  }
+});
+
+btnUsarCupom.addEventListener("click", async () => {
+  const codigo = $("cupomCodigo").value.trim().toUpperCase();
+  try {
+    await api.utilizarCupom(codigo);
+    mostrarCupom(`Cupom ${codigo} marcado como utilizado.`, "ok");
+  } catch (err) {
+    mostrarCupom(err.message, "error");
+  }
+  btnUsarCupom.disabled = true;
+});
+
+carregarDoacoes();
+carregarContexto();

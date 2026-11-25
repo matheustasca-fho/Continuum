@@ -13,36 +13,30 @@ import {
 } from "../../../../js/shared/loader.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const $ = (id) => document.getElementById(id);
-  const card = $("doadorSignupCard");
-  const form = $("formCadastroConta");
-  const status = $("cadastroStatus");
-  const doneView = $("doadorDoneView");
-  const stepper = $("doadorStepper");
-  const stepCounter = $("doadorStepCounter");
-  const btnPrev = $("doadorBtnPrev");
-  const btnNext = $("doadorBtnNext");
-  const btnSubmit = $("doadorBtnSubmit");
-
-  let currentStep = 1;
-  let maxUnlockedStep = 1;
-
-  const f = {
-    cpf: $("cpfDoador"),
-    cep: $("cepDoador"),
-    pass: $("senhaUsuario"),
-    confirm: $("confirmarSenhaDoador"),
-    name: $("nomeDoador"),
-    email: $("emailDoador"),
-    phone: $("telefoneDoador"),
-    terms: $("aceiteTermosDoador"),
-    uf: $("ufDoador"),
-    city: $("cidadeDoador"),
-    bairro: $("bairroDoador"),
-    street: $("logradouroDoador"),
-    number: $("numeroDoador"),
+  const $ = (id) => document.getElementById(id),
+    form = $("formCadastroConta"),
+    status = $("cadastroStatus"),
+    f = {
+      cpf: $("cpfDoador"),
+      cep: $("cepDoador"),
+      pass: $("senhaUsuario"),
+      confirm: $("confirmarSenhaDoador"),
+      name: $("nomeDoador"),
+      email: $("emailDoador"),
+      phone: $("telefoneDoador"),
+      terms: $("aceiteTermosDoador"),
+      uf: $("ufDoador"),
+      city: $("cidadeDoador"),
+      bairro: $("bairroDoador"),
+      street: $("logradouroDoador"),
+      number: $("numeroDoador"),
+    };
+  const fields = {
+    uf: f.uf,
+    cidade: f.city,
+    bairro: f.bairro,
+    logradouro: f.street,
   };
-
   const hints = {
     name: $("nomeAjuda"),
     cpf: $("cpfAjuda"),
@@ -86,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     email: () =>
       check(
         "email",
-        f.email.value.trim() && f.email.validity.valid
+        f.email.value.trim() && !f.email.validity.typeMismatch
           ? ""
           : "Informe um e-mail válido.",
       ),
@@ -155,6 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
       metaEl.textContent = parts.join(" · ");
     }
   };
+
+  const stepCounter = $("doadorStepCounter");
+  const btnPrev = $("doadorBtnPrev");
+  const btnNext = $("doadorBtnNext");
+  const btnSubmit = $("doadorBtnSubmit");
+  let currentStep = 1;
+  let maxUnlockedStep = 1;
 
   const goToStep = (step) => {
     currentStep = Math.max(1, Math.min(3, Number(step)));
@@ -250,7 +251,16 @@ document.addEventListener("DOMContentLoaded", () => {
     f.cep.value = mascaraCEP(f.cep.value);
     if (onlyDigits(f.cep.value).length === 8) v.cep();
   });
-
+  conectarBuscaCep(f.cep, fields, {
+    aoEncontrar: () => {
+      v.cep();
+      v.uf();
+      v.city();
+      if (f.bairro.value.trim()) v.bairro();
+      if (f.street.value.trim()) v.street();
+    },
+    aoErro: (msg) => check("cep", msg),
+  });
   f.phone.addEventListener("input", () => {
     f.phone.value = mascaraTelefone(f.phone.value);
     if (onlyDigits(f.phone.value).length >= 10) v.phone();
@@ -321,53 +331,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setStatus("");
     try {
-      await runWithDynamicLoading({
-        button: btnSubmit,
-        container: card,
-        title: "Criando sua conta de Doador",
-        steps: [
-          "Validando CPF e credenciais…",
-          "Vinculando histórico de doações e cupons…",
-          "Preparando seu Painel Circular…",
-        ],
-        buttonLabel: "Cadastrando…",
-        successText: "Conta Doador ativada!",
-        task: async () => {
-          const emailVal = f.email.value.trim();
-          const passVal = f.pass.value;
-          const novo = await api.registrarDoador({
-            nome: f.name.value.trim(),
-            cpf: onlyDigits(f.cpf.value),
-            email: emailVal,
-            telefone: onlyDigits(f.phone.value),
-            cep: onlyDigits(f.cep.value),
-            uf: f.uf.value.trim().toUpperCase(),
-            cidade: f.city.value.trim(),
-            bairro: f.bairro.value.trim(),
-            logradouro: f.street.value.trim(),
-            numero: f.number.value.trim(),
-            complemento: $("complementoDoador").value.trim(),
-            faixaEtaria: $("faixaEtariaDoador").value,
-            comoConheceu: $("comoConheceuDoador").value,
-            senhaHash: passVal,
-          });
-          try {
-            await api.login("doador", emailVal, passVal);
-            sessionStorage.setItem(
-              "continuum_sessao",
-              JSON.stringify({ perfil: "doador", nome: novo.nome }),
-            );
-          } catch {}
-        },
+      await api.registrarDoador({
+        nome: f.name.value.trim(),
+        cpf: onlyDigits(f.cpf.value),
+        email: f.email.value.trim(),
+        telefone: onlyDigits(f.phone.value),
+        cep: onlyDigits(f.cep.value),
+        uf: f.uf.value.trim().toUpperCase(),
+        cidade: f.city.value.trim(),
+        bairro: f.bairro.value.trim(),
+        logradouro: f.street.value.trim(),
+        numero: f.number.value.trim(),
+        complemento: $("complementoDoador").value.trim(),
+        faixaEtaria: $("faixaEtariaDoador").value,
+        comoConheceu: $("comoConheceuDoador").value,
+        termosAceitos: Boolean(f.terms.checked),
+        senhaHash: f.pass.value,
       });
-
-      setStatus("Cadastro realizado com sucesso!", true);
-      form.hidden = true;
-      if (stepper) stepper.hidden = true;
-      if (doneView) doneView.hidden = false;
-      setTimeout(() => {
-        window.location.href = "../../../doador/painel/index.html";
-      }, 650);
+      status.textContent = "Cadastro realizado com sucesso!";
+      form.reset();
     } catch (err) {
       setStatus(err.message || "Não foi possível concluir o cadastro.");
     }

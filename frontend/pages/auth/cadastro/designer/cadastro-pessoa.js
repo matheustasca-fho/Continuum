@@ -46,103 +46,29 @@ document.addEventListener("DOMContentLoaded", () => {
     bairro: $("bairroPessoa"),
     razao: $("razaoSocialDesigner"),
   };
-
-  const hints = {
-    doc: $("docAjuda"),
-    name: $("nomePessoaAjuda"),
-    razao: $("razaoAjuda"),
-    email: $("emailPessoaAjuda"),
-    phone: $("telefonePessoaAjuda"),
-    pass: $("senhaPessoaAjuda"),
-    confirm: $("confirmarPessoaAjuda"),
-    cep: $("cepPessoaAjuda"),
-    street: $("logradouroAjuda"),
-  };
-
-  const setStatus = (msg, isSuccess = false) => {
-    status.textContent = msg || "";
-    status.classList.toggle("is-success", Boolean(msg && isSuccess));
-  };
-
-  const check = (key, msg) => {
-    const el = f[key];
-    const hint = hints[key];
-    if (!el) return true;
-    el.setCustomValidity(msg);
-    el.setAttribute("aria-invalid", String(Boolean(msg)));
-    if (hint) {
-      hint.textContent = msg;
-      hint.style.display = msg ? "block" : "none";
-    }
-    return !msg;
-  };
-
-  const v = {
-    name: () =>
-      check(
-        "name",
-        f.name.value.trim().length >= 3 ? "" : "Informe pelo menos 3 caracteres.",
-      ),
-    doc: () =>
-      check(
-        "doc",
-        (type === "PF" ? validarCPF(f.doc.value) : validarCNPJ(f.doc.value))
-          ? ""
-          : `Informe um ${type === "PF" ? "CPF" : "CNPJ"} válido.`,
-      ),
-    razao: () =>
-      type !== "PJ"
-        ? check("razao", "")
-        : check(
-            "razao",
-            f.razao.value.trim().length >= 2 ? "" : "Informe a Razão Social.",
-          ),
-    email: () =>
-      check(
-        "email",
-        f.email.value.trim() && f.email.validity.valid
-          ? ""
-          : "Informe um e-mail válido.",
-      ),
-    phone: () =>
-      check(
-        "phone",
-        onlyDigits(f.phone.value).length >= 10
-          ? ""
-          : "Informe telefone com DDD.",
-      ),
-    pass: () =>
-      check(
-        "pass",
-        f.pass.value.length >= 8
-          ? ""
-          : "A senha deve ter pelo menos 8 caracteres.",
-      ),
-    confirm: () =>
-      check(
-        "confirm",
-        f.confirm.value && f.confirm.value === f.pass.value
-          ? ""
-          : "As senhas precisam coincidir.",
-      ),
-    cep: () =>
-      check(
-        "cep",
-        onlyDigits(f.cep.value).length === 8
-          ? ""
-          : "O CEP deve conter 8 dígitos.",
-      ),
-    city: () => check("city", f.city.value.trim() ? "" : "Informe a cidade."),
-    uf: () =>
-      check("uf", f.uf.value.trim().length === 2 ? "" : "Informe a UF."),
-    street: () =>
-      check("street", f.street.value.trim() ? "" : "Informe o logradouro."),
-    number: () =>
-      check("number", f.number.value.trim() ? "" : "Informe o número."),
-    bairro: () =>
-      check("bairro", f.bairro.value.trim() ? "" : "Informe o bairro."),
-  };
-
+  conectarBuscaCep(
+    f.cep,
+    { logradouro: f.street, bairro: f.bairro, cidade: f.city, uf: f.uf },
+    {
+      aoEncontrar: () => {
+        const cepHint = $("cepPessoaAjuda");
+        if (cepHint) {
+          cepHint.textContent = "";
+          cepHint.style.display = "none";
+        }
+        f.cep.setAttribute("aria-invalid", "false");
+      },
+      aoErro: (msg) => {
+        const cepHint = $("cepPessoaAjuda");
+        if (cepHint) {
+          cepHint.textContent = msg;
+          cepHint.dataset.state = "error";
+          cepHint.style.display = "block";
+        }
+        f.cep.setAttribute("aria-invalid", "true");
+      },
+    },
+  );
   const setType = (t) => {
     type = t === "fisica" ? "PF" : "PJ";
     document
@@ -395,64 +321,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setStatus("");
     try {
-      await runWithDynamicLoading({
-        button: btnSubmit,
-        container: card,
-        title: "Credenciando seu Ateliê no CONTINUUM",
-        steps: [
-          `Validando ${type === "PF" ? "CPF" : "CNPJ"} e credenciais…`,
-          "Configurando vitrine de lotes e rastreabilidade QR…",
-          "Liberando acesso ao Painel Designer…",
-        ],
-        buttonLabel: "Cadastrando…",
-        successText: "Ateliê cadastrado!",
-        task: async () => {
-          const docDigits = onlyDigits(f.doc.value);
-          const passVal = f.pass.value;
-          const novo = await api.registrarConfeccionista({
-            tipoPessoa: type,
-            documento: docDigits,
-            razaoSocial: f.razao.value.trim(),
-            nomeProfissional: f.name.value.trim(),
-            nome: f.name.value.trim(),
-            email: f.email.value.trim(),
-            telefone: onlyDigits(f.phone.value),
-            cep: onlyDigits(f.cep.value),
-            logradouro: f.street.value.trim(),
-            numero: f.number.value.trim(),
-            complemento: f.complement.value.trim(),
-            bairro: f.bairro.value.trim(),
-            cidade: f.city.value.trim(),
-            uf: f.uf.value.trim().toUpperCase(),
-            senhaHash: passVal,
-            maioridadeConfirmada: true,
-            comoConheceu: $("canalDesigner").value,
-            consentimentoPerfilPublico: $("consentimentoPublicoDesigner").checked,
-            consentimentoUsoImagem: $("consentimentoPublicoDesigner").checked,
-            especialidades: [],
-            faixaExperiencia: "",
-            portfolio: "",
-            manifesto: "",
-            instagram: "",
-            site: "",
-          });
-          try {
-            await api.login("designer", docDigits, passVal);
-            sessionStorage.setItem(
-              "continuum_sessao",
-              JSON.stringify({ perfil: "designer", nome: novo.nome }),
-            );
-          } catch {}
-        },
+      await api.registrarConfeccionista({
+        tipoPessoa: type,
+        documento: onlyDigits(f.doc.value),
+        razaoSocial: f.razao.value.trim(),
+        nomeProfissional: f.name.value.trim(),
+        nome: f.name.value.trim(),
+        email: f.email.value.trim(),
+        telefone: onlyDigits(f.phone.value),
+        cep: onlyDigits(f.cep.value),
+        logradouro: f.street.value.trim(),
+        numero: f.number.value.trim(),
+        complemento: f.complement.value.trim(),
+        bairro: f.bairro.value.trim(),
+        cidade: f.city.value.trim(),
+        uf: f.uf.value.trim().toUpperCase(),
+        senhaHash: f.pass.value,
+        maioridadeConfirmada: Boolean($("maioridadeDesigner").checked),
+        termosAceitos: Boolean($("termosDesigner").checked),
+        comoConheceu: $("canalDesigner").value,
+        consentimentoPerfilPublico: $("consentimentoPublicoDesigner").checked,
+        consentimentoUsoImagem: $("consentimentoPublicoDesigner").checked,
+        especialidades: [],
+        faixaExperiencia: "",
+        portfolio: "",
+        manifesto: "",
+        instagram: "",
+        site: "",
       });
-
-      setStatus("Cadastro realizado com sucesso!", true);
-      form.hidden = true;
-      if (stepper) stepper.hidden = true;
-      if (doneView) doneView.hidden = false;
-      setTimeout(() => {
-        window.location.href = "../../../designer/painel/index.html";
-      }, 650);
+      status.textContent = "Cadastro realizado com sucesso!";
+      form.reset();
     } catch (err) {
       setStatus(err.message || "Não foi possível concluir o cadastro.");
     }

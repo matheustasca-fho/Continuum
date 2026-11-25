@@ -1,5 +1,4 @@
 import { api, STATUS_LOTE } from "../../../js/shared/api.js";
-import { store } from "../../../js/shared/store.js";
 import { runWithDynamicLoading } from "../../../js/shared/loader.js";
 
 (() => {
@@ -89,9 +88,11 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
   const modalImgPlaceholder = byId("modalImgPlaceholder");
   const statusField = byId("statusField");
   const lotStatusSelect = byId("lotStatusSelect");
+  const editorModalBox = addModal.querySelector(".modal-box");
   const statusConfirmModal = byId("statusConfirmModal");
   const statusConfirmCopy = byId("statusConfirmCopy");
   const deleteConfirmModal = byId("deleteConfirmModal");
+  const closeDeleteConfirm = () => deleteConfirmModal?.classList.remove("active");
   const lotToast = byId("lotToast");
   const lotToastMsg = byId("lotToastMsg");
 
@@ -156,12 +157,6 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     const legacyDate = (String(lot.code || "").split("|")[1] || "").trim();
     if (legacyDate) return legacyDate;
     return getTodayStr();
-  };
-
-  const getNextLotCode = () => {
-    const allStored = store.get("lotes") || [];
-    const nextNum = Math.max(allStored.length, lotsData.length) + 1;
-    return `LOT-${new Date().getFullYear()}-${String(nextNum).padStart(3, "0")}`;
   };
 
   const findLotById = (id) => lotsData.find((lot) => lot.id === id);
@@ -280,25 +275,44 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     if (item) selectFilterOption(item);
   });
 
-  // Seletor opcional de status ao editar um lote existente
-  let editorMenuControls = null;
-  const syncEditorStatus = () => {
-    if (!lotStatusSelect || !editorMenu) return;
-    const selected =
-      STATUS_OPTIONS.find(({ value }) => value === lotStatusSelect.value) ||
-      STATUS_OPTIONS[1];
-    editorMenu.trigger.dataset.status = slugifyStatus(selected.value);
-    editorMenu.trigger.innerHTML =
-      `${statusIconMarkup(selected.value)}<span class="status-menu__label">${escapeHtml(selected.label)}</span>` +
-      '<span class="status-menu__chevron" aria-hidden="true">⌄</span>';
-    editorMenu.options
-      .querySelectorAll(".status-menu__option")
-      .forEach((option) =>
-        setOptionSelected(option, option.dataset.value === selected.value),
+  // ---- Seletor de status (modal de edição) ----
+  const animateEditorModal = (expand) => {
+    if (!editorModalBox || typeof editorModalBox.animate !== "function") return;
+
+    const currentHeight = editorModalBox.getBoundingClientRect().height;
+    editorModalBox.style.height = `${currentHeight}px`;
+
+    if (expand) {
+      editorModalBox.classList.add("modal-box--status-expanded");
+      const targetHeight = Math.min(
+        window.innerHeight - 40,
+        Math.max(currentHeight + 250, 540),
       );
+      editorModalBox.animate(
+        [{ height: `${currentHeight}px` }, { height: `${targetHeight}px` }],
+        { duration: 360, easing: MODAL_EASING },
+      ).onfinish = () => {
+        editorModalBox.style.height = `${targetHeight}px`;
+      };
+      return;
+    }
+
+    editorModalBox.classList.remove("modal-box--status-expanded");
+    editorModalBox.style.height = "auto";
+    const naturalHeight = editorModalBox.getBoundingClientRect().height;
+    editorModalBox.style.height = `${currentHeight}px`;
+    editorModalBox.animate(
+      [{ height: `${currentHeight}px` }, { height: `${naturalHeight}px` }],
+      { duration: 300, easing: MODAL_EASING },
+    ).onfinish = () => {
+      editorModalBox.style.height = "";
+    };
   };
 
   let editorMenu = null;
+  let editorMenuControls = null;
+  let syncEditorStatus = () => {};
+
   if (lotStatusSelect) {
     editorMenu = createStatusMenu({
       extraClass: "status-menu--editor",
@@ -312,7 +326,27 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
       item.setAttribute("aria-selected", "false");
       editorMenu.options.appendChild(item);
     });
-    editorMenuControls = bindMenuToggle(editorMenu);
+
+    syncEditorStatus = () => {
+      const selected =
+        STATUS_OPTIONS.find(({ value }) => value === lotStatusSelect.value) ||
+        STATUS_OPTIONS[1];
+      editorMenu.trigger.dataset.status = slugifyStatus(selected.value);
+      editorMenu.trigger.innerHTML =
+        `${statusIconMarkup(selected.value)}<span class="status-menu__label">${escapeHtml(selected.label)}</span>` +
+        '<span class="status-menu__chevron" aria-hidden="true">⌄</span>';
+      editorMenu.options
+        .querySelectorAll(".status-menu__option")
+        .forEach((option) =>
+          setOptionSelected(option, option.dataset.value === selected.value),
+        );
+    };
+
+    editorMenuControls = bindMenuToggle(editorMenu, {
+      onOpen: () => animateEditorModal(true),
+      onClose: () => animateEditorModal(false),
+    });
+
     editorMenu.options.addEventListener("click", (event) => {
       const item = event.target.closest(".status-menu__option");
       if (!item) return;
@@ -502,13 +536,15 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     }
   };
 
-  const loadBriefingAndCuradoria = async (selectedDoacoes = []) => {
+  let doacoesEmpresaCache = [];
+
+  const loadBriefingAndCuradoria = async () => {
     const cartilhaEl = byId("cartilhaPadraoReadonly");
     if (cartilhaEl) {
       try {
         const emp = currentCompany || (await api.getEmpresa());
         currentCompany = emp;
-        const ver = emp?.cartilhaPadrao?.versao || "v1.0";
+        const ver = emp?.cartilhaPadrao?.versao || "—";
         const txt =
           emp?.cartilhaPadrao?.conteudo ||
           "Nenhuma cartilha padrão cadastrada no perfil da empresa.";
@@ -517,7 +553,12 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
         cartilhaEl.textContent = "Não foi possível carregar a cartilha.";
       }
     }
-    renderCuradoriaDoacoes(selectedDoacoes);
+    try {
+      doacoesEmpresaCache = (await api.listarDoacoesEmpresa()) || [];
+    } catch {
+      doacoesEmpresaCache = [];
+    }
+    renderCuradoriaDoacoes();
   };
 
   const renderCuradoriaDoacoes = (preselected = []) => {
@@ -530,10 +571,8 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
       .toLowerCase();
     const dataFiltro = byId("curadoriaFiltroData")?.value || "";
 
-    const todas = store.get("doacoes") || [];
-    const empId = currentCompany?.id;
+    const todas = doacoesEmpresaCache;
     const pendentes = todas.filter((d) => {
-      if (empId && d.empresaId && d.empresaId !== empId) return false;
       const jaVinculadaNesteLote = preselected.includes(d.id);
       if (
         !jaVinculadaNesteLote &&
@@ -562,7 +601,7 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
             ? new Date(d.criadoEm).toLocaleDateString("pt-BR")
             : "—";
           const peso = Number(d.pesoKg || 0);
-          const tipo = d.tipoPeca || d.tipo || "Peças diversas";
+          const tipo = d.tipoPeca || d.tipo || "—";
           const checkedAttr = preselected.includes(d.id) ? "checked" : "";
           return `
             <label class="curadoria-item">
@@ -616,7 +655,7 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     lotIdInput.value = "";
     if (lotFormError) lotFormError.textContent = "";
     modalFormTitle.textContent = "Novo Lote Têxtil";
-    lotCodeInput.value = getNextLotCode();
+    lotCodeInput.value = "";
     if (lotTitleInput) lotTitleInput.value = "";
     if (lotMaterialInput) lotMaterialInput.value = "";
     lotDescInput.value = "";
@@ -644,6 +683,11 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     const lot = findLotById(id);
     if (!lot) return;
 
+    if (lot.status === "RESERVADO" || lot.status !== STATUS_LOTE.DISPONIVEL) {
+      alert("Lotes reservados ou em produção não podem ser editados ou excluídos.");
+      return;
+    }
+
     currentEditingLotId = id;
     lotIdInput.value = id;
     if (lotFormError) lotFormError.textContent = "";
@@ -653,26 +697,11 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     if (lotMaterialInput) lotMaterialInput.value = lot.material || "";
     lotDescInput.value = lot.desc || "";
     lotWeightInput.value = lot.pesoKg || 1;
-    if (lotPiecesInput) lotPiecesInput.value = lot.quantidadePecas ?? 10;
-
-    if (byId("briefingIdeiaMarca"))
-      byId("briefingIdeiaMarca").value = lot.briefing?.ideiaMarca || "";
-    if (byId("briefingExpectativa"))
-      byId("briefingExpectativa").value = lot.briefing?.expectativa || "";
-    if (byId("briefingLiberdadeCriativa"))
-      byId("briefingLiberdadeCriativa").value =
-        lot.briefing?.liberdadeCriativa || "";
-    if (byId("briefingPrazoProducao"))
-      byId("briefingPrazoProducao").value =
-        lot.briefing?.prazoProducaoDias || 30;
-
     if (lotStatusSelect) {
       lotStatusSelect.value = lot.status;
       syncEditorStatus();
     }
-
     setEditorFieldsMode(true);
-    loadBriefingAndCuradoria(lot.doacoesVinculadas || []);
 
     if (lot.image) showModalImagePreview(lot.image);
     else resetModalImage();
@@ -754,125 +783,87 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
       document.querySelectorAll("#curadoriaDoacoesList .curadoria-check:checked"),
     ).map((el) => el.value);
 
-    if (doacoesVinculadas.length > 0) {
-      const todasDoacoes = store.get("doacoes") || [];
-      todasDoacoes.forEach((d) => {
-        if (doacoesVinculadas.includes(d.id)) {
-          d.statusCuradoria = "Em lote";
-        }
-      });
-      store.set("doacoes", todasDoacoes);
+    if (currentEditingLotId === null) {
+      btnSaveLot.disabled = true; // sem etapa de confirmação, evita lote duplicado por duplo clique
+      try {
+        await createLotBatch({ code, title, material, desc, image: pendingModalImage, count: 1, pesoKg, quantidadePecas, briefing, doacoesVinculadas });
+      } catch (err) {
+        if (lotFormError) lotFormError.textContent = err.message;
+      } finally {
+        btnSaveLot.disabled = false;
+      }
+      return;
     }
-
-    const submitBtn = lotForm?.querySelector('button[type="submit"]');
-    const modalCard = addModal?.querySelector(".modal-box") || lotForm;
 
     try {
-      if (currentEditingLotId === null) {
-        const saved = await runWithDynamicLoading({
-          button: submitBtn,
-          container: modalCard,
-          title: "Publicando novo lote têxtil",
-          steps: [
-            "Vinculando doações triadas ao lote…",
-            "Disponibilizando no catálogo para Designers…",
-          ],
-          buttonLabel: "Cadastrando…",
-          successText: "Lote publicado!",
-          minDuration: 760,
-          task: async () => {
-            const empresa = currentCompany || (await api.getEmpresa());
-            return api.criarLote({
-              empresaId: empresa.id,
-              titulo: title,
-              composicao: material || "Tecidos variados",
-              material: material || "tecido",
-              tipo: "tecido",
-              descricao: desc || title,
-              pesoKg,
-              peso: `${String(pesoKg).replace(".", ",")} kg`,
-              quantidadePecas,
-              briefing,
-              direcao: briefing.ideiaMarca || desc || title,
-              doacoesVinculadas,
-              image: pendingModalImage || null,
-              logistica_aceita: empresa.aceitaRetirada
-                ? ["retirada", "envio"]
-                : ["envio"],
-              perfil_loja: empresa.perfilLoja || "",
-            });
-          },
-        });
-
-        lotsData.unshift({
-          id: saved.id,
-          code: saved.codigo,
-          title: saved.titulo || title,
-          material: saved.composicao || material,
-          date: getTodayStr(),
-          desc: saved.descricao || desc,
-          status: saved.status,
-          image: pendingModalImage || saved.image || null,
-          pesoKg: saved.pesoKg ?? pesoKg,
-          quantidadePecas: saved.quantidadePecas ?? quantidadePecas,
-          briefing: saved.briefing || briefing,
-          doacoesVinculadas: saved.doacoesVinculadas || doacoesVinculadas,
-        });
-
-        renderLots();
-        closeAddModal();
-        showToast(`Lote ${saved.codigo} criado com sucesso!`);
-        return;
-      }
-
-      const lot = findLotById(currentEditingLotId);
-      if (!lot) return;
-      const nextStatus = lotStatusSelect?.value || lot.status || DEFAULT_STATUS;
-      const changes = {
-        code,
-        title,
-        material,
-        desc,
-        status: nextStatus,
-        pesoKg,
-        quantidadePecas,
-        briefing,
-        doacoesVinculadas,
-      };
-
-      if (lot.status !== nextStatus) {
-        pendingStatusChange = { lot, ...changes };
-        statusConfirmCopy.textContent = `Deseja alterar o status deste lote para “${nextStatus}”?`;
-        statusConfirmModal.classList.add("active");
-        return;
-      }
-
-      await applyLotChanges(lot, changes);
-      renderLots();
-      closeAddModal();
-      showToast("Lote atualizado com sucesso!");
-    } catch (error) {
-      if (lotFormError) {
-        lotFormError.textContent =
-          error.message || "Não foi possível salvar o lote.";
-      }
+      await applyLotChanges(findLotById(currentEditingLotId), {
+        code, title, material, desc, status: DEFAULT_STATUS, pesoKg, quantidadePecas, briefing, doacoesVinculadas,
+      });
+    } catch (err) {
+      if (lotFormError) lotFormError.textContent = err.message;
+      return;
     }
+    renderLots();
+    closeAddModal();
   });
 
-  btnAddLote?.addEventListener("click", openNewLotModal);
-  btnHeaderAddLote?.addEventListener("click", openNewLotModal);
-  addModalClose?.addEventListener("click", closeAddModal);
-  addModalCancel?.addEventListener("click", closeAddModal);
-  addModal?.addEventListener("click", (event) => {
+  btnAddLote.addEventListener("click", openNewLotModal);
+  addModalClose.addEventListener("click", closeAddModal);
+  addModalCancel.addEventListener("click", closeAddModal);
+  addModal.addEventListener("click", (event) => {
     if (event.target === addModal) closeAddModal();
   });
 
-  /* ==========================================================
-     EXCLUSÃO COM CONFIRMAÇÃO
-     ========================================================== */
-  const closeDeleteConfirm = () => {
-    deleteConfirmModal?.classList.remove("active");
-  };
+  btnDeleteLot.addEventListener("click", async () => {
+    if (currentEditingLotId === null) return;
+    try {
+      await api.excluirLote(currentEditingLotId);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
+    lotsData = lotsData.filter((lot) => lot.id !== currentEditingLotId);
+    renderLots();
+    closeAddModal();
+  });
+
+  async function createLotBatch({ code, count, title, material, desc, image, pesoKg, quantidadePecas, briefing, doacoesVinculadas }) {
+    const empresa = await api.getEmpresa();
+    for (let index = 0; index < count; index++) {
+      const saved = await api.criarLote({
+        empresaId: empresa.id,
+        codigo: code || undefined,
+        titulo: title || desc || "Novo lote têxtil",
+        descricao: desc,
+        pesoKg: pesoKg || 1,
+        quantidadePecas: quantidadePecas || 0,
+        cartilhaPadrao: empresa.cartilhaPadrao,
+        briefing: briefing || {
+          ideiaMarca: "",
+          expectativa: "",
+          liberdadeCriativa: "",
+          prazoProducaoDias: 30,
+        },
+        doacoesVinculadas: doacoesVinculadas || [],
+      });
+      lotsData.push({
+        id: saved.id,
+        code: saved.codigo,
+        date: getTodayStr(),
+        desc: saved.descricao,
+        status: saved.status,
+        image,
+        pesoKg: saved.pesoKg,
+        title: saved.titulo,
+        material,
+        quantidadePecas: saved.quantidadePecas ?? 0,
+        briefing,
+        doacoesVinculadas: doacoesVinculadas || [],
+      });
+    }
+    renderLots();
+    closeAddModal();
+  }
 
   btnDeleteLot?.addEventListener("click", () => {
     if (currentEditingLotId === null) return;
@@ -930,6 +921,7 @@ import { runWithDynamicLoading } from "../../../js/shared/loader.js";
     closeStatusConfirm();
     closeAddModal();
     if (!filterMenu.options.hidden) filterMenuControls.close();
+    if (editorMenu && !editorMenu.options.hidden) editorMenuControls?.close();
     if (editorMenu && !editorMenu.options.hidden) editorMenuControls?.close();
   });
 
