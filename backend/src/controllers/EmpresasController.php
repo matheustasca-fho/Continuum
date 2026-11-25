@@ -165,7 +165,7 @@ class EmpresasController {
         $empresa  = Empresas::obterAtual();
         $cnpj     = $empresa['cnpj'] ?? '';
         $lotes    = Lotes::listarPorEmpresa($cnpj);
-        $projetos = Projetos::listarPorEmpresa();
+        $projetos = Projetos::listarPorLotes($lotes);
 
         $periodo = strtolower(trim((string)($params['periodo'] ?? 'todos')));
         $agora   = time();

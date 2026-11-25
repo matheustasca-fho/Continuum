@@ -99,15 +99,10 @@ class Lotes {
         return '';
     }
 
-    public static function formatar(array $row, array $empresasMap = []): array {
-        require_once __DIR__ . '/Designers.php';
-        $cdLote   = (int)$row['CD_LOTE'];
-        $cdStatus = (int)($row['STATUS_LOTE'] ?? 3);
-        $dsItens  = $row['DS_ITENS'] ?? 'Lote têxtil';
-        $pesoKg   = (float)($row['PESO_LOTE'] ?? 1.0);
-
-        $state = Auth::getState();
-        $meta  = $state['lotesMeta'][(string)$cdLote] ?? [];
+    /** Meta do lote (lotesMeta) mesclada com o briefing bruto do banco. Usada por formatar e pelo filtro por empresa. */
+    private static function metaDoLote(array $row, array $state): array {
+        $cdLote = (int)$row['CD_LOTE'];
+        $meta   = $state['lotesMeta'][(string)$cdLote] ?? [];
 
         if (!empty($row['BRIEFING'])) {
             $rawBriefing = trim($row['BRIEFING']);
@@ -120,7 +115,11 @@ class Lotes {
                 $meta['briefing']['ideiaMarca'] = $rawBriefing;
             }
         }
+        return $meta;
+    }
 
+    /** Empresa dona do lote (regra única). Retorna [cnpj, mapa de empresas atualizado, empresa padrão]. */
+    private static function resolverDono(array $meta, array $empresasMap): array {
         $empresaDefault = reset($empresasMap) ?: Empresas::obterAtual();
         $defaultCnpj    = $empresaDefault['cnpj'] ?? '';
         $empresaId      = $meta['empresaId'] ?? $defaultCnpj;
@@ -133,6 +132,19 @@ class Lotes {
                 $empresaId = $defaultCnpj;
             }
         }
+        return [$empresaId, $empresasMap, $empresaDefault];
+    }
+
+    public static function formatar(array $row, array $empresasMap = []): array {
+        require_once __DIR__ . '/Designers.php';
+        $cdLote   = (int)$row['CD_LOTE'];
+        $cdStatus = (int)($row['STATUS_LOTE'] ?? 3);
+        $dsItens  = $row['DS_ITENS'] ?? 'Lote têxtil';
+        $pesoKg   = (float)($row['PESO_LOTE'] ?? 1.0);
+
+        $state = Auth::getState();
+        $meta  = self::metaDoLote($row, $state);
+        [$empresaId, $empresasMap, $empresaDefault] = self::resolverDono($meta, $empresasMap);
         $empresa = $empresasMap[$empresaId] ?? Empresas::obterPorId($empresaId) ?? $empresaDefault;
 
         $statusStr = self::codigoBancoParaStatus($cdStatus, $meta['status'] ?? null);
@@ -266,18 +278,39 @@ class Lotes {
         return $map;
     }
 
-    public static function listarTodos(): array {
+    private static function linhasLotes(): array {
         $conn = Database::getConnection();
         $sql  = "SELECT CD_LOTE, STATUS_LOTE, DS_ITENS, PESO_LOTE, BRIEFING FROM LOTES ORDER BY CD_LOTE";
         $stmt = oci_parse($conn, $sql);
         oci_execute($stmt);
-
-        $empMap = self::mapaEmpresas();
-        $lotes  = [];
+        $linhas = [];
         while ($linha = oci_fetch_assoc($stmt)) {
-            $lotes[] = self::formatar($linha, $empMap);
+            $linhas[] = $linha;
         }
         oci_free_statement($stmt);
+        return $linhas;
+    }
+
+    public static function listarTodos(): array {
+        $empMap = self::mapaEmpresas();
+        $lotes  = [];
+        foreach (self::linhasLotes() as $linha) {
+            $lotes[] = self::formatar($linha, $empMap);
+        }
+        return $lotes;
+    }
+
+    /** Lotes cujo dono é o CNPJ informado. Filtra as linhas antes de formatar (formatar é caro por lote). */
+    public static function listarDaEmpresa(string $cnpj): array {
+        $empMap = self::mapaEmpresas();
+        $state  = Auth::getState();
+        $lotes  = [];
+        foreach (self::linhasLotes() as $linha) {
+            [$dono] = self::resolverDono(self::metaDoLote($linha, $state), $empMap);
+            if ($dono === $cnpj) {
+                $lotes[] = self::formatar($linha, $empMap);
+            }
+        }
         return $lotes;
     }
 
@@ -372,16 +405,7 @@ class Lotes {
         if (!$emp) {
             return [];
         }
-        $cnpjAlvo = $emp['cnpj'];
-        $todos = self::listarTodos();
-
-        $filtrados = [];
-        foreach ($todos as $lote) {
-            if ($lote['empresaId'] === $cnpjAlvo) {
-                $filtrados[] = $lote;
-            }
-        }
-        return $filtrados;
+        return self::listarDaEmpresa($emp['cnpj']);
     }
 
     public static function listarPorDesigner(string $designerIdParam): array {

@@ -304,7 +304,8 @@ class Projetos {
         return $map;
     }
 
-    public static function listarTodos(bool $modoPublicoEstrito = false): array {
+    /** Linhas cruas de PROJETOS (sem formatar); base de listarTodos e listarPorLotes. */
+    private static function linhasProjetos(): array {
         $conn = Database::getConnection();
         $sql  = "
             SELECT p.CD_PROJETO,
@@ -327,19 +328,69 @@ class Projetos {
         ";
         $stmt = oci_parse($conn, $sql);
         oci_execute($stmt);
-
-        $lotesMap = self::mapaLotes();
-        $projetos = [];
+        $linhas = [];
         while ($row = oci_fetch_assoc($stmt)) {
-            $projetos[] = self::formatar($row, $lotesMap, $modoPublicoEstrito);
+            $linhas[] = $row;
         }
         oci_free_statement($stmt);
+        return $linhas;
+    }
+
+    public static function listarTodos(bool $modoPublicoEstrito = false): array {
+        $lotesMap = self::mapaLotes();
+        $projetos = [];
+        foreach (self::linhasProjetos() as $row) {
+            $projetos[] = self::formatar($row, $lotesMap, $modoPublicoEstrito);
+        }
+        return $projetos;
+    }
+
+    /**
+     * Projetos cujo lote está em $lotesEmpresa (lotes já formatados de uma empresa).
+     * Filtra as linhas antes de formatar: formatar cada projeto custa consultas de timeline.
+     */
+    public static function listarPorLotes(array $lotesEmpresa): array {
+        $lotesMap = [];
+        foreach ($lotesEmpresa as $l) {
+            $lotesMap[$l['id']] = $l;
+        }
+        if (!$lotesMap) {
+            return [];
+        }
+        $state = Auth::getState();
+        $projetos = [];
+        foreach (self::linhasProjetos() as $row) {
+            $meta   = $state['projetosMeta'][(string)(int)$row['CD_PROJETO']] ?? [];
+            $idLote = $meta['idLote'] ?? null;
+            if ($idLote === null || !isset($lotesMap[$idLote])) {
+                continue;
+            }
+            $projetos[] = self::formatar($row, $lotesMap);
+        }
         return $projetos;
     }
 
     public static function obterPorId($idParam, bool $modoPublicoEstrito = false): ?array {
         $alvo  = trim((string)$idParam);
         $idNum = self::extrairIdNumerico($alvo);
+        // shortcut: formata só o projeto de mesmo CD_PROJETO antes da varredura completa (extrairIdNumerico aceita CNT-QR-n).
+        // Código público customizado diferente do padrão cai na varredura.
+        if ($idNum !== null) {
+            foreach (self::linhasProjetos() as $row) {
+                if ((int)$row['CD_PROJETO'] !== $idNum) {
+                    continue;
+                }
+                $p = self::formatar($row, self::mapaLotes(), $modoPublicoEstrito);
+                if (
+                    strcasecmp($p['id'], $alvo) === 0 ||
+                    strcasecmp($p['codigoPublicoQr'], $alvo) === 0 ||
+                    ($idNum !== null && (int)$p['id'] === $idNum)
+                ) {
+                    return $p;
+                }
+                break;
+            }
+        }
         $todos = self::listarTodos($modoPublicoEstrito);
         foreach ($todos as $p) {
             if (
@@ -421,15 +472,7 @@ class Projetos {
         if (!$emp) {
             return [];
         }
-        $cnpjAlvo = $emp['cnpj'];
-
-        $filtrados = [];
-        foreach (self::listarTodos() as $p) {
-            if (($p['lote']['empresaId'] ?? null) === $cnpjAlvo) {
-                $filtrados[] = $p;
-            }
-        }
-        return $filtrados;
+        return self::listarPorLotes(Lotes::listarPorEmpresa($emp['cnpj']));
     }
 
     public static function garantirProjetoParaLote(int $cdLote, string $docDesigner, string $titulo, string $descricao): array {

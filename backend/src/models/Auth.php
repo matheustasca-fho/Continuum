@@ -172,13 +172,20 @@ class Auth {
         ];
     }
 
+    // Memo por requisição: o arquivo de estado pode passar de 300 KB (fotos em base64) e
+    // era relido a cada linha de lote/projeto. Invalidado em saveState, único ponto de escrita.
+    private static ?array $stateMemo = null;
+
     public static function getState(): array {
+        if (self::$stateMemo !== null) {
+            return self::$stateMemo;
+        }
         if (!file_exists(self::STATE_FILE)) {
-            return self::defaultState();
+            return self::$stateMemo = self::defaultState();
         }
         $raw = @file_get_contents(self::STATE_FILE);
         $data = $raw ? json_decode($raw, true) : null;
-        return is_array($data) ? array_merge(self::defaultState(), $data) : self::defaultState();
+        return self::$stateMemo = is_array($data) ? array_merge(self::defaultState(), $data) : self::defaultState();
     }
 
     public static function saveState(array $state): void {
@@ -199,6 +206,7 @@ class Auth {
             }
         }
         @file_put_contents(self::STATE_FILE, json_encode($state, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
+        self::$stateMemo = null;
     }
 
     public static function setSessao(string $perfil, array $sessaoData): array {
