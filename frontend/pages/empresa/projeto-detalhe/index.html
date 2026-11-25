@@ -21,7 +21,7 @@
     <div id="appHeader" data-role="empresa" data-active="projetos"></div>
 
     <!-- MAIN P3 -->
-    <main class="main-content">
+    <main data-skeleton class="main-content">
       <div class="header-area animate-slide-up">
         <div>
           <div class="breadcrumb">
@@ -46,20 +46,17 @@
         <div class="card">
           <h2 class="card__title">O que foi pedido (Briefing)</h2>
           <p class="briefing-copy">
-            <strong>Perfil da loja:</strong> Marca focada em streetwear
-            consciente para público jovem adulto.<br />
-            <strong>Expectativas:</strong> Transformar lotes de retalhos de
-            jeans em uma jaqueta unissex estilo oversized com recortes
-            visíveis.<br />
+            <strong>Perfil da loja:</strong> —<br />
+            <strong>Expectativas:</strong> —<br />
           </p>
           <div class="info-grid">
             <div>
               <div class="info-label">Material Fornecido</div>
-              <div class="info-val">Jeans / Denim lavado (6.5 kg)</div>
+              <div class="info-val">—</div>
             </div>
             <div>
               <div class="info-label">Lote Origem</div>
-              <div class="info-val">#L-003</div>
+              <div class="info-val">—</div>
             </div>
           </div>
         </div>
@@ -84,33 +81,13 @@
       <div>
         <div class="card">
           <h2 class="card__title">Rastreio</h2>
-          <div class="timeline">
-            <div class="tl-item tl-item--done">
-              <div class="tl-title">Cadastrado</div>
-              <div class="tl-date">10/05/2026 • Empresa Teste</div>
-            </div>
-            <div class="tl-item tl-item--done">
-              <div class="tl-title">Reservado</div>
-              <div class="tl-date">12/05/2026 • Samuel Pires</div>
-            </div>
-            <div class="tl-item tl-item--current">
-              <div class="tl-title">Em Produção</div>
-              <div class="tl-date">14/05/2026 • Material retirado</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-title u-text-muted">Finalizado</div>
-              <div class="tl-date">—</div>
-            </div>
-          </div>
+          <div class="timeline"></div>
         </div>
 
         <div class="card">
           <h2 class="card__title">Confeccionista</h2>
-          <p class="designer-name">
-            Samuel Pires
-            <span class="badge badge--finalizado badge--tiny">PF</span>
-          </p>
-          <p class="designer-email">samuel.upcycle@email.com</p>
+          <p class="designer-name">—</p>
+          <p class="designer-email"></p>
           <button class="btn btn--secondary btn--block-sm">Contatar</button>
         </div>
       </div>
@@ -119,9 +96,10 @@
     <script type="module">
       import { api } from "../../../js/shared/api.js";
       document.addEventListener("DOMContentLoaded", async () => {
-        const id = new URLSearchParams(location.search).get("id") || "1";
+        const id = new URLSearchParams(location.search).get("id");
+        if (!id) return;
         try {
-          const p = (await api.getProjeto(id)) || (await api.listarProjetosEmpresa())?.[0];
+          const p = await api.getProjeto(id);
           if (!p) return;
           const bc = document.querySelector(".breadcrumb");
           if (bc) bc.innerHTML = `<a href="../projetos/index.html">Projetos</a> › PRJ-${String(p.id).padStart(2, "0")}`;
@@ -131,16 +109,16 @@
           if (revLink) revLink.href = `../projeto-revisao/index.html?id=${encodeURIComponent(p.id)}`;
           const briefingCopy = document.querySelector(".briefing-copy");
           if (briefingCopy) {
-            briefingCopy.innerHTML = `<strong>Perfil da loja:</strong> ${p.lote?.perfil_loja || "Marca parceira focada em moda circular."}<br /><strong>Expectativas:</strong> ${p.lote?.briefing?.ideiaMarca || p.lote?.descricao || p.ds_descricao || ""}<br />`;
+            briefingCopy.innerHTML = `<strong>Perfil da loja:</strong> ${p.lote?.perfil_loja || "—"}<br /><strong>Expectativas:</strong> ${p.lote?.briefing?.ideiaMarca || p.lote?.descricao || p.ds_descricao || ""}<br />`;
           }
           const infoVals = document.querySelectorAll(".info-grid .info-val");
-          if (infoVals[0]) infoVals[0].textContent = `${p.lote?.descricao || "Material têxtil"} (${p.pesoKg ?? p.lote?.pesoKg ?? 0} kg)`;
+          if (infoVals[0]) infoVals[0].textContent = `${p.lote?.descricao || "—"} (${p.pesoKg ?? p.lote?.pesoKg ?? 0} kg)`;
           if (infoVals[1]) infoVals[1].textContent = p.codigoLote || `#L-${p.idLote}`;
           const emptyProc = document.querySelectorAll(".card .empty-state")[0];
           if (emptyProc && p.processoCriativo) emptyProc.textContent = p.processoCriativo;
           const emptyFotos = document.querySelectorAll(".card .empty-state")[1];
           if (emptyFotos && Array.isArray(p.fotos) && p.fotos.length > 0) {
-            emptyFotos.innerHTML = p.fotos.map((f) => `<span class="badge">${f}</span>`).join(" ");
+            emptyFotos.innerHTML = p.fotos.map((f) => (String(f).startsWith("data:image/") ? `<img src="${f}" alt="Foto da peça" style="max-width:160px;border-radius:8px;margin-right:8px;">` : `<span class="badge">${f}</span>`)).join(" ");
           }
           const tlContainer = document.querySelector(".timeline");
           const historico = p.acompanhamentos || p.timeline || p.historico || [];
@@ -160,7 +138,7 @@
           if (dName) {
             const notaTxt = p.designerNota != null ? ` • Nota: ★ ${p.designerNota}` : "";
             const restBadge = p.designerRestricaoAtiva ? ` <span class="badge" style="background:#b71c1c;color:#fff;">RESTRIÇÃO ATIVA</span>` : "";
-            dName.innerHTML = `${p.designer_nome || "Designer"}${notaTxt}${restBadge}`;
+            dName.innerHTML = `${p.designer_nome || "—"}${notaTxt}${restBadge}`;
           }
           const dEmail = document.querySelector(".designer-email");
           if (dEmail && p.contatoConfeccionista) {

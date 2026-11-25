@@ -35,7 +35,8 @@ document.getElementById("btn-confirma-fim").onclick = async () => {
       });
     }
     modalFinalizar.close();
-    const targetId = encodeURIComponent(projetoAtual?.id || "1");
+    if (!projetoAtual?.id) return;
+    const targetId = encodeURIComponent(projetoAtual.id);
     window.location.href = `../projeto-tag/index.html?id=${targetId}`;
   } catch (err) {
     alert(err.message);
@@ -65,7 +66,7 @@ if (btnConfirmaAjuste && modalAjuste) {
         });
       }
       modalAjuste.close();
-      window.location.href = `../projeto-detalhe/index.html?id=${encodeURIComponent(projetoAtual?.id || "1")}`;
+      window.location.href = `../projeto-detalhe/index.html?id=${encodeURIComponent(projetoAtual.id)}`;
     } catch (err) {
       alert(err.message);
     }
@@ -73,10 +74,10 @@ if (btnConfirmaAjuste && modalAjuste) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const id = new URLSearchParams(location.search).get("id") || "1";
+  const id = new URLSearchParams(location.search).get("id");
+  if (!id) return;
   try {
-    projetoAtual =
-      (await api.getProjeto(id)) || (await api.listarProjetosEmpresa())?.[0];
+    projetoAtual = await api.getProjeto(id);
     if (!projetoAtual) return;
 
     const bc = document.querySelector(".breadcrumb");
@@ -94,10 +95,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (boxes[0]) {
       boxes[0].innerHTML = `
         <strong>Material Origem</strong>
-        ${projetoAtual.lote?.descricao || "Material têxtil"} (${projetoAtual.codigoLote || `Lote #${projetoAtual.idLote}`})
+        ${projetoAtual.lote?.descricao || "—"} (${projetoAtual.codigoLote || `Lote #${projetoAtual.idLote}`})
 
         <strong>Perfil da Loja</strong>
-        ${projetoAtual.lote?.perfil_loja || "Marca parceira focada em moda circular."}
+        ${projetoAtual.lote?.perfil_loja || "—"}
 
         <strong>Expectativas e Diretrizes</strong>
         ${projetoAtual.lote?.briefing?.ideiaMarca || projetoAtual.lote?.descricao || ""}
@@ -105,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (boxes[1]) {
       boxes[1].innerHTML = `
-        <strong>Processo Criativo do Designer (${projetoAtual.designer_nome || "Designer"})</strong>
+        <strong>Processo Criativo do Designer (${projetoAtual.designer_nome || "—"})</strong>
         "${projetoAtual.processoCriativo || projetoAtual.ds_descricao || ""}"
       `;
     }

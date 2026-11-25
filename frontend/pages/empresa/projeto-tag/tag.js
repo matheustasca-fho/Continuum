@@ -1,17 +1,17 @@
 import { api } from "../../../js/shared/api.js";
 
+const QR_IMG_URL = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=";
 const canvas = document.getElementById("canvas-area");
 const sizeSelect = document.getElementById("tag-size");
 const qtyInput = document.getElementById("tag-qty");
 const showDesignerCheck = document.getElementById("tag-show-designer");
 
 let projeto = {
-  id: "1",
-  peca: "Peça Upcycling",
-  designer: "Designer",
-  material: "Material têxtil reaproveitado",
-  codigoQr: "CNT-QR-0001",
-  qrSvg: "",
+  id: "",
+  peca: "—",
+  designer: "—",
+  material: "—",
+  codigoQr: "",
   urlPublica: "",
 };
 
@@ -22,9 +22,9 @@ function renderTags() {
   const qty = parseInt(qtyInput.value, 10) || 1;
   const showDesigner = showDesignerCheck.checked;
 
-  // Renderiza o SVG real do QR Code gerado pela API (BE-13.5)
-  const qrContent = projeto.qrSvg
-    ? `<div class="qr-svg-container" data-qr-url="${projeto.urlPublica}" style="width:96px;height:96px;margin:0 auto;">${projeto.qrSvg}</div>`
+  // O QR é uma imagem de serviço externo que só recebe a URL pública da peça (sem dado pessoal)
+  const qrContent = projeto.urlPublica
+    ? `<img class="qr-img" src="${QR_IMG_URL}${encodeURIComponent(projeto.urlPublica)}" alt="QR Code ${projeto.codigoQr}" width="96" height="96" style="display:block;margin:0 auto;">`
     : `<div class="qr-code-label">${projeto.codigoQr}</div>`;
 
   const tagHTML = `
@@ -55,10 +55,9 @@ qtyInput.addEventListener("input", renderTags);
 showDesignerCheck.addEventListener("change", renderTags);
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const id = new URLSearchParams(location.search).get("id") || "1";
+  const id = new URLSearchParams(location.search).get("id");
   try {
-    const p =
-      (await api.getProjeto(id)) || (await api.listarProjetosEmpresa())?.[0];
+    const p = id ? await api.getProjeto(id) : null;
     if (p) {
       const codigoQr = p.codigoPublicoQr || `CNT-QR-${String(p.id).padStart(4, "0")}`;
       let qrInfo = null;
@@ -71,11 +70,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       projeto = {
         id: p.id,
         peca: p.tituloPeca || p.lote_nome || `Projeto #${p.id}`,
-        designer: p.designer_nome || "Designer",
-        material: p.lote?.descricao || "Material têxtil reaproveitado",
+        designer: p.designer_nome || "—",
+        material: p.lote?.descricao || "—",
         codigoQr,
-        qrSvg: qrInfo?.svg || "",
-        urlPublica: qrInfo?.urlPublica || `../peca-publica/index.html?codigo=${encodeURIComponent(codigoQr)}`,
+        urlPublica: qrInfo?.urlPublica || "",
       };
       const bc = document.querySelector(".breadcrumb");
       if (bc) {

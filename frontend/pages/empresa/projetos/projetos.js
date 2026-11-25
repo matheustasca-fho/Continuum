@@ -230,14 +230,19 @@ function abrirDrawer(p) {
     }
   });
 
-  statusOptions.addEventListener("click", (e) => {
+  statusOptions.addEventListener("click", async (e) => {
     const opt = e.target.closest(".status-menu__option");
     if (!opt) return;
     const newStatus = opt.dataset.status;
+    statusOptions.classList.remove("is-open");
+    statusTrigger.setAttribute("aria-expanded", "false");
+    try {
+      await api.alterarStatusProjeto(p.cd_projeto, newStatus);
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     p.status = newStatus;
-    api
-      .alterarStatusProjeto(p.cd_projeto, newStatus)
-      .catch((error) => alert(error.message));
 
     statusTrigger.querySelector(".status-menu__label").textContent =
       getBadgeConfig(newStatus).text;

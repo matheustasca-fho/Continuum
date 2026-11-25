@@ -15,17 +15,15 @@
     <link rel="stylesheet" href="publica.css" />
   </head>
   <body>
-    <main class="mobile-container">
+    <main data-skeleton class="mobile-container">
       <div class="topbar">
         <div class="topbar-logo">CONTINUUM</div>
       </div>
 
       <!-- Cabeçalho (Peca e Designer) -->
       <header class="hero">
-        <h1 class="hero-title">Jaqueta Upcycling</h1>
-        <p class="hero-designer">
-          por Samuel Pires <span class="hero-badge">PF</span>
-        </p>
+        <h1 class="hero-title">—</h1>
+        <p class="hero-designer">por —</p>
       </header>
 
       <div class="content-area">
@@ -33,48 +31,21 @@
         <div class="info-card info-grid">
           <div>
             <div class="info-label">Material de Origem</div>
-            <div class="info-val">Jeans lavado / Retalhos</div>
+            <div class="info-val">—</div>
           </div>
           <div>
-            <div class="info-label">Ponto de Coleta</div>
-            <div class="info-val">EcoJeans Store</div>
+            <div class="info-label">Loja</div>
+            <div class="info-val">—</div>
           </div>
         </div>
 
         <!-- História (Processo Criativo) -->
         <h2 class="section-title">O Processo</h2>
-        <blockquote class="story-block">
-          A jaqueta foi construída utilizando a técnica de moulage para
-          aproveitar 98% dos recortes do lote. As lavagens diferentes do denim
-          criaram um padrão geométrico natural. Os botões utilizados foram
-          extraídos de peças antigas danificadas que não tinham mais uso.
-        </blockquote>
+        <blockquote class="story-block"></blockquote>
 
         <!-- Linha do tempo -->
         <h2 class="section-title">A Jornada da Peça</h2>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-title">Material Descartado</div>
-            <div class="tl-desc">
-              Retalhos e peças antigas foram doadas por consumidores
-              conscientes.
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-title">Transformação no Ateliê</div>
-            <div class="tl-desc">
-              O designer Samuel Pires recriou a peça do zero, promovendo a
-              economia circular.
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-title">Disponível para você</div>
-            <div class="tl-desc">
-              Esta peça voltou à loja como um item único, sustentável e
-              exclusivo.
-            </div>
-          </div>
-        </div>
+        <div class="timeline"></div>
 
         <div class="cta-container">
           <a href="../../../index.html" class="btn">Faça parte do CONTINUUM</a>
@@ -86,17 +57,18 @@
       import { api } from "../../../js/shared/api.js";
       document.addEventListener("DOMContentLoaded", async () => {
         const params = new URLSearchParams(location.search);
-        const codigo = params.get("codigo") || params.get("id") || "CNT-QR-0001";
+        const codigo = params.get("codigo") || params.get("id");
+        if (!codigo) return;
         try {
-          const p = (await api.obterPecaPublica(codigo)) || (await api.getProjeto(codigo));
+          const p = await api.obterPecaPublica(codigo);
           if (!p) return;
           const title = document.querySelector(".hero-title");
-          if (title) title.textContent = p.tituloPeca || p.lote_nome || "Peça Upcycling";
+          if (title) title.textContent = p.tituloPeca || p.lote_nome || "—";
           const designer = document.querySelector(".hero-designer");
-          if (designer) designer.innerHTML = `por ${p.designer_nome || "Designer"} <span class="hero-badge">AUTORAL</span>`;
+          if (designer) designer.innerHTML = `por ${p.designer_nome || "—"} <span class="hero-badge">AUTORAL</span>`;
           const infoVals = document.querySelectorAll(".info-grid .info-val");
-          if (infoVals[0]) infoVals[0].textContent = p.material || p.lote?.descricao || "Material têxtil reaproveitado";
-          if (infoVals[1]) infoVals[1].textContent = p.nomeEmpresa || p.lote?.nomeEmpresa || "Empresa Parceira";
+          if (infoVals[0]) infoVals[0].textContent = p.material || p.lote?.descricao || "—";
+          if (infoVals[1]) infoVals[1].textContent = p.nomeEmpresa || p.lote?.nomeEmpresa || "—";
           const story = document.querySelector(".story-block");
           if (story && (p.processoCriativo || p.ds_descricao)) {
             story.textContent = p.processoCriativo || p.ds_descricao;
