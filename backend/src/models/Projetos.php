@@ -169,17 +169,18 @@ class Projetos {
         $state = Auth::getState();
         $meta  = $state['projetosMeta'][(string)$cdProjeto] ?? [];
 
-        $idLote = $meta['idLote'] ?? (isset($lotesMap[(string)($cdProjeto + 100)]) ? (string)($cdProjeto + 100) : (string)$cdProjeto);
-        $lote   = $lotesMap[$idLote] ?? reset($lotesMap) ?: null;
+        $idLote = $meta['idLote'] ?? null;
+        $lote   = $idLote !== null ? ($lotesMap[$idLote] ?? null) : null;
 
-        $docDesigner  = trim($row['CPF_CNPJ_CONFECCIONISTA'] ?? '') ?: ($meta['idDesigner'] ?? '12345678901');
-        $nomeDesigner = $row['NM_CONFECCIONISTA'] ?: ($meta['nomeDesigner'] ?? 'Maria da Silva');
+        $docDesigner  = trim($row['CPF_CNPJ_CONFECCIONISTA'] ?? '') ?: ($meta['idDesigner'] ?? '');
+        $nomeDesigner = $row['NM_CONFECCIONISTA'] ?: ($meta['nomeDesigner'] ?? '');
 
         $statusStr  = self::codigoProjetoParaStatus($cdStatus, $meta['status'] ?? null);
         $tituloPeca = $meta['tituloPeca'] ?? ($row['NM_PROJETO'] ?: ($lote['titulo'] ?? ('Projeto #' . $cdProjeto)));
-        $processo   = $meta['processoCriativo'] ?? ($row['DS_PROCESSO_CRIATIVO'] ?: ($row['DS_PROJETO'] ?? ($lote['descricao'] ?? '')));
+        // o relato do designer só existe depois que ele escreve; a descrição do lote não conta como processo criativo
+        $processo   = $meta['processoCriativo'] ?? ($row['DS_PROCESSO_CRIATIVO'] ?: '');
         $descricao  = $meta['descricao'] ?? ($row['DS_PROJETO'] ?: $processo);
-        $nomeEmpresa = $lote['nomeEmpresa'] ?? 'Têxtil Brasil';
+        $nomeEmpresa = $lote['nomeEmpresa'] ?? '';
         $codigoQr   = 'CNT-QR-' . str_pad((string)$cdProjeto, 4, '0', STR_PAD_LEFT);
 
         $timeline = self::montarHistoricoETimeline($cdProjeto, $lote ? (int)$lote['cdLote'] : null, $nomeEmpresa, $nomeDesigner, $meta);
@@ -215,6 +216,15 @@ class Projetos {
         ] : null;
 
         if ($modoPublicoEstrito) {
+            // Registros antigos podem ter CPF/CNPJ no texto do rastreamento: nada disso sai na resposta pública
+            $timelinePublica = array_map(function ($ev) {
+                foreach (['titulo', 'evento'] as $k) {
+                    if (isset($ev[$k])) {
+                        $ev[$k] = trim(preg_replace('/\(\s*\)/', '', preg_replace('/\b\d{11}(\d{3})?\b/', '', (string)$ev[$k])));
+                    }
+                }
+                return $ev;
+            }, $timeline);
             // Regra BE-13.1 e BE-13.2: Nenhum dado pessoal (CPF, e-mail, telefone, endereço) na resposta pública da peça
             return [
                 'id'               => (string)$cdProjeto,
@@ -237,8 +247,8 @@ class Projetos {
                 'quantidadePecas'  => (int)($meta['quantidadePecas'] ?? ($lote['quantidadePecas'] ?? 10)),
                 'fotos'            => $fotos,
                 'lote'             => $lotePublico,
-                'timeline'         => $timeline,
-                'historico'        => $timeline,
+                'timeline'         => $timelinePublica,
+                'historico'        => $timelinePublica,
             ];
         }
 
@@ -254,7 +264,6 @@ class Projetos {
             'designerRestricaoAtiva'=> $dadosInternosDesigner['restricaoAtiva'],
             'contatoConfeccionista' => [
                 'nome'           => $nomeDesigner,
-                'instagram'      => '@atelie.' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $nomeDesigner)),
                 'canalContato'   => 'Mensagem interna CONTINUUM',
                 'nota'           => $dadosInternosDesigner['nota'],
                 'restricaoAtiva' => $dadosInternosDesigner['restricaoAtiva'],
@@ -359,8 +368,22 @@ class Projetos {
         return $p;
     }
 
+    /** Endereço do front onde a página pública da peça está publicada (QR impresso precisa apontar para ele, não para a API). */
+    private static function urlDoFront(): string {
+        $env = getenv('FRONTEND_URL');
+        if ($env) {
+            return rtrim($env, '/');
+        }
+        $ref = $_SERVER['HTTP_REFERER'] ?? '';
+        $i = strpos($ref, '/pages/');
+        if ($i !== false) {
+            return substr($ref, 0, $i);
+        }
+        return 'http://127.0.0.1:5500/frontend';
+    }
+
     /**
-     * BE-13.5: Gera SVG de QR Code contendo a URL pública real e decodificável da peça
+     * BE-13.5: URL pública da peça; a imagem do QR é gerada pelo front a partir dela.
      */
     public static function gerarQrCodePublico(string $codigoOuId): ?array {
         $p = self::obterPorId($codigoOuId, true);
@@ -368,67 +391,25 @@ class Projetos {
             return null;
         }
         $cdPub = $p['codigoPublicoQr'];
-        $urlPublica = "http://localhost:8000/pages/empresa/peca-publica/index.html?codigo={$cdPub}&id={$p['id']}";
-
-        // Constrói matriz 21x21 determinística com padrões finder QR e bits da URL
-        $hashBits = '';
-        $hashRaw = hash('sha256', $urlPublica, true) . hash('sha256', $cdPub, true);
-        for ($i = 0; $i < strlen($hashRaw); $i++) {
-            $hashBits .= str_pad(decbin(ord($hashRaw[$i])), 8, '0', STR_PAD_LEFT);
-        }
-
-        $rects = '';
-        $bitIdx = 0;
-        for ($r = 0; $r < 21; $r++) {
-            for ($c = 0; $c < 21; $c++) {
-                $isFinder = ($r < 7 && $c < 7) || ($r < 7 && $c >= 14) || ($r >= 14 && $c < 7);
-                $on = false;
-                if ($isFinder) {
-                    $lr = $r >= 14 ? $r - 14 : $r;
-                    $lc = $c >= 14 ? $c - 14 : $c;
-                    if ($lr === 0 || $lr === 6 || $lc === 0 || $lc === 6 || ($lr >= 2 && $lr <= 4 && $lc >= 2 && $lc <= 4)) {
-                        $on = true;
-                    }
-                } else {
-                    $on = ($hashBits[$bitIdx % strlen($hashBits)] === '1');
-                    $bitIdx++;
-                }
-                if ($on) {
-                    $x = 10 + ($c * 8);
-                    $y = 10 + ($r * 8);
-                    $rects .= "<rect x=\"{$x}\" y=\"{$y}\" width=\"8\" height=\"8\" fill=\"#111111\"/>";
-                }
-            }
-        }
-
-        $urlEsc = htmlspecialchars($urlPublica, ENT_QUOTES, 'UTF-8');
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 188 188" width="188" height="188" data-qr-url="' . $urlEsc . '" data-cd-publico="' . htmlspecialchars($cdPub, ENT_QUOTES, 'UTF-8') . '">'
-            . '<title>QR Code ' . htmlspecialchars($cdPub, ENT_QUOTES, 'UTF-8') . '</title>'
-            . '<desc id="qr-decoded-url">' . $urlEsc . '</desc>'
-            . '<rect width="188" height="188" fill="#FFFFFF"/>'
-            . $rects
-            . '</svg>';
+        $urlPublica = self::urlDoFront() . '/pages/empresa/peca-publica/index.html?codigo=' . rawurlencode($cdPub);
 
         return [
-            'idProjeto'          => $p['id'],
-            'codigoPublicoQr'    => $cdPub,
-            'urlPublica'         => $urlPublica,
-            'payloadDecodificado'=> $urlPublica,
-            'svg'                => $svg,
+            'idProjeto'           => $p['id'],
+            'codigoPublicoQr'     => $cdPub,
+            'urlPublica'          => $urlPublica,
+            'payloadDecodificado' => $urlPublica,
         ];
     }
 
     public static function listarPorDesigner(string $designerIdParam): array {
         $doc = Designers::extrairDocumento($designerIdParam);
         if ($doc === '') {
-            $atual = Designers::obterAtual(false);
-            $doc = $atual['documento'] ?? '12345678901';
+            return [];
         }
 
-        $todos = self::listarTodos();
-        $meus  = [];
-        foreach ($todos as $p) {
-            if ($p['idDesigner'] === $doc || ($doc === '12345678901' && empty($p['idDesigner']))) {
+        $meus = [];
+        foreach (self::listarTodos() as $p) {
+            if ($p['idDesigner'] === $doc) {
                 $meus[] = $p;
             }
         }
@@ -437,13 +418,14 @@ class Projetos {
 
     public static function listarPorEmpresa(): array {
         $emp = Empresas::obterAtual();
-        $cnpjAlvo = $emp['cnpj'] ?? '12345678000190';
-        $todos = self::listarTodos();
+        if (!$emp) {
+            return [];
+        }
+        $cnpjAlvo = $emp['cnpj'];
 
         $filtrados = [];
-        foreach ($todos as $p) {
-            $empLote = $p['lote']['empresaId'] ?? $cnpjAlvo;
-            if ($empLote === $cnpjAlvo) {
+        foreach (self::listarTodos() as $p) {
+            if (($p['lote']['empresaId'] ?? null) === $cnpjAlvo) {
                 $filtrados[] = $p;
             }
         }
@@ -455,20 +437,6 @@ class Projetos {
         foreach (($state['projetosMeta'] ?? []) as $cdProj => $pMeta) {
             if ((int)($pMeta['idLote'] ?? 0) === $cdLote) {
                 return self::alterarStatus((string)$cdProj, 'EM PRODUÇÃO', [], true);
-            }
-        }
-
-        if ($cdLote >= 101 && $cdLote <= 103) {
-            $seedProjId = $cdLote - 100;
-            $existente = self::obterPorId($seedProjId);
-            if ($existente) {
-                $state['projetosMeta'][(string)$seedProjId] = [
-                    'idLote'     => (string)$cdLote,
-                    'idDesigner' => $docDesigner,
-                    'status'     => 'EM PRODUÇÃO',
-                ];
-                Auth::saveState($state);
-                return self::alterarStatus((string)$seedProjId, 'EM PRODUÇÃO', [], true);
             }
         }
 
@@ -486,7 +454,8 @@ class Projetos {
             VALUES (:cd, SYSTIMESTAMP, :proc, :nm, :ds, :doc)
         ");
         oci_bind_by_name($ins, ':cd', $cdProjeto);
-        oci_bind_by_name($ins, ':proc', $dsProj);
+        $semProcesso = null;
+        oci_bind_by_name($ins, ':proc', $semProcesso);
         oci_bind_by_name($ins, ':nm', $nmProj);
         oci_bind_by_name($ins, ':ds', $dsProj);
         oci_bind_by_name($ins, ':doc', $docDesigner);
@@ -544,14 +513,23 @@ class Projetos {
                 if (!in_array($projeto['status'], ['ENVIADO PARA A LOJA', 'CONCLUÍDO', 'FINALIZADO'], true)) {
                     throw new InvalidArgumentException('Um projeto que ainda está EM PRODUÇÃO não pode ser finalizado antes de ser enviado para a loja pelo confeccionista.');
                 }
-                // Regra BE-12.1: Verifica checklist se enviado
-                if (isset($dados['checklist'])) {
-                    $chk = is_array($dados['checklist']) ? $dados['checklist'] : [];
-                    $marcados = array_filter($chk, fn($v) => (bool)$v === true);
-                    if (count($marcados) < 4) {
-                        throw new InvalidArgumentException('Todos os 4 itens do checklist de inspeção física devem estar marcados para aprovar e finalizar o projeto.');
-                    }
+                // Regra BE-12.1: o checklist de 4 itens é obrigatório e deve vir completo
+                $chk = is_array($dados['checklist'] ?? null) ? $dados['checklist'] : [];
+                $marcados = array_filter($chk, fn($v) => (bool)$v === true);
+                if (count($marcados) < 4) {
+                    throw new InvalidArgumentException('Todos os 4 itens do checklist de inspeção física devem estar marcados para aprovar e finalizar o projeto.');
                 }
+            }
+
+            // Regra BE-03: a empresa só decide sobre peça já enviada pelo confeccionista; as demais etapas têm dono próprio
+            $transicoesDaEmpresa = [
+                'ENVIADO PARA A LOJA' => ['FINALIZADO', 'EM AJUSTE', 'FINALIZADO — NÃO APROVEITADO'],
+            ];
+            if ($novoStatusNorm === $projeto['status']) {
+                return $projeto;
+            }
+            if (!in_array($novoStatusNorm, $transicoesDaEmpresa[$projeto['status']] ?? [], true)) {
+                throw new InvalidArgumentException("Transição não permitida: de '{$projeto['status']}' para '{$novoStatusNorm}'.");
             }
 
             // Regra BE-12.3 e BE-12.4: Solicitar ajuste exige motivo obrigatório
@@ -579,13 +557,13 @@ class Projetos {
 
         if ($novoStatusNorm === 'FINALIZADO') {
             $pMeta['finalizadoEm']      = date('c');
-            $pMeta['checklistInspecao'] = $dados['checklist'] ?? [true, true, true, true];
+            $pMeta['checklistInspecao'] = $dados['checklist'] ?? $pMeta['checklistInspecao'] ?? null;
             $pMeta['timeline'][] = [
                 'id'     => 'TL-FIN-' . $cdProjeto . '-' . time(),
                 'status' => 'FINALIZADO',
                 'titulo' => 'Inspeção física de 4 etapas concluída e peça aprovada pela loja.',
                 'evento' => 'Inspeção física de 4 etapas concluída e peça aprovada pela loja.',
-                'autor'  => $projeto['lote']['nomeEmpresa'] ?? 'Empresa Parceira',
+                'autor'  => $projeto['lote']['nomeEmpresa'] ?? '',
                 'data'   => date('c'),
             ];
             Notificacoes::registrar(
@@ -604,7 +582,7 @@ class Projetos {
                 'status' => 'EM AJUSTE',
                 'titulo' => 'Ajuste solicitado pela loja: ' . $motivoAjuste,
                 'evento' => 'Ajuste solicitado pela loja: ' . $motivoAjuste,
-                'autor'  => $projeto['lote']['nomeEmpresa'] ?? 'Empresa Parceira',
+                'autor'  => $projeto['lote']['nomeEmpresa'] ?? '',
                 'data'   => date('c'),
             ];
             Notificacoes::registrar(
@@ -712,7 +690,7 @@ class Projetos {
         Notificacoes::registrar(
             'PECA_ENVIADA_LOJA',
             'empresa',
-            (string)($projeto['lote']['empresaId'] ?? '12345678000190'),
+            (string)($projeto['lote']['empresaId'] ?? ''),
             'Peça concluída e enviada para revisão',
             "O confeccionista concluiu o projeto '{$tituloPeca}' e enviou para revisão física da loja.",
             (string)$cdProjeto

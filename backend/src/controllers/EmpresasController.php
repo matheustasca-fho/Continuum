@@ -163,7 +163,7 @@ class EmpresasController {
      */
     private function calcularIndicadoresEmpresa(array $params): array {
         $empresa  = Empresas::obterAtual();
-        $cnpj     = $empresa['cnpj'] ?? '12345678000190';
+        $cnpj     = $empresa['cnpj'] ?? '';
         $lotes    = Lotes::listarPorEmpresa($cnpj);
         $projetos = Projetos::listarPorEmpresa();
 
@@ -345,7 +345,7 @@ class EmpresasController {
                 'toneladasRedirecionadas' => $toneladas,
                 'aguaEconomizadaLitros'   => $aguaLitros,
                 'co2EvitadoKg'            => $co2Kg,
-                'marcasFomentadas'        => max(1, count($designersSet)),
+                'marcasFomentadas'        => count($designersSet),
                 'fatoresConversao'        => [
                     'aguaLitrosPorKg' => Auth::FATOR_AGUA_LITROS_POR_KG,
                     'co2KgPorKg'      => Auth::FATOR_CO2_KG_POR_KG,
@@ -404,7 +404,7 @@ class EmpresasController {
             $svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520">'
                 . '<rect width="800" height="520" fill="#F5F2EB" stroke="#782736" stroke-width="8"/>'
                 . '<text x="400" y="70" text-anchor="middle" font-family="Anton, sans-serif" font-size="32" fill="#782736">CERTIFICADO DE SUSTENTABILIDADE ESG — CONTINUUM</text>'
-                . '<text x="400" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#1E1E1E">' . htmlspecialchars($emp['nomeFantasia'] ?? 'Empresa Parceira', ENT_QUOTES, 'UTF-8') . ' (CNPJ ' . htmlspecialchars($emp['cnpj'] ?? '', ENT_QUOTES, 'UTF-8') . ')</text>'
+                . '<text x="400" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#1E1E1E">' . htmlspecialchars($emp['nomeFantasia'] ?? '', ENT_QUOTES, 'UTF-8') . ' (CNPJ ' . htmlspecialchars($emp['cnpj'] ?? '', ENT_QUOTES, 'UTF-8') . ')</text>'
                 . '<text x="400" y="200" text-anchor="middle" font-family="Space Mono, monospace" font-size="18" fill="#333">Resíduos Redirecionados: ' . $imp['kgRedirecionados'] . ' kg (' . $imp['toneladasRedirecionadas'] . ' t)</text>'
                 . '<text x="400" y="240" text-anchor="middle" font-family="Space Mono, monospace" font-size="18" fill="#333">Economia de Água Estimada: ' . $imp['aguaEconomizadaLitros'] . ' Litros</text>'
                 . '<text x="400" y="280" text-anchor="middle" font-family="Space Mono, monospace" font-size="18" fill="#333">Emissões de CO2 Evitadas: ' . $imp['co2EvitadoKg'] . ' kg CO2</text>'

@@ -45,7 +45,7 @@ class Empresas {
         $meta   = $state['empresasMeta'][$digits] ?? [];
 
         $ativa = ((int)($row['SITUACAO_CADASTRAL'] ?? 1)) === 1;
-        $nomeFantasia = $row['NM_FANTASIA'] ?? 'Empresa Parceira';
+        $nomeFantasia = $row['NM_FANTASIA'] ?? '';
         $cepVal = trim($row['CEP'] ?? '');
 
         if ($cepVal === '20040002' || $digits === '11444777000161') {
@@ -68,17 +68,15 @@ class Empresas {
             'bairro'                => $row['BAIRRO'] ?: ($meta['bairro'] ?? ''),
             'cidade'                => $cidadeEfetiva,
             'uf'                    => $ufEfetiva,
-            'horariosFuncionamento' => $meta['horariosFuncionamento'] ?? [
-                ['diaSemana' => 'Segunda a sexta', 'abertura' => '10:00', 'fechamento' => '18:00']
-            ],
-            'horarioRetirada'       => $meta['horarioRetirada'] ?? 'Seg a Sex das 10h às 18h',
+            'horariosFuncionamento' => $meta['horariosFuncionamento'] ?? [],
+            'horarioRetirada'       => $meta['horarioRetirada'] ?? '',
             'aceitaRetirada'        => ((int)($row['ACEITA_RETIRADA'] ?? 1)) === 1,
-            'segmento'              => $row['SEGMENTO'] ?? 'Moda Sustentável',
+            'segmento'              => $row['SEGMENTO'] ?? '',
             'porte'                 => $row['PORTE'] ?? '',
-            'perfilLoja'            => $row['DS_SOBRE_MIM'] ?? 'Marca parceira focada em moda circular.',
-            'sobre'                 => $row['DS_SOBRE_MIM'] ?? 'Marca parceira focada em moda circular.',
+            'perfilLoja'            => $row['DS_SOBRE_MIM'] ?? '',
+            'sobre'                 => $row['DS_SOBRE_MIM'] ?? '',
             'logo'                  => $row['URL_LOGO'] ?? '',
-            'frete'                 => $meta['frete'] ?? 'Frete por conta do designer',
+            'frete'                 => $meta['frete'] ?? '',
             'cartilhaPadrao'        => $meta['cartilhaPadrao'] ?? [
                 'versao'       => 'v1.0',
                 'conteudo'     => 'Acabamento limpo e higienização adequada.',
@@ -92,8 +90,8 @@ class Empresas {
                 'plano'           => 'Parceiro Circular',
                 'valorFicticio'   => 299.9,
                 'status'          => $ativa ? 'ATIVA' : 'AGUARDANDO PAGAMENTO',
-                'bandeiraCartao'  => $meta['bandeiraCartao'] ?? 'VISA',
-                'ultimos4Digitos' => $meta['ultimos4Digitos'] ?? '4242',
+                'bandeiraCartao'  => $meta['bandeiraCartao'] ?? '',
+                'ultimos4Digitos' => $meta['ultimos4Digitos'] ?? '',
             ],
         ];
     }
@@ -136,52 +134,14 @@ class Empresas {
             return $user;
         }
 
-        $emp = self::obterPorId($digits);
-        if (!$emp) {
-            return null;
-        }
-
-        $emailPadrao = $digits === '12345678000190' ? 'admin@loja.com' : "admin.{$digits}@continuum.com";
-        $nomeAdmin   = 'Admin ' . ($emp['nomeFantasia'] ?: 'Loja');
-        $senhaHash   = password_hash('empresa123', PASSWORD_BCRYPT);
-        $telefone    = '11999999999';
-        $perfil      = 'ADMIN';
-        $ativo       = 1;
-
-        $ins = oci_parse($conn, "
-            INSERT INTO USUARIO_EMPRESA (CNPJ_EMPRESA, NM_USUARIO, EMAIL, SENHA_HASH, TELEFONE, PERFIL, ST_ATIVO)
-            VALUES (:cnpj, :nome, :email, :hash, :tel, :perfil, :ativo)
-        ");
-        oci_bind_by_name($ins, ':cnpj', $digits);
-        oci_bind_by_name($ins, ':nome', $nomeAdmin);
-        oci_bind_by_name($ins, ':email', $emailPadrao);
-        oci_bind_by_name($ins, ':hash', $senhaHash);
-        oci_bind_by_name($ins, ':tel', $telefone);
-        oci_bind_by_name($ins, ':perfil', $perfil);
-        oci_bind_by_name($ins, ':ativo', $ativo);
-        @oci_execute($ins, OCI_COMMIT_ON_SUCCESS);
-        oci_free_statement($ins);
-
-        $stmt = oci_parse($conn, $sql);
-        oci_bind_by_name($stmt, ':cnpj', $digits);
-        oci_execute($stmt);
-        $user = oci_fetch_assoc($stmt);
-        oci_free_statement($stmt);
-
-        return $user ?: null;
+        // Sem usuário cadastrado não há admin implícito: nada de conta criada com senha padrão.
+        return null;
     }
 
     public static function buscarUsuarioLogin(string $identificador): ?array {
         $conn   = Database::getConnection();
         $digits = self::extrairCnpj($identificador);
         $lower  = Auth::norm($identificador);
-
-        if ($lower === 'empresa') {
-            $emp = self::obterAtual();
-            if ($emp) {
-                return self::garantirAdminEmpresa($emp['cnpj']);
-            }
-        }
 
         // 1. Por e-mail na tabela USUARIO_EMPRESA
         $sql = "SELECT ID_USUARIO, CNPJ_EMPRESA, NM_USUARIO, EMAIL, SENHA_HASH, TELEFONE, PERFIL, ST_ATIVO,
@@ -195,11 +155,6 @@ class Empresas {
         oci_free_statement($stmt);
         if ($row) {
             return $row;
-        }
-
-        // 2. Se for o e-mail demo admin@loja.com e ainda não existir, garante admin da primeira empresa ativa
-        if ($lower === 'admin@loja.com') {
-            return self::garantirAdminEmpresa('12345678000190');
         }
 
         // 3. Por CNPJ da empresa
@@ -262,20 +217,7 @@ class Empresas {
             }
         }
 
-        $conn = Database::getConnection();
-        $stmt = oci_parse($conn, self::SELECT_BASE . " WHERE e.SITUACAO_CADASTRAL = 1 ORDER BY CASE WHEN TRIM(e.CNPJ) = '12345678000190' THEN 0 ELSE 1 END, e.CNPJ FETCH FIRST 1 ROWS ONLY");
-        oci_execute($stmt);
-        $row = oci_fetch_assoc($stmt);
-        oci_free_statement($stmt);
-
-        if (!$row) {
-            $stmt = oci_parse($conn, self::SELECT_BASE . " FETCH FIRST 1 ROWS ONLY");
-            oci_execute($stmt);
-            $row = oci_fetch_assoc($stmt);
-            oci_free_statement($stmt);
-        }
-
-        return $row ? self::formatar($row) : null;
+        return null; // sem sessão de empresa não há empresa "atual"
     }
 
     private static function salvarOuAtualizarEmpresaEAdmin(array $dadosEmpresa, array $dadosAdmin, int $situacaoCadastral, array $pagamento = []): array {
@@ -313,7 +255,7 @@ class Empresas {
             $ufIn
         );
 
-        $nmFantasia     = mb_substr(trim((string)($dadosEmpresa['nomeFantasia'] ?? $dadosEmpresa['razaoSocial'] ?? 'Empresa Parceira')), 0, 100);
+        $nmFantasia     = mb_substr(trim((string)($dadosEmpresa['nomeFantasia'] ?? $dadosEmpresa['razaoSocial'] ?? '')), 0, 100);
         $nrEndereco     = mb_substr(trim((string)($dadosEmpresa['numero'] ?? '')), 0, 4);
         $dsComplemento  = mb_substr(trim((string)($dadosEmpresa['complemento'] ?? '')), 0, 100);
         $aceitaRetirada = (!isset($dadosEmpresa['aceitaRetirada']) || !empty($dadosEmpresa['aceitaRetirada'])) ? 1 : 0;
@@ -421,12 +363,10 @@ class Empresas {
             'cidade'                => $cidadeIn,
             'bairro'                => trim((string)($dadosEmpresa['bairro'] ?? '')),
             'logradouro'            => trim((string)($dadosEmpresa['logradouro'] ?? '')),
-            'horariosFuncionamento' => $dadosEmpresa['horariosFuncionamento'] ?? [
-                ['diaSemana' => 'Segunda a sábado', 'abertura' => '10:00', 'fechamento' => '18:00']
-            ],
-            'horarioRetirada'       => $dadosEmpresa['horarioRetirada'] ?? 'Seg a Sex das 10h às 18h',
-            'bandeiraCartao'        => $pagamento['bandeiraCartao'] ?? 'VISA',
-            'ultimos4Digitos'       => substr(Auth::onlyDigits($pagamento['ultimos4Digitos'] ?? '4242'), -4) ?: '4242',
+            'horariosFuncionamento' => $dadosEmpresa['horariosFuncionamento'] ?? [],
+            'horarioRetirada'       => $dadosEmpresa['horarioRetirada'] ?? '',
+            'bandeiraCartao'        => $pagamento['bandeiraCartao'] ?? '',
+            'ultimos4Digitos'       => substr(Auth::onlyDigits($pagamento['ultimos4Digitos'] ?? ''), -4),
         ]);
         Auth::saveState($state);
 
@@ -850,10 +790,7 @@ class Empresas {
             }
         }
 
-        return [
-            'razaoSocial'  => 'Empresa Demonstrativa LTDA',
-            'nomeFantasia' => 'Empresa Parceira',
-        ];
+        return ['razaoSocial' => '', 'nomeFantasia' => ''];
     }
 
     public static function formatarDoacao(array $row): array {
@@ -1012,7 +949,7 @@ class Empresas {
 
         if ($cicloRes !== null) {
             $ultima['ciclosPorLoja'] = $cicloRes['ciclosPorLoja'];
-            $ultima['cuponsGerados'] = $cicloRes['cuponsCiclo'];
+            $ultima['cuponsGerados'] = $cicloRes['cuponsNovos'] ?? [];
         }
 
         return $ultima;

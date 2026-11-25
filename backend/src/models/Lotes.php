@@ -96,7 +96,7 @@ class Lotes {
         if (strpos($d, 'seda') !== false)  return 'seda';
         if (strpos($d, 'metal') !== false || strpos($d, 'bot') !== false || strpos($d, 'ziper') !== false) return 'metal';
         if (strpos($d, 'algod') !== false) return 'algodão';
-        return 'algodão';
+        return '';
     }
 
     public static function formatar(array $row, array $empresasMap = []): array {
@@ -122,7 +122,7 @@ class Lotes {
         }
 
         $empresaDefault = reset($empresasMap) ?: Empresas::obterAtual();
-        $defaultCnpj    = $empresaDefault['cnpj'] ?? '12345678000190';
+        $defaultCnpj    = $empresaDefault['cnpj'] ?? '';
         $empresaId      = $meta['empresaId'] ?? $defaultCnpj;
         if (stripos($empresaId, 'EMP-') === 0 || (!empty($empresasMap) && !isset($empresasMap[$empresaId]))) {
             $empLookup = Empresas::obterPorId($empresaId);
@@ -140,8 +140,8 @@ class Lotes {
         $titulo    = $meta['titulo'] ?? $dsItens;
         $briefing  = array_merge([
             'ideiaMarca'        => $dsItens,
-            'expectativa'       => 'Reaproveitamento criativo',
-            'liberdadeCriativa' => 'Livre',
+            'expectativa'       => '',
+            'liberdadeCriativa' => '',
             'prazoProducaoDias' => 30,
         ], is_array($meta['briefing'] ?? null) ? $meta['briefing'] : []);
 
@@ -208,15 +208,15 @@ class Lotes {
             'descricao'           => $dsItens,
             'pesoKg'              => $pesoKg,
             'peso'                => str_replace('.', ',', (string)$pesoKg) . ' kg',
-            'quantidadePecas'     => (int)($meta['quantidadePecas'] ?? 12),
-            'composicao'          => $meta['composicao'] ?? '100% têxtil reaproveitado',
+            'quantidadePecas'     => (int)($meta['quantidadePecas'] ?? 0),
+            'composicao'          => $meta['composicao'] ?? '',
             'empresaId'           => $empresaId,
             'lojaId'              => $empresaId,
-            'nomeEmpresa'         => $empresa['nomeFantasia'] ?? 'Empresa Parceira',
-            'empresaParceira'     => $empresa['nomeFantasia'] ?? 'Empresa Parceira',
+            'nomeEmpresa'         => $empresa['nomeFantasia'] ?? '',
+            'empresaParceira'     => $empresa['nomeFantasia'] ?? '',
             'loja'                => [
                 'id'              => $empresaId,
-                'nome'            => $empresa['nomeFantasia'] ?? 'Empresa Parceira',
+                'nome'            => $empresa['nomeFantasia'] ?? '',
                 'sobre'           => $empresa['perfilLoja'] ?? '',
                 'endereco'        => trim(($empresa['logradouro'] ?? '') . ', ' . ($empresa['numero'] ?? '') . ' - ' . ($empresa['cidade'] ?? 'São Paulo') . '/' . ($empresa['uf'] ?? 'SP')),
                 'horarioRetirada' => $empresa['horarioRetirada'] ?? 'Seg a Sex das 10h às 18h',
@@ -250,7 +250,6 @@ class Lotes {
             'retiradaConfirmadaEm'=> $meta['retiradaConfirmadaEm'] ?? null,
             'entregaRegistrada'   => !empty($meta['entregaRegistrada']),
             'recebidoEm'          => $meta['recebidoEm'] ?? null,
-            'distancia'           => '3,2 km',
             'material'            => $meta['material'] ?? self::inferirMaterial($dsItens . ' ' . $titulo),
             'tipo'                => 'tecido',
             'logistica_aceita'    => $logisticaAceita,
@@ -369,8 +368,11 @@ class Lotes {
     }
 
     public static function listarPorEmpresa(string $empresaIdParam): array {
-        $emp = Empresas::obterPorId($empresaIdParam) ?? Empresas::obterAtual();
-        $cnpjAlvo = $emp['cnpj'] ?? '12345678000190';
+        $emp = Empresas::obterPorId($empresaIdParam);
+        if (!$emp) {
+            return [];
+        }
+        $cnpjAlvo = $emp['cnpj'];
         $todos = self::listarTodos();
 
         $filtrados = [];
@@ -475,18 +477,21 @@ class Lotes {
         $descricao   = trim((string)($dados['descricao'] ?? $dados['descricaoItens'] ?? $titulo));
         $dsItensCol  = mb_substr($descricao ?: $titulo, 0, 200);
         $peso        = (float)($dados['pesoKg'] ?? $dados['pesoLote'] ?? 1.0);
-        $qtdPecas    = (int)($dados['quantidadePecas'] ?? 12);
+        $qtdPecas    = (int)($dados['quantidadePecas'] ?? 0);
 
         $empAtual    = !empty($dados['empresaId']) ? Empresas::obterPorId((string)$dados['empresaId']) : null;
         if (!$empAtual) {
             $empAtual = Empresas::obterAtual();
         }
-        $empresaCnpj = $empAtual['cnpj'] ?? '12345678000190';
+        $empresaCnpj = $empAtual['cnpj'] ?? '';
+        if ($empresaCnpj === '') {
+            throw new InvalidArgumentException('Empresa não identificada para cadastrar o lote.');
+        }
         $codigo      = trim((string)($dados['codigo'] ?? ('L' . str_pad((string)$cdLote, 3, '0', STR_PAD_LEFT) . date('dmY'))));
         $briefing    = is_array($dados['briefing'] ?? null) ? $dados['briefing'] : [
             'ideiaMarca'        => is_string($dados['briefing'] ?? null) ? $dados['briefing'] : $dsItensCol,
-            'expectativa'       => 'Reaproveitamento criativo',
-            'liberdadeCriativa' => 'Livre',
+            'expectativa'       => '',
+            'liberdadeCriativa' => '',
             'prazoProducaoDias' => 30,
         ];
 
@@ -554,7 +559,7 @@ class Lotes {
         $state['lotesMeta'][(string)$cdLote] = $metaPayload;
         Auth::saveState($state);
 
-        self::registrarRastreamento($cdLote, $cdStatus, 'Lote cadastrado e publicado na plataforma por ' . ($empAtual['nomeFantasia'] ?? 'Empresa Parceira') . '.');
+        self::registrarRastreamento($cdLote, $cdStatus, 'Lote cadastrado e publicado na plataforma por ' . ($empAtual['nomeFantasia'] ?? '') . '.');
 
         return self::obterPorCodigoOuId($cdLote);
     }
@@ -971,7 +976,10 @@ class Lotes {
         @oci_execute($stmt, OCI_COMMIT_ON_SUCCESS);
         oci_free_statement($stmt);
 
-        $docDesigner = $donoReserva ?: (Designers::obterAtual(false)['documento'] ?? '12345678901');
+        if ($donoReserva === '') {
+            throw new InvalidArgumentException('Este lote não possui uma reserva de confeccionista.');
+        }
+        $docDesigner = $donoReserva;
         $recebidoEm  = date('c');
         $prazoProducaoIso = Auth::adicionarDiasUteis($recebidoEm, 10)->format('Y-m-d');
 
@@ -982,7 +990,8 @@ class Lotes {
         $state['lotesMeta'][(string)$cdLote] = $meta;
         Auth::saveState($state);
 
-        self::registrarRastreamento($cdLote, $cdStatus, "Recebimento confirmado pelo confeccionista ({$docDesigner}). Lote em produção.");
+        $nomeDesigner = Designers::obterPorId($docDesigner, false)['nome'] ?? 'confeccionista';
+        self::registrarRastreamento($cdLote, $cdStatus, "Recebimento confirmado por {$nomeDesigner}. Lote em produção.");
 
         Projetos::garantirProjetoParaLote($cdLote, $docDesigner, $lote['titulo'], $lote['descricao']);
 
@@ -1113,7 +1122,10 @@ class Lotes {
 
         $state       = Auth::getState();
         $meta        = $state['lotesMeta'][(string)$cdLote] ?? [];
-        $docDesigner = $meta['designerId'] ?? (Designers::obterAtual(false)['documento'] ?? '12345678901');
+        $docDesigner = (string)($meta['designerId'] ?? '');
+        if ($docDesigner === '') {
+            throw new InvalidArgumentException('Este lote não possui confeccionista associado para cancelar.');
+        }
 
         // Registra motivo em MOTIVO_CANCELAMENTO e evento em CANCELAMENTO
         $motivoTrunc = mb_substr($motivo, 0, 200);

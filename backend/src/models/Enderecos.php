@@ -118,6 +118,16 @@ class Enderecos {
             $uf         = ($uf && $uf !== 'SP') ? $uf : $fb['uf'];
         }
 
+        // Cadastro sem rua/bairro (ex.: só CEP) consulta o ViaCEP em vez de gravar placeholders
+        if ($logradouro === '' || $bairro === '') {
+            $via = self::consultarViaCep($cepLimpo);
+            if ($via) {
+                $logradouro = $logradouro ?: ($via['logradouro'] ?? '');
+                $bairro     = $bairro ?: ($via['bairro'] ?? '');
+                $cidade     = $cidade ?: ($via['localidade'] ?? '');
+            }
+        }
+
         $ufNorm     = strtoupper(substr(trim($uf ?: 'SP'), 0, 2)) ?: 'SP';
         $cidadeNorm = mb_substr(trim($cidade ?: 'São Paulo'), 0, 100);
         $bairroNorm = mb_substr(trim($bairro ?: 'Centro'), 0, 100);
@@ -225,6 +235,31 @@ class Enderecos {
         return $cepLimpo;
     }
 
+    /** Consulta o ViaCEP sem gravar nada no banco. Retorna null se indisponível ou CEP inexistente. */
+    private static function consultarViaCep(string $cepLimpo): ?array {
+        if (!function_exists('curl_init')) {
+            return null;
+        }
+        $ch = curl_init("https://viacep.com.br/ws/{$cepLimpo}/json/");
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 4,
+            CURLOPT_CONNECTTIMEOUT => 2,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_USERAGENT      => 'Continuum-App/1.0',
+        ]);
+        $resp = @curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if (!$resp || $code !== 200) {
+            return null;
+        }
+        $json = json_decode($resp, true);
+        return (is_array($json) && empty($json['erro'])) ? $json : null;
+    }
+
     public static function buscarCep(string $cep): ?array {
         $cepLimpo = substr(Auth::onlyDigits($cep), 0, 8);
         if (strlen($cepLimpo) !== 8) {
@@ -238,38 +273,21 @@ class Enderecos {
         }
 
         // 2. Tenta consultar ViaCEP
-        if (function_exists('curl_init')) {
-            $ch = curl_init("https://viacep.com.br/ws/{$cepLimpo}/json/");
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT        => 4,
-                CURLOPT_CONNECTTIMEOUT => 2,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_USERAGENT      => 'Continuum-App/1.0',
-            ]);
-            $resp = @curl_exec($ch);
-            $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($resp && $code === 200) {
-                $json = json_decode($resp, true);
-                if (is_array($json) && empty($json['erro'])) {
-                    $logr = $json['logradouro'] ?? '';
-                    $bai  = $json['bairro'] ?? '';
-                    $loc  = $json['localidade'] ?? 'São Paulo';
-                    $uf   = $json['uf'] ?? 'SP';
-                    self::garantirCep($cepLimpo, $logr, $bai, $loc, $uf);
-                    return [
-                        'cep'        => $cepLimpo,
-                        'logradouro' => $logr,
-                        'bairro'     => $bai,
-                        'localidade' => $loc,
-                        'cidade'     => $loc,
-                        'uf'         => $uf,
-                    ];
-                }
-            }
+        $json = self::consultarViaCep($cepLimpo);
+        if ($json) {
+            $logr = $json['logradouro'] ?? '';
+            $bai  = $json['bairro'] ?? '';
+            $loc  = $json['localidade'] ?? 'São Paulo';
+            $uf   = $json['uf'] ?? 'SP';
+            self::garantirCep($cepLimpo, $logr, $bai, $loc, $uf);
+            return [
+                'cep'        => $cepLimpo,
+                'logradouro' => $logr,
+                'bairro'     => $bai,
+                'localidade' => $loc,
+                'cidade'     => $loc,
+                'uf'         => $uf,
+            ];
         }
 
         // 3. Fallback local

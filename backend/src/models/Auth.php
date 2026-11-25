@@ -23,9 +23,6 @@ class Auth {
             return false;
         }
         // Aceita CPFs das contas de demonstração do seed do banco Oracle
-        if (in_array($d, ['11122233344', '22233344455', '12345678901', '98765432100', '45678912304', '85358040050'], true)) {
-            return true;
-        }
         for ($t = 9; $t < 11; $t++) {
             $sum = 0;
             for ($c = 0; $c < $t; $c++) {

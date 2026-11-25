@@ -64,14 +64,6 @@ class Doadores {
         $digits = Auth::onlyDigits($identificador);
         $lower  = Auth::norm($identificador);
 
-        if ($lower === 'doador') {
-            $stmt = oci_parse($conn, self::SELECT_BASE . " FETCH FIRST 1 ROWS ONLY");
-            oci_execute($stmt);
-            $row = oci_fetch_assoc($stmt);
-            oci_free_statement($stmt);
-            return $row ?: null;
-        }
-
         $sql = self::SELECT_BASE . " WHERE TRIM(d.CPF) = :cpf OR LOWER(TRIM(d.EMAIL_DOADOR)) = :email";
         $stmt = oci_parse($conn, $sql);
         $cpfBind = strlen($digits) === 11 ? $digits : '__NONE__';
@@ -119,13 +111,7 @@ class Doadores {
             }
         }
 
-        $conn = Database::getConnection();
-        $stmt = oci_parse($conn, self::SELECT_BASE . " ORDER BY d.CPF FETCH FIRST 1 ROWS ONLY");
-        oci_execute($stmt);
-        $row = oci_fetch_assoc($stmt);
-        oci_free_statement($stmt);
-
-        return $row ? self::formatar($row) : null;
+        return null; // sem sessão de doador não há doador "atual"
     }
 
     public static function registrar(array $dados): array {
@@ -164,7 +150,10 @@ class Doadores {
 
         $nmDoador    = mb_substr($nome, 0, 30);
         $hashSenha   = password_hash($senha, PASSWORD_BCRYPT);
-        $nrEndereco  = mb_substr(trim((string)($dados['numero'] ?? '')), 0, 3);
+        $nrEndereco  = trim((string)($dados['numero'] ?? ''));
+        if (mb_strlen($nrEndereco) > 3) {
+            throw new InvalidArgumentException('O número deve ter no máximo 3 caracteres.');
+        }
         $complemento = mb_substr(trim((string)($dados['complemento'] ?? '')), 0, 100);
         $faixaEtaria = mb_substr(trim((string)($dados['faixaEtaria'] ?? '')), 0, 20);
         $canal       = mb_substr(trim((string)($dados['comoConheceu'] ?? '')), 0, 50);
@@ -257,7 +246,10 @@ class Doadores {
         $nome        = mb_substr(trim((string)($dados['nome'] ?? $atual['nome'])), 0, 30);
         $email       = mb_substr(trim((string)($dados['email'] ?? $atual['email'])), 0, 150);
         $telefone    = substr(Auth::onlyDigits($dados['telefone'] ?? $atual['telefone']), 0, 11) ?: $atual['telefone'];
-        $numero      = mb_substr(trim((string)($dados['numero'] ?? $atual['numero'])), 0, 3);
+        $numero      = trim((string)($dados['numero'] ?? $atual['numero']));
+        if (mb_strlen($numero) > 3) {
+            throw new InvalidArgumentException('O número deve ter no máximo 3 caracteres.');
+        }
         $complemento = mb_substr(trim((string)($dados['complemento'] ?? $atual['complemento'])), 0, 100);
         $faixa       = mb_substr(trim((string)($dados['faixaEtaria'] ?? $atual['faixaEtaria'])), 0, 20);
         $canal       = mb_substr(trim((string)($dados['comoConheceu'] ?? $atual['comoConheceu'])), 0, 50);
@@ -392,11 +384,12 @@ class Doadores {
         }
 
         $cuponsGeradosCiclo = $state['cuponsMeta'][$cpf] ?? [];
+        $chavesAntes = array_keys($cuponsGeradosCiclo);
         $ciclosPorLoja      = [];
 
         foreach ($porLoja as $cnpj => $listaLoja) {
             $emp = Empresas::obterPorId($cnpj);
-            $nomeLoja = $emp['nomeFantasia'] ?? 'Empresa Parceira';
+            $nomeLoja = $emp['nomeFantasia'] ?? '';
             $pctLoja  = (float)($emp['politicaCupom']['percentual'] ?? 15);
             $diasLoja = (int)($emp['politicaCupom']['validadeDias'] ?? 30);
 
@@ -524,6 +517,7 @@ class Doadores {
         return [
             'doacoes'       => array_values($doacoesFormatadas),
             'cuponsCiclo'   => array_values($cuponsGeradosCiclo),
+            'cuponsNovos'   => array_values(array_diff_key($cuponsGeradosCiclo, array_flip($chavesAntes))),
             'ciclosPorLoja' => array_values($ciclosPorLoja),
         ];
     }
@@ -568,34 +562,6 @@ class Doadores {
         $doacoes = $proc['doacoes'];
         $ciclosPorLoja = $proc['ciclosPorLoja'];
 
-        // Fallback: se DOACAO estiver vazia mas NR_DOACOES > 0 (dados seed da tabela DOADOR)
-        $nrDoacoes = (int)($doador['nrDoacoes'] ?? 0);
-        if (empty($doacoes) && $nrDoacoes > 0) {
-            $stmtEmp = oci_parse($conn, "SELECT CNPJ FROM DOADOR_EMPRESA WHERE TRIM(CPF) = :cpf");
-            oci_bind_by_name($stmtEmp, ':cpf', $cpf);
-            oci_execute($stmtEmp);
-            $cnpjs = [];
-            while ($er = oci_fetch_assoc($stmtEmp)) {
-                $cnpjs[] = trim($er['CNPJ']);
-            }
-            oci_free_statement($stmtEmp);
-            $defaultCnpj = $cnpjs[0] ?? '12345678000190';
-
-            for ($i = 1; $i <= $nrDoacoes; $i++) {
-                $doacoes[] = [
-                    'id'              => 'DOA-' . str_pad((string)$i, 2, '0', STR_PAD_LEFT),
-                    'empresaId'       => $cnpjs[($i - 1) % max(1, count($cnpjs))] ?? $defaultCnpj,
-                    'cpfInformado'    => $cpf,
-                    'doadorId'        => $cpf,
-                    'pecas'           => 1,
-                    'pesoKg'          => 1.5,
-                    'statusCuradoria' => 'Em lote',
-                    'statusContagem'  => 'CONTANDO',
-                    'criadoEm'        => date('c'),
-                ];
-            }
-        }
-
         // 2. Cupons (DOADOR_DESCONTO + DESCONTO + EMPRESA) + cupons do state
         $state = Auth::getState();
         $utilizados = $state['cuponsUtilizados'] ?? [];
@@ -622,11 +588,11 @@ class Doadores {
                 'id'          => 'CUP-' . $idDesc,
                 'codigo'      => $codigo,
                 'empresaId'   => trim($r['CNPJ_EMPRESA'] ?? ''),
-                'empresaNome' => $r['NM_FANTASIA'] ?? 'Empresa Parceira',
+                'empresaNome' => $r['NM_FANTASIA'] ?? '',
                 'cpfDoador'   => $cpf,
                 'doadorId'    => $cpf,
                 'percentual'  => (float)($r['PORCENTAGEM'] ?? 15),
-                'validade'    => $r['VALIDADE_ISO'] ?? date('Y-m-d', strtotime('+30 days')),
+                'validade'    => $r['VALIDADE_ISO'] ?? null,
                 'status'      => $status,
                 'utilizadoEm' => $utilizados[$codigo] ?? null,
             ];
@@ -710,10 +676,10 @@ class Doadores {
                     'id'          => 'CUP-' . $idNum,
                     'codigo'      => $codigoPadrao,
                     'empresaId'   => trim($r['CNPJ_EMPRESA'] ?? ''),
-                    'empresaNome' => $r['NM_FANTASIA'] ?? 'Empresa Parceira',
+                    'empresaNome' => $r['NM_FANTASIA'] ?? '',
                     'cpfDoador'   => trim($r['CPF'] ?? ''),
                     'percentual'  => (float)($r['PORCENTAGEM'] ?? 15),
-                    'validade'    => $r['VALIDADE_ISO'] ?? date('Y-m-d', strtotime('+30 days')),
+                    'validade'    => $r['VALIDADE_ISO'] ?? null,
                     'status'      => isset($utilizados[$codigoPadrao]) ? 'Utilizado' : 'Ativo',
                     'utilizadoEm' => $utilizados[$codigoPadrao] ?? null,
                 ];
