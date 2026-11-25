@@ -85,13 +85,6 @@ class ProjetosController {
                 return;
             }
 
-            if (strtolower((string)($params['formato'] ?? '')) === 'svg') {
-                header('Content-Type: image/svg+xml; charset=utf-8');
-                http_response_code(200);
-                echo $qr['svg'];
-                return;
-            }
-
             http_response_code(200);
             echo json_encode([
                 'status' => 'success',
@@ -108,7 +101,16 @@ class ProjetosController {
      */
     public function finalizar($data) {
         try {
+            $sessao  = Auth::exigirAutenticacao(['designer']);
             $id      = (string)($data['id'] ?? '');
+            $atual   = Projetos::obterPorId($id);
+            $docSess = Auth::onlyDigits((string)($sessao['usuario']['documento'] ?? $sessao['id'] ?? ''));
+            if ($atual && Auth::onlyDigits((string)($atual['idDesigner'] ?? '')) !== $docSess) {
+                http_response_code(403);
+                $m = 'Este projeto pertence a outro confeccionista.';
+                echo json_encode(['status' => 'error', 'erro' => $m, 'message' => $m]);
+                return;
+            }
             $projeto = Projetos::finalizarDesigner($id, $data);
 
             http_response_code(200);

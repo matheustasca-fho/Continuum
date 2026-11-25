@@ -144,14 +144,6 @@ class Designers {
         $digits = self::extrairDocumento($identificador);
         $lower  = Auth::norm($identificador);
 
-        if ($lower === 'designer') {
-            $stmt = oci_parse($conn, self::SELECT_BASE . " ORDER BY cf.CPF_CNPJ FETCH FIRST 1 ROWS ONLY");
-            oci_execute($stmt);
-            $row = oci_fetch_assoc($stmt);
-            oci_free_statement($stmt);
-            return $row ?: null;
-        }
-
         $sql = self::SELECT_BASE . " WHERE TRIM(cf.CPF_CNPJ) = :doc OR LOWER(TRIM(cf.EMAIL_CONF)) = :email";
         $stmt = oci_parse($conn, $sql);
         $docBind = (strlen($digits) === 11 || strlen($digits) === 14) ? $digits : '__NONE__';
@@ -191,13 +183,7 @@ class Designers {
             }
         }
 
-        $conn = Database::getConnection();
-        $stmt = oci_parse($conn, self::SELECT_BASE . " ORDER BY cf.CPF_CNPJ FETCH FIRST 1 ROWS ONLY");
-        oci_execute($stmt);
-        $row = oci_fetch_assoc($stmt);
-        oci_free_statement($stmt);
-
-        return $row ? self::formatar($row, $visaoEmpresa) : null;
+        return null; // sem sessão de designer não há designer "atual"
     }
 
     public static function registrar(array $dados): array {
@@ -454,7 +440,10 @@ class Designers {
 
     public static function alternarFavorito(string $loteId): array {
         $designer = self::obterAtual(false);
-        $doc = $designer['documento'] ?? '12345678901';
+        $doc = $designer['documento'] ?? '';
+        if ($doc === '') {
+            throw new InvalidArgumentException('Confeccionista não identificado.');
+        }
         $loteIdStr = trim($loteId);
 
         $state = Auth::getState();

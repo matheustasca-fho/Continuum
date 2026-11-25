@@ -191,13 +191,29 @@ class DoadoresController {
     /**
      * GET /api/cupons/{codigo} (BE-15.4, BE-15.5)
      */
+    /** Cupom só pode ser consultado e resgatado pela loja que o emitiu. */
+    private function cupomDeOutraLoja(array $cupom, array $sessao): bool {
+        return Auth::onlyDigits((string)($cupom['empresaId'] ?? '')) !== Auth::onlyDigits((string)($sessao['empresaId'] ?? ''));
+    }
+
+    private function negarCupomDeOutraLoja(): void {
+        http_response_code(403);
+        $m = 'Este cupom pertence a outra loja.';
+        echo json_encode(['status' => 'error', 'erro' => $m, 'message' => $m]);
+    }
+
     public function validarCupom($params) {
         try {
+            $sessao = Auth::exigirAutenticacao(['empresa']);
             $codigo = (string)($params['codigo'] ?? '');
             $cupom = Doadores::buscarCupomPorCodigo($codigo);
             if (!$cupom) {
                 http_response_code(404);
                 echo json_encode(['status' => 'error', 'erro' => 'Cupom não encontrado.', 'message' => 'Cupom não encontrado.']);
+                return;
+            }
+            if ($this->cupomDeOutraLoja($cupom, $sessao)) {
+                $this->negarCupomDeOutraLoja();
                 return;
             }
             http_response_code(200);
@@ -216,7 +232,13 @@ class DoadoresController {
      */
     public function utilizarCupom($params) {
         try {
+            $sessao = Auth::exigirAutenticacao(['empresa']);
             $codigo = (string)($params['codigo'] ?? '');
+            $existente = Doadores::buscarCupomPorCodigo($codigo);
+            if ($existente && $this->cupomDeOutraLoja($existente, $sessao)) {
+                $this->negarCupomDeOutraLoja();
+                return;
+            }
             $cupom = Doadores::utilizarCupom($codigo);
             http_response_code(200);
             echo json_encode([

@@ -120,7 +120,12 @@ $router->add('GET', '/api/notificacoes', function ($params) {
 $router->add('POST', '/api/notificacoes', function ($data) {
     $tipo   = (string)($data['tipo'] ?? 'AVISO');
     $perfil = (string)($data['destinatarioPerfil'] ?? 'empresa');
-    $destId = (string)($data['destinatarioId'] ?? '12345678000190');
+    $destId = (string)($data['destinatarioId'] ?? '');
+    if ($destId === '') {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'destinatarioId é obrigatório.']);
+        return;
+    }
     $titulo = (string)($data['titulo'] ?? 'Notificação do sistema');
     $msg    = (string)($data['mensagem'] ?? '');
     $ref    = (string)($data['referenciaId'] ?? '');
