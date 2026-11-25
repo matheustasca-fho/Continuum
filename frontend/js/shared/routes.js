@@ -215,7 +215,54 @@ const readCurrentToken = () => {
   }
 };
 
+// Skeleton de carga inicial: <main data-skeleton> fica em skeleton até as primeiras requisições GET da página terminarem.
+const SKELETON_IGNORAR = new Set(["buscarCep", "consultarCNPJ"]);
+let skeletonPendentes = 0;
+let skeletonConcluido = false;
+let skeletonTimer = null;
+
+function skeletonConcluir() {
+  if (skeletonConcluido) return;
+  skeletonConcluido = true;
+  clearTimeout(skeletonTimer);
+  globalThis.document
+    ?.querySelector("main[data-skeleton]")
+    ?.setAttribute("data-skeleton", "done");
+}
+
+function skeletonAgendar(ms) {
+  clearTimeout(skeletonTimer);
+  skeletonTimer = setTimeout(() => {
+    if (skeletonPendentes === 0) skeletonConcluir();
+  }, ms);
+}
+
+// Página sem GET inicial não pode ficar em skeleton; o teto de 10 s cobre requisição pendurada.
+if (globalThis.document) {
+  skeletonAgendar(1500);
+  setTimeout(skeletonConcluir, 10000);
+}
+
 export async function requestRoute(name, args = []) {
+  const rastrear =
+    ROUTES[name]?.method === "GET" &&
+    !SKELETON_IGNORAR.has(name) &&
+    !skeletonConcluido;
+  if (rastrear) {
+    skeletonPendentes++;
+    clearTimeout(skeletonTimer);
+  }
+  try {
+    return await executarRota(name, args);
+  } finally {
+    if (rastrear) {
+      skeletonPendentes--;
+      skeletonAgendar(150);
+    }
+  }
+}
+
+async function executarRota(name, args) {
   const definition = ROUTES[name];
   if (!definition) {
     throw new Error(`Rota não configurada na camada de API: ${name}`);

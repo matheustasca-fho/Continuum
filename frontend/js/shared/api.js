@@ -39,44 +39,6 @@ export const cnpjValido = (x) => {
   return calc(12) === +d[12] && calc(13) === +d[13];
 };
 
-/**
- * Motor de verificação de ciclo de 5 doações por loja em 6 meses (BE-20)
- */
-export function vincularDoacoesECriarCupons(doador, doacoes = [], empresas = []) {
-  const cpf = digits(doador?.cpf);
-  const sixMonths = 183 * 24 * 60 * 60 * 1000;
-  const now = Date.now();
-  const validas = doacoes.filter((d) => {
-    if (digits(d.cpfInformado || d.cpfDoador) !== cpf) return false;
-    const diff = now - new Date(d.criadoEm || d.dataDoacao).getTime();
-    if (diff > sixMonths && d.statusContagem === "CONTANDO") {
-      d.statusContagem = "EXPIRADA";
-    }
-    return d.statusContagem === "CONTANDO" && diff <= sixMonths;
-  });
-
-  const porLoja = {};
-  for (const d of validas) {
-    (porLoja[d.empresaId] ||= []).push(d);
-  }
-  const novosCupons = [];
-  for (const [empresaId, lista] of Object.entries(porLoja)) {
-    while (lista.length >= 5) {
-      const ciclo = lista.splice(0, 5);
-      ciclo.forEach((d) => (d.statusContagem = "EM_CUPOM"));
-      const emp = empresas.find((e) => e.id === empresaId);
-      novosCupons.push({
-        empresaId,
-        empresaNome: emp?.nomeFantasia || "Empresa Parceira",
-        cpfDoador: cpf,
-        percentual: emp?.politicaCupom?.percentual ?? 15,
-        status: STATUS_CUPOM.ATIVO,
-      });
-    }
-  }
-  return novosCupons;
-}
-
 const persistAuthenticatedSession = (perfil, sessionData) => {
   if (!sessionData) return null;
   const usuarioEmpresa = sessionData.usuarioEmpresa || null;
@@ -91,7 +53,7 @@ const persistAuthenticatedSession = (perfil, sessionData) => {
       sessionData.nomeFantasia ||
       "",
     perfilEmpresa:
-      sessionData.perfilEmpresa || usuarioEmpresa?.perfil || "ADMIN",
+      sessionData.perfilEmpresa || usuarioEmpresa?.perfil || "",
   };
   writeSession(normalized);
   return normalized;
@@ -152,7 +114,7 @@ const apiMethods = {
 
   podeExecutar(acao) {
     const s = this.getSessaoAtual();
-    const p = s?.usuarioEmpresa?.perfil || s?.perfilEmpresa || "ADMIN";
+    const p = s?.usuarioEmpresa?.perfil || s?.perfilEmpresa || "";
     if (s && s.perfil && s.perfil !== "empresa") return false;
     if (p === "ADMIN") return true;
     return (

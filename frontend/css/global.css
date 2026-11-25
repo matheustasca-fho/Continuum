@@ -933,6 +933,31 @@ h2,
   }
 }
 
+/* Skeleton de carga inicial: <main data-skeleton> até routes.js marcar data-skeleton="done" */
+main[data-skeleton]:not([data-skeleton="done"]) {
+  pointer-events: none;
+  user-select: none;
+}
+main[data-skeleton]:not([data-skeleton="done"])
+  :is(h1, h2, h3, h4, p, span, strong, small, dt, dd, td, th, li, label, .counter, input, select, textarea, button) {
+  color: transparent !important;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f7fafc 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  border-radius: 4px;
+}
+main[data-skeleton]:not([data-skeleton="done"]) :is(img, svg, canvas) {
+  visibility: hidden;
+}
+main[data-skeleton]:not([data-skeleton="done"]) ::placeholder {
+  color: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  main[data-skeleton]:not([data-skeleton="done"]) * {
+    animation: none !important;
+  }
+}
+
 /* Radio Card (variante com __content) */
 .radio-card__content {
   padding: 16px;
