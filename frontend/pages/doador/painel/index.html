@@ -27,7 +27,7 @@
     <div id="appHeader" data-role="doador" data-active="painel"></div>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <main data-skeleton class="main-content">
       <header class="page-header animate-slide-up">
         <div>
           <span class="text-detail" style="color: var(--color-primary); font-weight: 700; margin-bottom: 8px; display: block;">PAINEL DO DOADOR</span>
@@ -60,7 +60,7 @@
         </div>
       </header>
 
-      <!-- CARD DOAÇÕES E DESCONTOS (Do mock enviado pelo usuário) -->
+      <!-- CARD DOAÇÕES E DESCONTOS -->
       <section class="donations-card animate-slide-up delay-1">
         <header class="donations-card__header">
           <span class="donations-card__brand">CONTINUUM</span>
@@ -75,15 +75,15 @@
             <p class="donations-card__text">Cada doação acumula pontos no seu perfil e pode gerar cupons de desconto na rede parceira.</p>
             
             <div class="donations-progress">
-              <span class="donations-progress__label">Doações — 20%</span>
+              <span class="donations-progress__label">Doações — 0%</span>
               <div class="donations-progress__dots">
-                <div class="dot dot--active"></div>
+                <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
               </div>
-              <p class="donations-progress__hint">Faltam 4 doações para liberar seu próximo cupom de desconto</p>
+              <p class="donations-progress__hint">—</p>
             </div>
           </div>
           
@@ -109,12 +109,12 @@
       <!-- CARDS DE MÉTRICAS OPERACIONAIS -->
       <section class="dash-cards animate-slide-up delay-2">
         <div class="dash-card">
-          <div class="dash-card__number counter" data-target="15">0</div>
+          <div class="dash-card__number counter" data-target="0">0</div>
           <div class="dash-card__label">LOTES DOADOS</div>
         </div>
 
         <div class="dash-card">
-          <div class="dash-card__number counter" data-target="120">0</div>
+          <div class="dash-card__number counter" data-target="0">0</div>
           <div class="dash-card__label">KG REAPROVEITADOS</div>
         </div>
       </section>
@@ -130,21 +130,21 @@
           <div class="impact-metrics">
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number counter" data-target="120" style="color: #fff;">0</span>
+                <span class="impact-number counter" data-target="0" style="color: #fff;">0</span>
                 <span class="impact-unit">KG</span>
               </div>
               <span class="impact-label">Resíduos Salvos</span>
             </div>
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number counter" data-target="8" style="color: #fff;">0</span>
+                <span class="impact-number counter" data-target="0" style="color: #fff;">0</span>
                 <span class="impact-unit">DESIGNERS</span>
               </div>
               <span class="impact-label">Apoiados</span>
             </div>
             <div class="impact-item">
               <div class="impact-number-wrapper">
-                <span class="impact-number counter" data-target="950" style="color: #fff;">0</span>
+                <span class="impact-number counter" data-target="0" style="color: #fff;">0</span>
                 <span class="impact-unit">LITROS</span>
               </div>
               <span class="impact-label">Água Poupada Estimada</span>

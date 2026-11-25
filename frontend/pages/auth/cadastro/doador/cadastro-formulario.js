@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     email: () =>
       check(
         "email",
-        f.email.value.trim() && f.email.validity.valid
+        f.email.value.trim() && !f.email.validity.typeMismatch
           ? ""
           : "Informe um e-mail válido.",
       ),
@@ -149,6 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
       metaEl.textContent = parts.join(" · ");
     }
   };
+
+  const stepCounter = $("doadorStepCounter");
+  const btnPrev = $("doadorBtnPrev");
+  const btnNext = $("doadorBtnNext");
+  const btnSubmit = $("doadorBtnSubmit");
+  let currentStep = 1;
+  let maxUnlockedStep = 1;
 
   const goToStep = (step) => {
     currentStep = Math.max(1, Math.min(3, Number(step)));
