@@ -14,212 +14,501 @@
 
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="../../../components/header/header.css" />
-    <style>
-      .perfil-grid {
-        display: grid;
-        gap: 1.5rem;
-        max-width: 880px;
-      }
-      .perfil-card {
-        background: var(--color-surface, #fff);
-        border: 1px solid var(--color-border, #e5e5e5);
-        border-radius: 12px;
-        padding: 1.5rem;
-      }
-      .perfil-card h2 {
-        font-family: var(--font-display, "Anton", sans-serif);
-        font-size: 1.25rem;
-        letter-spacing: 0.02em;
-        margin-bottom: 1rem;
-      }
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        margin-bottom: 1rem;
-      }
-      .form-group label {
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-      .form-group input,
-      .form-group textarea,
-      .form-group select {
-        padding: 0.65rem 0.85rem;
-        border: 1px solid var(--color-border, #d4d4d4);
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 0.95rem;
-      }
-      .checkbox-row {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.75rem;
-        background: #f8f8f6;
-        border-radius: 8px;
-        margin-bottom: 0.75rem;
-      }
-      .logistics-note {
-        font-size: 0.85rem;
-        color: #555;
-        margin-bottom: 1rem;
-      }
-      details.cartilha-accordion {
-        border: 1px solid var(--color-border, #d4d4d4);
-        border-radius: 10px;
-        padding: 1rem 1.25rem;
-        background: #fafaf8;
-      }
-      details.cartilha-accordion summary {
-        cursor: pointer;
-        font-weight: 700;
-        font-size: 1rem;
-        list-style: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      details.cartilha-accordion[open] summary {
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid #e5e5e5;
-      }
-      .badge-version {
-        font-family: "Space Mono", monospace;
-        font-size: 0.75rem;
-        background: #111;
-        color: #fff;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-      }
-      .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        margin-top: 1rem;
-      }
-      .alert-banner {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        display: none;
-      }
-      .alert-banner.success {
-        display: block;
-        background: #e8f5e9;
-        color: #1b5e20;
-        border: 1px solid #a5d6a7;
-      }
-      .alert-banner.error {
-        display: block;
-        background: #ffebee;
-        color: #b71c1c;
-        border: 1px solid #ef9a9a;
-      }
-    </style>
   </head>
   <body>
+    <div class="toast" id="perfilToast" role="status" aria-live="polite">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      <span id="perfilToastMsg">Alterações salvas com sucesso!</span>
+    </div>
+
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="perfil"></div>
 
       <main class="main-content">
         <header class="page-header animate-slide-up">
           <div>
-            <span class="text-detail eyebrow-label">CONFIGURAÇÕES DA LOJA</span>
+            <span class="text-detail eyebrow-label">
+              CONFIGURAÇÕES DO PONTO DE COLETA
+            </span>
             <h1 class="page-header__title text-display">PERFIL DA EMPRESA</h1>
             <p class="page-header__subtitle text-body">
-              Gerencie as informações exibidas na vitrine do designer, regras de logística e sua Cartilha Padrão.
+              Personalize a apresentação da sua loja na vitrine dos designers,
+              regras de logística reversa, cupons para doadores e sua Cartilha
+              Padrão de produção.
             </p>
+          </div>
+
+          <div class="header-tag-container" aria-hidden="true">
+            <svg class="safety-pin" viewBox="0 0 120 40" fill="none">
+              <path
+                d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z"
+                fill="rgba(0,0,0,0.14)"
+                transform="translate(0, 3)"
+              />
+              <line
+                x1="30"
+                y1="12"
+                x2="100"
+                y2="12"
+                stroke="rgba(0,0,0,0.14)"
+                stroke-width="3"
+                stroke-linecap="round"
+                transform="translate(0, 3)"
+              />
+              <path
+                d="M 30,10 C 15,10 10,15 10,20 C 10,25 15,30 30,30 C 35,30 35,25 30,25 C 20,25 18,22 18,20 C 18,18 20,15 30,15 Z"
+                fill="#2d3748"
+              />
+              <line
+                x1="30"
+                y1="12"
+                x2="100"
+                y2="12"
+                stroke="#2d3748"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <circle
+                cx="102"
+                cy="18"
+                r="6"
+                stroke="#2d3748"
+                stroke-width="3"
+                fill="none"
+              />
+              <line
+                x1="100"
+                y1="24"
+                x2="35"
+                y2="20"
+                stroke="#2d3748"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+            </svg>
+            <div class="clothing-tag">
+              <div class="clothing-tag__hole"></div>
+              <div class="clothing-tag__content">
+                <div class="clothing-tag__title">CONTINUUM</div>
+                <div class="clothing-tag__subtitle">Loja Parceira</div>
+              </div>
+            </div>
           </div>
         </header>
 
+        <!-- Resumo de Identidade da Loja -->
+        <section
+          class="company-hero-card animate-slide-up"
+          aria-label="Resumo da empresa"
+        >
+          <div class="company-hero-card__identity">
+            <div class="company-monogram" id="empresaInitials">AB</div>
+            <div>
+              <h2 class="company-hero-card__name" id="headerFantasyName">
+                Carregando empresa…
+              </h2>
+              <div class="company-hero-card__meta">
+                <span id="displayCnpj">CNPJ —</span>
+                <span aria-hidden="true">·</span>
+                <span id="displayLocation">São Paulo, SP</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="company-hero-card__badges">
+            <span class="plan-pill" id="displayPlanBadge">
+              <span class="plan-pill__dot"></span>
+              Parceiro Circular · Ativa
+            </span>
+          </div>
+        </section>
+
         <div id="perfilFeedback" class="alert-banner" role="status"></div>
 
-        <form id="perfilEmpresaForm" class="perfil-grid">
+        <form id="perfilEmpresaForm" class="perfil-layout" novalidate>
+          <!-- COLUNA ESQUERDA: Dados Públicos & Endereço -->
           <section class="perfil-card">
-            <h2>Dados Públicos da Loja</h2>
-            <div class="form-group">
-              <label for="nomeFantasia">Nome Fantasia</label>
-              <input id="nomeFantasia" name="nomeFantasia" type="text" required />
-            </div>
-            <div class="form-group">
-              <label for="perfilLoja">Sobre a loja</label>
-              <textarea
-                id="perfilLoja"
-                name="perfilLoja"
-                rows="3"
-                placeholder="Descreva a proposta da marca, foco em economia circular e materiais..."
-                required
-              ></textarea>
-            </div>
-          </section>
-
-          <section class="perfil-card">
-            <h2>Logística e Frete</h2>
-            <p class="logistics-note">
-              O <strong>envio (Correios/transportadora)</strong> é sempre oferecido na plataforma. Defina abaixo se sua loja também aceita retirada presencial.
-            </p>
-
-            <div class="checkbox-row">
-              <input id="aceitaRetirada" name="aceitaRetirada" type="checkbox" />
-              <label for="aceitaRetirada" style="margin: 0; cursor: pointer;">
-                Aceitar retirada presencial na loja
-              </label>
-            </div>
-
-            <div class="form-group">
-              <label for="horarioRetirada">Horário de retirada</label>
-              <input
-                id="horarioRetirada"
-                name="horarioRetirada"
-                type="text"
-                placeholder="Ex: Seg a Sex das 10h às 18h"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="frete">Política de Frete</label>
-              <input
-                id="frete"
-                name="frete"
-                type="text"
-                placeholder="Ex: Frete por conta do designer ou a combinar"
-              />
-            </div>
-          </section>
-
-          <section class="perfil-card">
-            <details class="cartilha-accordion" id="cartilhaAccordion">
-              <summary>
-                <span>Cartilha Padrão da Empresa (Orientações Gerais)</span>
-                <span class="badge-version" id="cartilhaVersao">v1.0</span>
-              </summary>
-              <div class="form-group">
-                <label for="cartilhaConteudo">Diretrizes de produção, acabamento e higienização</label>
-                <textarea
-                  id="cartilhaConteudo"
-                  name="cartilhaConteudo"
-                  rows="5"
-                  placeholder="Informe padrões de qualidade, etiqueta, acabamento e cuidados esperados dos designers..."
-                ></textarea>
+            <header class="perfil-card__header">
+              <div class="perfil-card__title-wrap">
+                <span class="perfil-card__icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 21h18" />
+                    <path d="M5 21V7l8-4v18" />
+                    <path d="M19 21V11l-6-4" />
+                  </svg>
+                </span>
+                <h2 class="perfil-card__title">Vitrine & Identidade da Loja</h2>
               </div>
-              <small id="cartilhaAtualizadoEm" style="color: #666;"></small>
-            </details>
+              <span class="perfil-card__tag">Visível aos designers</span>
+            </header>
+
+            <div class="fields-grid">
+              <div class="form-group f-col-6">
+                <label for="nomeFantasia">Nome Fantasia *</label>
+                <input
+                  id="nomeFantasia"
+                  name="nomeFantasia"
+                  type="text"
+                  placeholder="Ex.: Ateliê Boreal"
+                  required
+                />
+              </div>
+
+              <div class="form-group f-col-6">
+                <label for="segmento">Segmento Têxtil</label>
+                <input
+                  id="segmento"
+                  name="segmento"
+                  type="text"
+                  placeholder="Ex.: Moda Feminina, Jeanswear, Malharia"
+                />
+              </div>
+
+              <div class="form-group f-col-8">
+                <label for="razaoSocial">Razão Social</label>
+                <input
+                  id="razaoSocial"
+                  name="razaoSocial"
+                  type="text"
+                  placeholder="Razão social registrada"
+                />
+              </div>
+
+              <div class="form-group f-col-4">
+                <label for="cnpjReadonly">CNPJ</label>
+                <input id="cnpjReadonly" type="text" disabled />
+              </div>
+
+              <div class="form-group f-col-12">
+                <label for="perfilLoja">Sobre a loja & propósito circular *</label>
+                <textarea
+                  id="perfilLoja"
+                  name="perfilLoja"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="Conte a história da marca, tipos de tecidos trabalhados e o que espera das parcerias de upcycling..."
+                  required
+                ></textarea>
+                <div class="field-footer">
+                  <span>Exibido no perfil da loja na vitrine de lotes.</span>
+                  <span id="perfilLojaCount">0 / 500</span>
+                </div>
+              </div>
+            </div>
+
+            <hr class="section-divider" />
+            <p class="subsection-label">Endereço do Ponto de Coleta</p>
+
+            <div class="fields-grid">
+              <div class="form-group f-col-4">
+                <label for="cep">CEP</label>
+                <input
+                  id="cep"
+                  name="cep"
+                  type="text"
+                  maxlength="9"
+                  placeholder="00000-000"
+                />
+              </div>
+
+              <div class="form-group f-col-6">
+                <label for="cidade">Cidade</label>
+                <input id="cidade" name="cidade" type="text" placeholder="São Paulo" />
+              </div>
+
+              <div class="form-group f-col-2" style="grid-column: span 2">
+                <label for="uf">UF</label>
+                <input id="uf" name="uf" type="text" maxlength="2" placeholder="SP" />
+              </div>
+
+              <div class="form-group f-col-8">
+                <label for="logradouro">Rua / Logradouro</label>
+                <input
+                  id="logradouro"
+                  name="logradouro"
+                  type="text"
+                  placeholder="Avenida Paulista"
+                />
+              </div>
+
+              <div class="form-group f-col-4">
+                <label for="numero">Número</label>
+                <input id="numero" name="numero" type="text" placeholder="1000" />
+              </div>
+
+              <div class="form-group f-col-6">
+                <label for="bairro">Bairro</label>
+                <input id="bairro" name="bairro" type="text" placeholder="Bela Vista" />
+              </div>
+
+              <div class="form-group f-col-6">
+                <label for="complemento">Complemento</label>
+                <input
+                  id="complemento"
+                  name="complemento"
+                  type="text"
+                  placeholder="Loja, sala, piso (opcional)"
+                />
+              </div>
+            </div>
           </section>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn--primary" id="btnSalvarPerfil">
-              Salvar Perfil e Cartilha
-            </button>
+          <!-- COLUNA DIREITA: Logística & Benefícios -->
+          <div class="perfil-stack">
+            <section class="perfil-card">
+              <header class="perfil-card__header">
+                <div class="perfil-card__title-wrap">
+                  <span class="perfil-card__icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="1" y="3" width="15" height="13" />
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                      <circle cx="5.5" cy="18.5" r="2.5" />
+                      <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                  </span>
+                  <h2 class="perfil-card__title">Logística e Frete</h2>
+                </div>
+                <span class="perfil-card__tag">Operação</span>
+              </header>
+
+              <div class="logistics-callout">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>
+                  O <strong>envio via Correios/transportadora</strong> dentro de
+                  SP é sempre habilitado na plataforma. Configure abaixo se sua
+                  loja também recebe designers presencialmente.
+                </span>
+              </div>
+
+              <label class="pickup-toggle-card" for="aceitaRetirada">
+                <input
+                  id="aceitaRetirada"
+                  name="aceitaRetirada"
+                  type="checkbox"
+                />
+                <span>
+                  <span class="pickup-toggle-card__title">
+                    Aceitar retirada presencial na loja
+                  </span>
+                  <span class="pickup-toggle-card__desc">
+                    Permite ao designer agendar e buscar o lote diretamente no
+                    balcão do ponto de coleta.
+                  </span>
+                </span>
+              </label>
+
+              <div class="fields-grid">
+                <div class="form-group f-col-12">
+                  <label for="horarioRetirada">Horário de retirada</label>
+                  <input
+                    id="horarioRetirada"
+                    name="horarioRetirada"
+                    type="text"
+                    placeholder="Ex.: Seg a Sex das 10h às 18h"
+                  />
+                </div>
+
+                <div class="form-group f-col-12">
+                  <label for="frete">Política de Frete & Observações</label>
+                  <input
+                    id="frete"
+                    name="frete"
+                    type="text"
+                    placeholder="Ex.: Envio em até 2 dias úteis após reserva"
+                  />
+                </div>
+              </div>
+
+              <hr class="section-divider" />
+              <p class="subsection-label">Política de Cupom para Doadores</p>
+
+              <div class="fields-grid">
+                <div class="form-group f-col-6">
+                  <label for="cupomPercentual">Desconto do cupom (%)</label>
+                  <input
+                    id="cupomPercentual"
+                    type="number"
+                    min="5"
+                    max="80"
+                    value="15"
+                  />
+                </div>
+
+                <div class="form-group f-col-6">
+                  <label for="cupomValidade">Validade (dias)</label>
+                  <input
+                    id="cupomValidade"
+                    type="number"
+                    min="7"
+                    max="365"
+                    value="30"
+                  />
+                </div>
+              </div>
+            </section>
           </div>
+
+          <!-- LARGURA TOTAL: Cartilha Padrão da Empresa -->
+          <section class="perfil-card perfil-card--full" id="cartilhaSection">
+            <header class="perfil-card__header">
+              <div class="perfil-card__title-wrap">
+                <span class="perfil-card__icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M4 4H16C18.2 4 20 5.8 20 8V20H4V4Z" />
+                    <path d="M4 12H20" stroke-dasharray="3 2" />
+                    <path d="M12 4V20" stroke-dasharray="3 2" />
+                  </svg>
+                </span>
+                <h2 class="perfil-card__title">
+                  Cartilha Padrão da Empresa (Orientações Gerais)
+                </h2>
+              </div>
+              <span class="perfil-card__tag">Anexada automaticamente aos lotes</span>
+            </header>
+
+            <div class="cartilha-meta-bar">
+              <div style="display: flex; align-items: center; gap: 0.65rem">
+                <span class="badge-version" id="cartilhaVersao">v1.0</span>
+                <span class="cartilha-updated" id="cartilhaAtualizadoEm">
+                  Versão inicial da cartilha.
+                </span>
+              </div>
+              <span class="field-footer">
+                Cada atualização incrementa automaticamente a versão do documento.
+              </span>
+            </div>
+
+            <div class="cartilha-tips" aria-label="Sugestões rápidas de tópicos">
+              <button
+                type="button"
+                class="cartilha-tip"
+                data-insert="• Higienização prévia e secagem natural obrigatória antes do corte."
+              >
+                + Higienização
+              </button>
+              <button
+                type="button"
+                class="cartilha-tip"
+                data-insert="• Costuras internas reforçadas (overlock ou acabamento francês) sem fios aparentes."
+              >
+                + Acabamento interno
+              </button>
+              <button
+                type="button"
+                class="cartilha-tip"
+                data-insert="• Reservar espaço na peça para aplicação da Tag QR Code oficial CONTINUUM."
+              >
+                + Aplicação de Tag QR
+              </button>
+              <button
+                type="button"
+                class="cartilha-tip"
+                data-insert="• Priorizar aviamentos reaproveitados ou de baixo impacto ambiental."
+              >
+                + Aviamentos sustentáveis
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label for="cartilhaConteudo">
+                Diretrizes de produção, acabamento, etiquetagem e controle de qualidade
+              </label>
+              <textarea
+                id="cartilhaConteudo"
+                name="cartilhaConteudo"
+                rows="5"
+                placeholder="Informe padrões de qualidade, costura, higienização e cuidados esperados dos designers parceiros..."
+              ></textarea>
+              <div class="field-footer">
+                <span>Apresentada ao designer no detalhe do lote e no termo de reserva.</span>
+                <span id="cartilhaCharCount">0 caracteres</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Ações -->
+          <footer class="perfil-actions">
+            <span class="perfil-actions__hint">
+              As alterações refletem imediatamente na vitrine e nos novos lotes.
+            </span>
+            <div class="perfil-actions__buttons">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                id="btnResetPerfil"
+              >
+                Descartar alterações
+              </button>
+              <button
+                type="submit"
+                class="btn btn--primary"
+                id="btnSalvarPerfil"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                Salvar Perfil e Cartilha
+              </button>
+            </div>
+          </footer>
         </form>
       </main>
     </div>
 
-    <script type="module" src="../../../components/header/header.js"></script>
+    <script src="../../../components/header/header.js"></script>
     <script type="module" src="script.js"></script>
   </body>
 </html>

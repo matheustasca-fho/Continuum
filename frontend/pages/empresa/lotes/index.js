@@ -1,17 +1,13 @@
 import { api, STATUS_LOTE } from "../../../js/shared/api.js";
-// CONTINUUM - Application Script
+import { store } from "../../../js/shared/store.js";
+import { runWithDynamicLoading } from "../../../js/shared/loader.js";
+
 (() => {
   "use strict";
 
-  /* ==========================================================
-     CONSTANTES
-     ========================================================== */
-  const MAX_LOTS_PER_BATCH = 100;
   const SCROLL_FLAG_THRESHOLD_PX = 12;
   const SCROLLABLE_TOLERANCE_PX = 8;
   const MENU_CLOSE_DELAY_MS = 180;
-  const SEARCH_FOCUS_DELAY_MS = 180;
-  const MODAL_EASING = "cubic-bezier(.22,.75,.25,1)";
   const DEFAULT_STATUS = STATUS_LOTE.DISPONIVEL;
 
   const STATUS_OPTIONS = [
@@ -52,15 +48,14 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
      ESTADO
      ========================================================== */
   let lotsData = [];
-
+  let currentCompany = null;
   let activeFilter = "ALL";
   let searchQuery = "";
   let currentEditingLotId = null;
   let lotAwaitingImage = null;
   let pendingModalImage = null;
-  let authorizationConfirmed = false;
   let pendingStatusChange = null;
-  let pendingNewLot = null;
+  let toastTimer = null;
 
   /* ==========================================================
      ELEMENTOS DO DOM
@@ -70,21 +65,22 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   const lotsGrid = byId("lotsGrid");
   const filterSearchInput = byId("filterSearchInput");
   const statusFilter = byId("statusFilter");
-  const searchToggle = byId("searchToggle");
-  const filterTrigger = byId("filterTrigger");
-  const searchWrapper = document.querySelector(".filter-wrapper");
-  const lotQuantity = byId("lotQuantity");
-  const quantityField = byId("quantityField");
   const btnAddLote = byId("btnAddLote");
+  const btnHeaderAddLote = byId("btnHeaderAddLote");
   const addModal = byId("addModal");
   const addModalClose = byId("addModalClose");
   const addModalCancel = byId("addModalCancel");
   const addLotForm = byId("addLotForm");
   const lotCodeInput = byId("lotCode");
+  const lotTitleInput = byId("lotTitle");
+  const lotMaterialInput = byId("lotMaterial");
   const lotDescInput = byId("lotDesc");
   const lotWeightInput = byId("lotWeight");
+  const lotPiecesInput = byId("lotPieces");
   const lotIdInput = byId("lotIdInput");
+  const lotFormError = byId("lotFormError");
   const btnDeleteLot = byId("btnDeleteLot");
+  const btnSaveLot = byId("btnSaveLot");
   const modalFormTitle = byId("modalFormTitle");
   const imageUploadInput = byId("imageUploadInput");
   const modalImageInput = byId("modalImageInput");
@@ -93,25 +89,30 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   const modalImgPlaceholder = byId("modalImgPlaceholder");
   const statusField = byId("statusField");
   const lotStatusSelect = byId("lotStatusSelect");
-  const consentNoticeModal = byId("consentNoticeModal");
-  const consentModal = byId("consentModal");
-  const consentForm = byId("consentForm");
-  const adminPassword = byId("adminPassword");
-  const passwordToggle = byId("passwordToggle");
-  const passwordMessage = byId("passwordMessage");
-  const consentCheck = byId("consentCheck");
   const statusConfirmModal = byId("statusConfirmModal");
   const statusConfirmCopy = byId("statusConfirmCopy");
-  const editorModalBox = addModal.querySelector(".modal-box");
+  const deleteConfirmModal = byId("deleteConfirmModal");
+  const lotToast = byId("lotToast");
+  const lotToastMsg = byId("lotToastMsg");
 
   /* ==========================================================
      UTILIDADES
      ========================================================== */
+  const showToast = (msg) => {
+    if (!lotToast || !lotToastMsg) return;
+    lotToastMsg.textContent = msg;
+    lotToast.classList.add("toast--visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      lotToast.classList.remove("toast--visible");
+    }, 3200);
+  };
+
   const escapeHtml = (value) =>
-    String(value).replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+    String(value ?? "").replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 
   const slugifyStatus = (status) =>
-    status
+    String(status || "")
       .toLowerCase()
       .replace(/ /g, "-")
       .normalize("NFD")
@@ -148,24 +149,19 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     return `${dd}/${mm}/${today.getFullYear()}`;
   };
 
-  const getLotCode = (lot) => lot.code.split("|")[0].trim();
+  const getLotCode = (lot) => String(lot.code || "").split("|")[0].trim();
 
   const getLotDate = (lot) => {
     if (lot.date) return lot.date;
-    const legacyDate = (lot.code.split("|")[1] || "").trim();
+    const legacyDate = (String(lot.code || "").split("|")[1] || "").trim();
     if (legacyDate) return legacyDate;
-    const compactDate = getLotCode(lot).match(/^L\d{3}(\d{2})(\d{2})(\d{4})$/i);
-    return compactDate
-      ? `${compactDate[1]}/${compactDate[2]}/${compactDate[3]}`
-      : getTodayStr();
+    return getTodayStr();
   };
 
   const getNextLotCode = () => {
-    const highest = lotsData.reduce((value, lot) => {
-      const match = getLotCode(lot).match(/^L(?:ote-)?(\d{3})/i);
-      return match ? Math.max(value, Number(match[1])) : value;
-    }, 0);
-    return `L${String(highest + 1).padStart(3, "0")}${getTodayStr().replace(/\//g, "")}`;
+    const allStored = store.get("lotes") || [];
+    const nextNum = Math.max(allStored.length, lotsData.length) + 1;
+    return `LOT-${new Date().getFullYear()}-${String(nextNum).padStart(3, "0")}`;
   };
 
   const findLotById = (id) => lotsData.find((lot) => lot.id === id);
@@ -177,7 +173,8 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   };
 
   const createPatternSvg = (id) => {
-    const patternId = `pat-${id}`;
+    const safeId = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
+    const patternId = `pat-${safeId}`;
     const label = (x, y) =>
       `<text x="${x}" y="${y}" fill="#782736" font-family="Anton,sans-serif" font-size="14" letter-spacing="2">CONTINUUM</text>`;
     return (
@@ -190,7 +187,7 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   };
 
   /* ==========================================================
-     MENU DE STATUS (filtro e editor)
+     MENU DE STATUS (filtro da barra superior + seletor de edição)
      ========================================================== */
   const createStatusMenu = ({
     extraClass = "",
@@ -209,21 +206,16 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     };
   };
 
-  const bindMenuToggle = (
-    { menu, trigger, options },
-    { onOpen = () => {}, onClose = () => {} } = {},
-  ) => {
+  const bindMenuToggle = ({ menu, trigger, options }) => {
     const open = () => {
       options.hidden = false;
       trigger.setAttribute("aria-expanded", "true");
-      onOpen();
       window.requestAnimationFrame(() => options.classList.add("is-open"));
     };
 
     const close = () => {
       options.classList.remove("is-open");
       trigger.setAttribute("aria-expanded", "false");
-      onClose();
       window.setTimeout(() => {
         if (!options.classList.contains("is-open")) options.hidden = true;
       }, MENU_CLOSE_DELAY_MS);
@@ -239,6 +231,7 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   };
 
   const populateSelect = (select, options) => {
+    if (!select) return;
     select.innerHTML = "";
     options.forEach(({ value, label }) => {
       const option = document.createElement("option");
@@ -248,11 +241,11 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     });
   };
 
-  // ---- Filtro de status (barra superior) ----
   const filterMenu = createStatusMenu({
     triggerContent: `${statusIconMarkup("ALL")}<span class="status-menu__label">Todos os status</span><span class="status-menu__chevron" aria-hidden="true">⌄</span>`,
     heading: "Filtrar por status",
   });
+
   const filterMenuControls = (() => {
     populateSelect(statusFilter, STATUS_OPTIONS);
     statusFilter.hidden = true;
@@ -371,7 +364,7 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   }
 
   /* ==========================================================
-     RENDERIZAÇÃO
+     RENDERIZAÇÃO DOS LOTES
      ========================================================== */
   const updateGridScrollFlags = () => {
     lotsGrid.classList.toggle(
@@ -389,27 +382,45 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     const matchesStatus = activeFilter === "ALL" || lot.status === activeFilter;
     const matchesSearch =
       query === "" ||
-      lot.code.toLowerCase().includes(query) ||
-      (lot.desc || "").toLowerCase().includes(query);
+      String(lot.code || "").toLowerCase().includes(query) ||
+      String(lot.title || "").toLowerCase().includes(query) ||
+      String(lot.material || "").toLowerCase().includes(query) ||
+      String(lot.desc || "").toLowerCase().includes(query);
     return matchesStatus && matchesSearch;
   };
 
   const byStatusThenId = (a, b) =>
     STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
-    a.id - b.id;
+    String(b.id).localeCompare(String(a.id));
 
   const lotCardMarkup = (lot) => {
+    const canChangeImg = api.podeExecutar("ALTERAR_IMAGEM_LOTE");
+    const canEditLot = api.podeExecutar("EDITAR_EXCLUIR_LOTE");
     const thumb = lot.image
-      ? `<img src="${lot.image}" class="card-lote__thumb-img" alt="${lot.code}">`
+      ? `<img src="${lot.image}" class="card-lote__thumb-img" alt="${escapeHtml(lot.title || lot.code)}">`
       : createPatternSvg(lot.id);
 
+    const displayTitle = lot.title || getLotCode(lot);
+    const metaLine = [
+      getLotCode(lot),
+      lot.material || null,
+      `${String(lot.pesoKg ?? 0).replace(".", ",")} kg`,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+
+    const thumbOverlay = canChangeImg
+      ? `<div class="card-lote__thumb-overlay">${PEN_ICON}<span>Trocar imagem</span></div>`
+      : "";
+
     return (
-      '<div class="card-lote__thumb" data-action="upload-image">' +
-      `${thumb}<div class="card-lote__thumb-overlay">${PEN_ICON}<span>Trocar imagem</span></div></div>` +
-      '<div class="card-lote__body" data-action="edit-lot">' +
-      `<div class="card-lote__heading"><h3 class="card-lote__title">${escapeHtml(getLotCode(lot))}</h3>` +
+      `<div class="card-lote__thumb ${canChangeImg ? "" : "card-lote__thumb--readonly"}" ${canChangeImg ? 'data-action="upload-image"' : ""}>` +
+      `${thumb}${thumbOverlay}</div>` +
+      `<div class="card-lote__body ${canEditLot ? "" : "card-lote__body--readonly"}" ${canEditLot ? 'data-action="edit-lot"' : ""}>` +
+      `<div class="card-lote__heading"><h3 class="card-lote__title">${escapeHtml(displayTitle)}</h3>` +
       `<time class="card-lote__date">${escapeHtml(getLotDate(lot))}</time></div>` +
-      `<p class="card-lote__desc">${escapeHtml(lot.desc || "Sem descrição cadastrada.")} · ${escapeHtml(String(lot.pesoKg ?? 0))} kg</p>` +
+      `<p class="card-lote__meta">${escapeHtml(metaLine)}</p>` +
+      `<p class="card-lote__desc">${escapeHtml(lot.desc || lot.briefing?.ideiaMarca || "Lote disponível para criação autoral.")}</p>` +
       `<div class="card-lote__footer"><span class="${statusBadgeClass(lot.status)}">${escapeHtml(lot.status)}</span></div></div>`
     );
   };
@@ -421,9 +432,11 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     card.innerHTML = lotCardMarkup(lot);
     card.addEventListener("click", (event) => {
       if (event.target.closest('[data-action="upload-image"]')) {
+        if (!api.podeExecutar("ALTERAR_IMAGEM_LOTE")) return;
         lotAwaitingImage = lot.id;
         imageUploadInput.click();
       } else if (event.target.closest('[data-action="edit-lot"]')) {
+        if (!api.podeExecutar("EDITAR_EXCLUIR_LOTE")) return;
         openEditModal(lot.id);
       }
     });
@@ -439,7 +452,7 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     if (filtered.length === 0) {
       lotsGrid.classList.remove("is-scrollable", "is-scrolled");
       lotsGrid.innerHTML =
-        '<div class="empty-state"><strong>Nenhum lote encontrado</strong><span>Tente buscar por outro termo ou limpar os filtros.</span></div>';
+        '<div class="empty-state"><strong>Nenhum lote encontrado</strong><span>Clique em "Novo Lote" para cadastrar um lote têxtil ou ajuste os filtros de busca.</span></div>';
       return;
     }
 
@@ -457,23 +470,25 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   /* ==========================================================
      UPLOAD DE IMAGEM
      ========================================================== */
-  // ---- Card ----
   imageUploadInput.addEventListener("change", (event) => {
     const [file] = event.target.files;
     if (!file || lotAwaitingImage === null) return;
 
-    readImageAsDataUrl(file, (dataUrl) => {
+    readImageAsDataUrl(file, async (dataUrl) => {
       const lot = findLotById(lotAwaitingImage);
       if (lot) {
         lot.image = dataUrl;
+        try {
+          await api.atualizarLote(lot.id, { image: dataUrl });
+        } catch {}
         renderLots();
+        showToast("Imagem do lote atualizada!");
       }
       lotAwaitingImage = null;
       imageUploadInput.value = "";
     });
   });
 
-  // ---- Modal ----
   const showModalImagePreview = (src) => {
     pendingModalImage = src;
     modalImgPreview.src = src;
@@ -491,7 +506,10 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 
   modalImgUploadArea.addEventListener("click", () => modalImageInput.click());
   modalImgUploadArea.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") modalImageInput.click();
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      modalImageInput.click();
+    }
   });
   modalImageInput.addEventListener("change", (event) => {
     const [file] = event.target.files;
@@ -501,55 +519,26 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
   /* ==========================================================
      FILTROS E BUSCA
      ========================================================== */
-  const collapseSearch = () => {
-    filterSearchInput.value = "";
-    searchQuery = "";
-    renderLots();
-    filterTrigger.classList.remove("is-open");
-    searchWrapper.classList.remove("search-open");
-    searchToggle.setAttribute("aria-expanded", "false");
-  };
-
   statusFilter.addEventListener("change", () => {
     activeFilter = statusFilter.value;
     renderLots();
   });
 
-  if (filterSearchInput) {
-    filterSearchInput.addEventListener("input", (event) => {
-      searchQuery = event.target.value;
-      renderLots();
-    });
-  }
-
-  if (filterTrigger) filterTrigger.hidden = false;
-
-  if (searchToggle && filterTrigger && searchWrapper) {
-    searchToggle.addEventListener("click", () => {
-      searchWrapper.classList.add("search-open");
-      filterTrigger.classList.add("is-open");
-      searchToggle.setAttribute("aria-expanded", "true");
-      window.setTimeout(
-        () => filterSearchInput?.focus(),
-        SEARCH_FOCUS_DELAY_MS,
-      );
-    });
-
-    const searchDismiss = document.createElement("button");
-    searchDismiss.type = "button";
-    searchDismiss.className = "search-dismiss";
-    searchDismiss.setAttribute("aria-label", "Fechar pesquisa");
-    searchDismiss.textContent = "×";
-    filterTrigger.appendChild(searchDismiss);
-    searchDismiss.addEventListener("click", collapseSearch);
-  }
+  filterSearchInput?.addEventListener("input", (event) => {
+    searchQuery = event.target.value;
+    renderLots();
+  });
 
   /* ==========================================================
-     MODAL DE LOTE (abrir / fechar / salvar)
+     CURADORIA & BRIEFING
      ========================================================== */
   const setEditorFieldsMode = (isEditing) => {
     const canEdit = api.podeExecutar("EDITAR_EXCLUIR_LOTE");
     btnDeleteLot.style.display = isEditing && canEdit ? "inline-flex" : "none";
+    if (statusField) statusField.hidden = !isEditing;
+    if (btnSaveLot) {
+      btnSaveLot.textContent = isEditing ? "Salvar Alterações" : "Criar Lote";
+    }
   };
 
   let doacoesEmpresaCache = [];
@@ -558,9 +547,12 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     const cartilhaEl = byId("cartilhaPadraoReadonly");
     if (cartilhaEl) {
       try {
-        const emp = await api.getEmpresa();
+        const emp = currentCompany || (await api.getEmpresa());
+        currentCompany = emp;
         const ver = emp?.cartilhaPadrao?.versao || "v1.0";
-        const txt = emp?.cartilhaPadrao?.conteudo || "Nenhuma cartilha padrão cadastrada.";
+        const txt =
+          emp?.cartilhaPadrao?.conteudo ||
+          "Nenhuma cartilha padrão cadastrada no perfil da empresa.";
         cartilhaEl.textContent = `[${ver}] ${txt}`;
       } catch {
         cartilhaEl.textContent = "Não foi possível carregar a cartilha.";
@@ -574,34 +566,53 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     renderCuradoriaDoacoes();
   };
 
-  const renderCuradoriaDoacoes = () => {
+  const renderCuradoriaDoacoes = (preselected = []) => {
     const listEl = byId("curadoriaDoacoesList");
     const resumoEl = byId("curadoriaPesoSugerido");
     if (!listEl) return;
 
-    const tipoFiltro = (byId("curadoriaFiltroTipo")?.value || "").trim().toLowerCase();
+    const tipoFiltro = (byId("curadoriaFiltroTipo")?.value || "")
+      .trim()
+      .toLowerCase();
     const dataFiltro = byId("curadoriaFiltroData")?.value || "";
 
     const todas = doacoesEmpresaCache;
     const pendentes = todas.filter((d) => {
-      if (d.statusCuradoria !== "Aguardando curadoria") return false;
-      if (tipoFiltro && !String(d.tipoPeca || d.tipo || "").toLowerCase().includes(tipoFiltro)) return false;
-      if (dataFiltro && !String(d.criadoEm || "").startsWith(dataFiltro)) return false;
+      if (empId && d.empresaId && d.empresaId !== empId) return false;
+      const jaVinculadaNesteLote = preselected.includes(d.id);
+      if (
+        !jaVinculadaNesteLote &&
+        d.statusCuradoria !== "Aguardando curadoria"
+      )
+        return false;
+      if (
+        tipoFiltro &&
+        !String(d.tipoPeca || d.tipo || "")
+          .toLowerCase()
+          .includes(tipoFiltro)
+      )
+        return false;
+      if (dataFiltro && !String(d.criadoEm || "").startsWith(dataFiltro))
+        return false;
       return true;
     });
 
     if (pendentes.length === 0) {
-      listEl.innerHTML = `<span style="font-size:0.85rem;color:#666;">Nenhuma doação aguardando curadoria encontrada.</span>`;
+      listEl.innerHTML =
+        '<span class="curadoria-empty">Nenhuma doação aguardando curadoria no momento. Você ainda pode cadastrar o lote avulso normalmente.</span>';
     } else {
       listEl.innerHTML = pendentes
         .map((d) => {
-          const dt = d.criadoEm ? new Date(d.criadoEm).toLocaleDateString("pt-BR") : "—";
+          const dt = d.criadoEm
+            ? new Date(d.criadoEm).toLocaleDateString("pt-BR")
+            : "—";
           const peso = Number(d.pesoKg || 0);
           const tipo = d.tipoPeca || d.tipo || "Peças diversas";
+          const checkedAttr = preselected.includes(d.id) ? "checked" : "";
           return `
-            <label style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.6rem;background:#fff;border:1px solid #e5e5e5;border-radius:6px;cursor:pointer;font-size:0.85rem;">
-              <input type="checkbox" class="curadoria-check" value="${d.id}" data-peso="${peso}" />
-              <span><strong>${d.id}</strong> · ${tipo} · ${d.pecas || 1} pç(s) · ${peso.toFixed(1)} kg · ${dt}</span>
+            <label class="curadoria-item">
+              <input type="checkbox" class="curadoria-check" value="${escapeHtml(d.id)}" data-peso="${peso}" ${checkedAttr} />
+              <span><strong>${escapeHtml(d.id)}</strong> · ${escapeHtml(tipo)} · ${Number(d.pecas || 1)} pç(s) · ${peso.toFixed(1).replace(".", ",")} kg · ${escapeHtml(dt)}</span>
             </label>
           `;
         })
@@ -609,12 +620,17 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     }
 
     const updatePeso = () => {
-      const checked = Array.from(listEl.querySelectorAll(".curadoria-check:checked"));
-      const totalPeso = checked.reduce((acc, el) => acc + Number(el.dataset.peso || 0), 0);
+      const checked = Array.from(
+        listEl.querySelectorAll(".curadoria-check:checked"),
+      );
+      const totalPeso = checked.reduce(
+        (acc, el) => acc + Number(el.dataset.peso || 0),
+        0,
+      );
       if (resumoEl) {
         resumoEl.textContent = `${checked.length} doação(ões) selecionada(s) · Peso sugerido: ${totalPeso.toFixed(1).replace(".", ",")} kg`;
       }
-      if (checked.length > 0 && lotWeightInput) {
+      if (checked.length > 0 && lotWeightInput && currentEditingLotId === null) {
         lotWeightInput.value = totalPeso.toFixed(1);
       }
     };
@@ -625,33 +641,44 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     updatePeso();
   };
 
-  byId("curadoriaFiltroTipo")?.addEventListener("input", renderCuradoriaDoacoes);
-  byId("curadoriaFiltroData")?.addEventListener("change", renderCuradoriaDoacoes);
+  byId("curadoriaFiltroTipo")?.addEventListener("input", () =>
+    renderCuradoriaDoacoes(),
+  );
+  byId("curadoriaFiltroData")?.addEventListener("change", () =>
+    renderCuradoriaDoacoes(),
+  );
 
+  /* ==========================================================
+     MODAL DE LOTE (abrir / fechar / criar / editar / excluir)
+     ========================================================== */
   const openNewLotModal = () => {
-    if (pendingNewLot && authorizationConfirmed) {
-      createLotBatch(pendingNewLot);
-      pendingNewLot = null;
-      authorizationConfirmed = false;
+    if (!api.podeExecutar("CADASTRAR_LOTE")) {
+      alert("Sua conta não possui permissão para cadastrar lotes.");
       return;
     }
 
-    pendingNewLot = null;
     currentEditingLotId = null;
     lotIdInput.value = "";
+    if (lotFormError) lotFormError.textContent = "";
     modalFormTitle.textContent = "Novo Lote Têxtil";
     lotCodeInput.value = getNextLotCode();
+    if (lotTitleInput) lotTitleInput.value = "";
+    if (lotMaterialInput) lotMaterialInput.value = "";
     lotDescInput.value = "";
-    lotWeightInput.value = "1";
+    lotWeightInput.value = "1.0";
+    if (lotPiecesInput) lotPiecesInput.value = "10";
     if (byId("briefingIdeiaMarca")) byId("briefingIdeiaMarca").value = "";
     if (byId("briefingExpectativa")) byId("briefingExpectativa").value = "";
-    if (byId("briefingLiberdadeCriativa")) byId("briefingLiberdadeCriativa").value = "";
-    if (byId("briefingPrazoProducao")) byId("briefingPrazoProducao").value = "30";
+    if (byId("briefingLiberdadeCriativa"))
+      byId("briefingLiberdadeCriativa").value = "";
+    if (byId("briefingPrazoProducao"))
+      byId("briefingPrazoProducao").value = "30";
+
     setEditorFieldsMode(false);
     resetModalImage();
-    loadBriefingAndCuradoria();
+    loadBriefingAndCuradoria([]);
     addModal.classList.add("active");
-    lotCodeInput.focus();
+    window.setTimeout(() => (lotTitleInput || lotDescInput)?.focus(), 60);
   };
 
   function openEditModal(id) {
@@ -669,9 +696,12 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
 
     currentEditingLotId = id;
     lotIdInput.value = id;
-    modalFormTitle.textContent = "Editar Lote";
+    if (lotFormError) lotFormError.textContent = "";
+    modalFormTitle.textContent = "Editar Lote Têxtil";
     lotCodeInput.value = getLotCode(lot);
-    lotDescInput.value = lot.desc;
+    if (lotTitleInput) lotTitleInput.value = lot.title || "";
+    if (lotMaterialInput) lotMaterialInput.value = lot.material || "";
+    lotDescInput.value = lot.desc || "";
     lotWeightInput.value = lot.pesoKg || 1;
     if (lotStatusSelect) {
       lotStatusSelect.value = lot.status;
@@ -683,62 +713,70 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     else resetModalImage();
 
     addModal.classList.add("active");
-    lotCodeInput.focus();
-    lotCodeInput.select();
   }
 
   const closeAddModal = () => {
     addModal.classList.remove("active");
-    editorModalBox.classList.remove("modal-box--status-expanded");
-    editorModalBox.getAnimations().forEach((animation) => animation.cancel());
-    editorModalBox.style.height = "";
+    if (lotFormError) lotFormError.textContent = "";
     currentEditingLotId = null;
   };
 
-  const applyLotChanges = (lot, { code, desc, status }) => {
+  const applyLotChanges = async (
+    lot,
+    { code, title, material, desc, status, pesoKg, quantidadePecas, briefing, doacoesVinculadas },
+  ) => {
     Object.assign(lot, {
       code,
+      title,
+      material,
       desc,
       status,
-      pesoKg: Number(lotWeightInput.value) || 1,
+      pesoKg,
+      quantidadePecas,
+      briefing,
+      doacoesVinculadas,
     });
     if (pendingModalImage !== null) lot.image = pendingModalImage;
-    api
-      .atualizarLote(lot.id, {
-        codigo: code,
-        titulo: desc,
-        descricao: desc,
-        status,
-        pesoKg: lot.pesoKg,
-      })
-      .catch((error) => alert(error.message));
+
+    await api.atualizarLote(lot.id, {
+      codigo: code,
+      titulo: title || desc || code,
+      composicao: material,
+      material,
+      descricao: desc,
+      status,
+      pesoKg,
+      peso: `${String(pesoKg).replace(".", ",")} kg`,
+      quantidadePecas,
+      briefing,
+      direcao: briefing?.ideiaMarca || desc,
+      doacoesVinculadas,
+      ...(pendingModalImage !== null ? { image: pendingModalImage } : {}),
+    });
   };
 
-  const handleEditSubmit = ({ code, desc, status }) => {
-    const lot = findLotById(currentEditingLotId);
-    if (!lot) return true;
-
-    if (lot.status !== status) {
-      pendingStatusChange = { lot, code, desc, status };
-      statusConfirmCopy.textContent = `Deseja alterar o status deste lote para “${status}”?`;
-      statusConfirmModal.classList.add("active");
-      return false;
-    }
-    applyLotChanges(lot, { code, desc, status });
-    return true;
-  };
-
-  addLotForm.addEventListener("submit", (event) => {
+  addLotForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const code = lotCodeInput.value.trim();
-    const desc = lotDescInput.value.trim();
+    if (lotFormError) lotFormError.textContent = "";
 
-    if (!code) {
-      lotCodeInput.setCustomValidity("Informe o nome ou código do lote.");
-      lotCodeInput.reportValidity();
+    const code = lotCodeInput.value.trim();
+    const title = (lotTitleInput?.value || "").trim();
+    const material = (lotMaterialInput?.value || "").trim();
+    const desc = lotDescInput.value.trim();
+    const pesoKg = Number(lotWeightInput.value);
+    const quantidadePecas = Math.max(0, Number(lotPiecesInput?.value || 0));
+
+    if (!title) {
+      if (lotFormError) lotFormError.textContent = "Informe um título para o lote.";
+      lotTitleInput?.focus();
       return;
     }
-    lotCodeInput.setCustomValidity("");
+    if (!pesoKg || pesoKg <= 0) {
+      if (lotFormError)
+        lotFormError.textContent = "Informe um peso válido maior que zero.";
+      lotWeightInput?.focus();
+      return;
+    }
 
     const briefing = {
       ideiaMarca: byId("briefingIdeiaMarca")?.value.trim() || "",
@@ -861,45 +899,63 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
     passwordToggle.textContent = show ? "Ocultar" : "Exibir";
   });
 
-  byId("consentNoticeConfirm").addEventListener("click", () => {
-    consentNoticeModal.classList.remove("active");
-    openConsentModal();
+  btnDeleteLot?.addEventListener("click", () => {
+    if (currentEditingLotId === null) return;
+    deleteConfirmModal?.classList.add("active");
   });
-  byId("consentNoticeCancel").addEventListener("click", closeConsentNotice);
-  byId("consentClose").addEventListener("click", closeConsentModal);
-  byId("consentCancel").addEventListener("click", closeConsentModal);
+
+  byId("deleteConfirmCancel")?.addEventListener("click", closeDeleteConfirm);
+  byId("deleteConfirmClose")?.addEventListener("click", closeDeleteConfirm);
+  byId("deleteConfirmAccept")?.addEventListener("click", async () => {
+    if (currentEditingLotId === null) return;
+    try {
+      await api.excluirLote(currentEditingLotId);
+      lotsData = lotsData.filter((lot) => lot.id !== currentEditingLotId);
+      closeDeleteConfirm();
+      closeAddModal();
+      renderLots();
+      showToast("Lote excluído do catálogo.");
+    } catch (error) {
+      closeDeleteConfirm();
+      if (lotFormError) lotFormError.textContent = error.message;
+    }
+  });
 
   /* ==========================================================
      CONFIRMAÇÃO DE ALTERAÇÃO DE STATUS
      ========================================================== */
   const closeStatusConfirm = () => {
-    statusConfirmModal.classList.remove("active");
+    statusConfirmModal?.classList.remove("active");
     pendingStatusChange = null;
   };
 
-  byId("statusConfirmAccept").addEventListener("click", () => {
+  byId("statusConfirmAccept")?.addEventListener("click", async () => {
     if (!pendingStatusChange) return;
     const { lot, ...changes } = pendingStatusChange;
-    applyLotChanges(lot, changes);
-    renderLots();
-    closeStatusConfirm();
-    closeAddModal();
+    try {
+      await applyLotChanges(lot, changes);
+      renderLots();
+      closeStatusConfirm();
+      closeAddModal();
+      showToast("Status do lote atualizado!");
+    } catch (error) {
+      closeStatusConfirm();
+      if (lotFormError) lotFormError.textContent = error.message;
+    }
   });
-  byId("statusConfirmCancel").addEventListener("click", closeStatusConfirm);
-  byId("statusConfirmClose").addEventListener("click", closeStatusConfirm);
+  byId("statusConfirmCancel")?.addEventListener("click", closeStatusConfirm);
+  byId("statusConfirmClose")?.addEventListener("click", closeStatusConfirm);
 
   /* ==========================================================
-     TECLADO
+     TECLADO (ESC)
      ========================================================== */
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-
-    closeAddModal();
-    closeConsentNotice();
-    closeConsentModal();
+    closeDeleteConfirm();
     closeStatusConfirm();
-    if (filterTrigger?.classList.contains("is-open")) collapseSearch();
+    closeAddModal();
     if (!filterMenu.options.hidden) filterMenuControls.close();
+    if (editorMenu && !editorMenu.options.hidden) editorMenuControls?.close();
     if (editorMenu && !editorMenu.options.hidden) editorMenuControls?.close();
   });
 
@@ -908,17 +964,39 @@ import { api, STATUS_LOTE } from "../../../js/shared/api.js";
      ========================================================== */
   if (statusField && quantityField) statusField.after(quantityField);
   (async () => {
-    const company = await api.getEmpresa();
-    lotsData = (await api.listarLotesEmpresa(company.id)).map((l) => ({
-      id: l.id,
-      code: l.codigo,
-      date: new Date(l.criadoEm).toLocaleDateString("pt-BR"),
-      desc: l.descricao || l.titulo,
-      status: l.status,
-      image: l.image || null,
-      pesoKg: l.pesoKg,
-    }));
-    if (!api.podeExecutar("EDITAR_EXCLUIR_LOTE")) btnAddLote.hidden = true;
-    renderLots();
+    try {
+      const company = await api.getEmpresa();
+      currentCompany = company;
+      lotsData = (await api.listarLotesEmpresa(company.id)).map((l) => ({
+        id: l.id,
+        code: l.codigo,
+        title: l.titulo || l.codigo,
+        material: l.composicao || l.material || "",
+        date: l.criadoEm
+          ? new Date(l.criadoEm).toLocaleDateString("pt-BR")
+          : getTodayStr(),
+        desc: l.descricao || l.titulo,
+        status: l.status,
+        image: l.image || null,
+        pesoKg: l.pesoKg,
+        quantidadePecas: l.quantidadePecas ?? 0,
+        briefing: l.briefing || {},
+        doacoesVinculadas: l.doacoesVinculadas || [],
+      }));
+
+      const canCreate = api.podeExecutar("CADASTRAR_LOTE");
+      if (btnAddLote) {
+        btnAddLote.hidden = !canCreate;
+        btnAddLote.style.display = canCreate ? "" : "none";
+      }
+      if (btnHeaderAddLote) {
+        btnHeaderAddLote.hidden = !canCreate;
+        btnHeaderAddLote.style.display = canCreate ? "" : "none";
+      }
+      renderLots();
+    } catch (err) {
+      console.error("Erro ao inicializar lotes:", err);
+      renderLots();
+    }
   })();
 })();

@@ -66,14 +66,14 @@ function renderDoacoes() {
     .join("");
 }
 
-filterBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    filterBtns.forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    filtroAtual = btn.dataset.filter;
-    renderDoacoes();
+  filterBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      filtroAtual = btn.dataset.filter;
+      renderDoacoes();
+    });
   });
-});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();

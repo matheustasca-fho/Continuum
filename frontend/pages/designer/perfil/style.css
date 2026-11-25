@@ -1111,3 +1111,59 @@ body::before {
 .u-mb-lg.u-mb-lg {
   margin-bottom: var(--space-lg);
 }
+
+
+/* ==========================================================
+   REFINAMENTOS DE PROPORÇÃO, FOTO DE PERFIL E CONSENTIMENTO
+   ========================================================== */
+.main-content {
+  padding: clamp(24px, 3.2vw, 44px) clamp(20px, 3.5vw, 52px);
+  max-width: 1120px;
+}
+
+.header-tag-container {
+  height: 210px;
+}
+
+.clothing-tag {
+  height: 185px;
+}
+
+.toast {
+  pointer-events: none;
+}
+
+.avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.consent-public-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--color-sand-offwhite);
+  border: 1px solid #e2dfd5;
+  cursor: pointer;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.consent-public-card input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .header-tag-container {
+    display: none;
+  }
+}

@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
       name: "cpfCnpj",
     },
     empresa: {
-      label: "CNPJ ou E-mail Corporativo",
-      placeholder: "CNPJ ou e-mail corporativo",
+      label: "Usuário, CNPJ ou E-mail Corporativo",
+      placeholder: "Ex.: administrador, CNPJ ou e-mail",
       name: "cnpjEmail",
     },
   };

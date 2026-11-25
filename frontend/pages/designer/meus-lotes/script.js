@@ -1,116 +1,301 @@
-import { api, STATUS_LOTE } from "../../../js/shared/api.js";
+import { api, STATUS_LOTE, STATUS_RESERVA } from "../../../js/shared/api.js";
 import { dates } from "../../../js/shared/dates.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const $ = (s) => document.querySelector(s),
-    list = $("#lotes"),
-    empty = $("#empty"),
-    search = $("#search"),
-    modal = $("#confirmModal"),
-    confirm = $("#modalConfirm");
+  const $ = (s) => document.querySelector(s);
+
+  const list = $("#lotes");
+  const empty = $("#empty");
+  const search = $("#search");
+  const modal = $("#confirmModal");
+  const confirm = $("#modalConfirm");
+  const cancelModal = $("#cancelModal");
+  const cancelForm = $("#cancelForm");
+  const filterBar = $("#filters");
+  const indicator = $("#filterIndicator");
+  const toast = $("#toast");
+  const toastMsg = $("#toastMsg");
+
+  let activeFilter = "todos";
+  let selected = null;
+  let toastTimer = null;
+
+  const showToast = (text) => {
+    if (!toast || !toastMsg) return;
+    toastMsg.textContent = text;
+    toast.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 3200);
+  };
+
+  const escapeHtml = (v) =>
+    String(v ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[c],
+    );
+
+  const classifyLot = (lot) => {
+    if (
+      lot.status === STATUS_LOTE.RESERVADO ||
+      lot.status === STATUS_LOTE.EM_TRANSPORTE
+    ) {
+      return "aguardando";
+    }
+    if (
+      lot.status === STATUS_LOTE.EM_PRODUCAO ||
+      lot.status === STATUS_LOTE.ENVIADO_LOJA ||
+      lot.status === STATUS_LOTE.FINALIZADO
+    ) {
+      return "recebido";
+    }
+    return "nao";
+  };
+
+  const moveIndicator = () => {
+    const activeBtn = filterBar?.querySelector(".filter.is-active");
+    if (!activeBtn || !indicator) return;
+    indicator.style.width = `${activeBtn.offsetWidth}px`;
+    indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  };
 
   const designer = await api.getDesigner();
-  let lots = await api.listarMeusLotesDesigner(designer.id),
-    selected = null;
+  let lots = await api.listarMeusLotesDesigner(designer.id);
 
-  // Inject Cancel Modal for FE-31
-  const cancelModal = document.createElement("dialog");
-  cancelModal.id = "cancelModal";
-  cancelModal.style.cssText = "border:none;border-radius:12px;padding:1.5rem;max-width:460px;width:90%;box-shadow:0 12px 32px rgba(0,0,0,0.2);";
-  cancelModal.innerHTML = `
-    <h3 style="margin-top:0;font-family:'Anton',sans-serif;">Cancelar Reserva / Produção</h3>
-    <div style="background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c;padding:0.75rem;border-radius:8px;font-size:0.85rem;margin-bottom:1rem;">
-      <strong>⚠️ Atenção:</strong> O cancelamento reduz sua nota de reputação. Se o lote já foi recebido, sua conta receberá um selo de <strong>RESTRIÇÃO</strong>.
-    </div>
-    <form id="cancelForm" style="display:flex;flex-direction:column;gap:0.75rem;">
-      <label style="font-weight:600;font-size:0.9rem;">Motivo do cancelamento *
-        <select id="cancelMotivo" required style="width:100%;padding:0.5rem;margin-top:0.25rem;border:1px solid #ccc;border-radius:6px;">
-          <option value="">Selecione um motivo...</option>
-          <option value="Imprevisto pessoal">Imprevisto pessoal</option>
-          <option value="Falta de capacidade produtiva">Falta de capacidade produtiva</option>
-          <option value="Material incompatível">Material incompatível</option>
-          <option value="Outro">Outro</option>
-        </select>
-      </label>
-      <label style="font-weight:600;font-size:0.9rem;">Texto explicativo *
-        <textarea id="cancelTexto" rows="3" required placeholder="Explique o motivo do cancelamento..." style="width:100%;padding:0.5rem;margin-top:0.25rem;border:1px solid #ccc;border-radius:6px;"></textarea>
-      </label>
-      <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.5rem;">
-        <button type="button" id="cancelCloseBtn" class="btn-pill" style="background:#eee;color:#111;">Voltar</button>
-        <button type="submit" class="btn-pill" style="background:#b71c1c;color:#fff;">Confirmar Cancelamento</button>
-      </div>
-    </form>
-  `;
-  document.body.appendChild(cancelModal);
-  cancelModal.querySelector("#cancelCloseBtn").addEventListener("click", () => cancelModal.close());
+  const updateCounts = () => {
+    const counts = {
+      todos: lots.length,
+      aguardando: lots.filter((l) => classifyLot(l) === "aguardando").length,
+      recebido: lots.filter((l) => classifyLot(l) === "recebido").length,
+      nao: lots.filter((l) => classifyLot(l) === "nao").length,
+    };
+    Object.entries(counts).forEach(([key, val]) => {
+      const el = document.querySelector(`[data-count="${key}"]`);
+      if (el) el.textContent = String(val);
+    });
+  };
 
   const render = () => {
-    const query = (search.value || "").toLowerCase(),
-      items = lots.filter((l) =>
-        `${l.codigo} ${l.titulo} ${l.empresaParceira}`
-          .toLowerCase()
-          .includes(query),
-      );
+    updateCounts();
+    const query = (search?.value || "").trim().toLowerCase();
+
+    const items = lots.filter((l) => {
+      if (activeFilter !== "todos" && classifyLot(l) !== activeFilter) {
+        return false;
+      }
+      if (!query) return true;
+      return `${l.codigo} ${l.titulo} ${l.empresaParceira} ${l.composicao || ""}`
+        .toLowerCase()
+        .includes(query);
+    });
+
+    $("#totalKg").textContent = lots
+      .reduce((n, l) => n + (Number(l.pesoKg) || 0), 0)
+      .toFixed(1)
+      .replace(".", ",");
+    $("#totalSub").textContent = `${lots.length} lote(s) no histórico`;
+
+    if (items.length === 0) {
+      list.innerHTML = "";
+      empty.hidden = false;
+      return;
+    }
+
+    empty.hidden = true;
+
     list.innerHTML = items
       .map((l) => {
+        const cat = classifyLot(l);
         const prazoInfo = dates.getPrazoStatus(l.reservadoEm || l.criadoEm);
-        const prazoLabel = `Prazo (10 dias úteis): ${dates.formatShort(prazoInfo.prazoISO)}`;
-        const modalidade = l.modalidade === "envio" ? "Envio (Correios)" : "Retirada na loja";
-        const tracking =
+        const prazoFormatado = dates.formatShort(prazoInfo.prazoISO);
+        const modalidade =
           l.modalidade === "envio"
-            ? `<p class="lote__meta">Rastreio: <strong>${l.codigoRastreio || "Aguardando postagem"}</strong></p>`
-            : "";
-        const canReceive =
-          l.status === STATUS_LOTE.RESERVADO || l.status === STATUS_LOTE.EM_TRANSPORTE;
+            ? "Envio via Correios"
+            : "Retirada presencial na loja";
+        const canReceive = cat === "aguardando";
+        const canCancel =
+          l.status !== STATUS_LOTE.FINALIZADO &&
+          l.status !== STATUS_LOTE.INTERROMPIDO;
+
+        const badgeMod =
+          cat === "aguardando"
+            ? "badge--aguardando"
+            : cat === "recebido"
+              ? "badge--recebido"
+              : "badge--nao";
+
+        const swatchStyle = l.image
+          ? `style="background-image:url('${l.image}')"`
+          : "";
+        const swatchClass = l.image ? "swatch" : "swatch swatch--stitch";
+
+        const emp = l.empresaObj || {};
+        const enderecoLoja = [
+          emp.logradouro,
+          emp.numero,
+          emp.bairro,
+          emp.cidade,
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+        const stepProgress = cat === "recebido" ? 1 : cat === "aguardando" ? 0.5 : 0;
 
         return `
-          <li class="lote" data-id="${l.id}">
-            <div class="lote__row">
+          <li class="lote" data-id="${escapeHtml(l.id)}">
+            <div class="lote__row" data-action="toggle-detail">
+              <div class="${swatchClass}" ${swatchStyle}></div>
+
               <div class="lote__info">
-                <h3 class="lote__title">${l.titulo}</h3>
-                <p class="lote__meta">${l.codigo} · ${l.pesoKg} kg · Empresa Parceira: ${l.empresaParceira}</p>
-                <p class="lote__meta">Modalidade: <strong>${modalidade}</strong> · ${prazoLabel}</p>
-                ${tracking}
+                <h3 class="lote__title">${escapeHtml(l.titulo)}</h3>
+                <p class="lote__meta">
+                  <span>${escapeHtml(l.codigo)}</span>
+                  <span class="sep">·</span>
+                  <span>${escapeHtml(String(l.pesoKg).replace(".", ","))} kg</span>
+                  <span class="sep">·</span>
+                  <span>${escapeHtml(l.empresaParceira)}</span>
+                  <span class="sep">·</span>
+                  <span><strong>${escapeHtml(modalidade)}</strong></span>
+                </p>
+                ${
+                  canReceive
+                    ? `<span class="lote__deadline ${prazoInfo.status !== "no_prazo" ? "is-urgent" : ""}">Prazo (10 dias úteis): até ${escapeHtml(prazoFormatado)}</span>`
+                    : ""
+                }
               </div>
-              <div class="lote__aside" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-                <span class="badge">${l.status}</span>
-                ${canReceive ? '<button class="btn-pill" data-action="receive">Sinalizar recebido</button>' : ""}
-                <button class="btn-pill" data-action="cancel" style="background:#ffebee;color:#b71c1c;">Cancelar</button>
+
+              <div class="lote__aside">
+                <span class="badge ${badgeMod}">${escapeHtml(l.status)}</span>
+                ${
+                  canReceive
+                    ? '<button type="button" class="btn-pill" data-action="receive">Sinalizar recebido</button>'
+                    : ""
+                }
+                ${
+                  cat === "recebido"
+                    ? '<a href="../meus-projetos/index.html" class="btn-pill" style="text-decoration:none;">Abrir projeto →</a>'
+                    : ""
+                }
+                ${
+                  canCancel
+                    ? '<button type="button" class="btn-pill btn-pill--danger" data-action="cancel">Cancelar</button>'
+                    : ""
+                }
+              </div>
+
+              <button type="button" class="lote__toggle" aria-label="Expandir detalhes do lote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="lote__detail">
+              <div class="lote__detail-inner">
+                <div class="detail">
+                  <div>
+                    <p class="detail__heading">Progresso Logístico</p>
+                    <ol class="track" style="--p: ${stepProgress}">
+                      <li class="track__step is-done">
+                        <span class="track__dot">✓</span>
+                        <span class="track__label">Reservado</span>
+                        <span class="track__date">${escapeHtml(dates.formatShort(l.reservadoEm || l.criadoEm))}</span>
+                      </li>
+                      <li class="track__step ${cat === "recebido" ? "is-done" : "is-current"}">
+                        <span class="track__dot">${cat === "recebido" ? "✓" : ""}</span>
+                        <span class="track__label">${escapeHtml(modalidade)}</span>
+                        <span class="track__date">${escapeHtml(l.codigoRastreio || "Prazo: " + prazoFormatado)}</span>
+                      </li>
+                      <li class="track__step ${cat === "recebido" ? "is-done" : ""}">
+                        <span class="track__dot">${cat === "recebido" ? "✓" : ""}</span>
+                        <span class="track__label">Em produção</span>
+                        <span class="track__date">${cat === "recebido" ? "Confirmado" : "Pendente"}</span>
+                      </li>
+                    </ol>
+
+                    <p class="detail__heading">Briefing Criativo</p>
+                    <p style="font-size:13px; color:var(--color-charcoal-text); line-height:1.55;">
+                      ${escapeHtml(l.briefing?.ideiaMarca || l.descricao || "Criação autoral livre respeitando a cartilha da loja.")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p class="detail__heading">Ficha Técnica & Origem</p>
+                    <dl class="spec">
+                      <dt>Código</dt>
+                      <dd class="code">${escapeHtml(l.codigo)}</dd>
+                      <dt>Composição</dt>
+                      <dd>${escapeHtml(l.composicao || l.material || "Tecido selecionado")}</dd>
+                      <dt>Peso</dt>
+                      <dd>${escapeHtml(String(l.pesoKg).replace(".", ","))} kg</dd>
+                      <dt>Loja</dt>
+                      <dd>${escapeHtml(l.empresaParceira)}</dd>
+                      <dt>Endereço</dt>
+                      <dd>${escapeHtml(enderecoLoja || "São Paulo - SP")} (${escapeHtml(emp.horarioRetirada || "10h às 18h")})</dd>
+                    </dl>
+                  </div>
+                </div>
               </div>
             </div>
           </li>
         `;
       })
       .join("");
-    empty.hidden = items.length > 0;
-    $("#totalKg").textContent = items
-      .reduce((n, l) => n + (Number(l.pesoKg) || 0), 0)
-      .toFixed(1);
-    $("#totalSub").textContent = `${items.length} lote(s) reservado(s)`;
   };
 
-  search.addEventListener("input", render);
+  filterBar?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".filter");
+    if (!btn) return;
+    filterBar.querySelectorAll(".filter").forEach((b) => {
+      b.classList.remove("is-active");
+      b.setAttribute("aria-selected", "false");
+    });
+    btn.classList.add("is-active");
+    btn.setAttribute("aria-selected", "true");
+    activeFilter = btn.dataset.filter;
+    moveIndicator();
+    render();
+  });
+
+  window.addEventListener("resize", moveIndicator);
+  search?.addEventListener("input", render);
 
   list.addEventListener("click", (e) => {
-    const receiveBtn = e.target.closest('[data-action="receive"]');
-    if (receiveBtn) {
-      selected = receiveBtn.closest("[data-id]").dataset.id;
-      $("#modalLote").textContent =
-        lots.find((l) => l.id === selected)?.titulo || "";
+    const itemEl = e.target.closest(".lote[data-id]");
+    if (!itemEl) return;
+    const lotId = itemEl.dataset.id;
+
+    if (e.target.closest('[data-action="receive"]')) {
+      e.stopPropagation();
+      selected = lotId;
+      const lot = lots.find((l) => l.id === selected);
+      $("#modalLote").textContent = lot?.titulo || "";
+      $("#modalMeta").textContent = `${lot?.codigo || ""} · ${lot?.empresaParceira || ""}`;
       modal.showModal();
       return;
     }
 
-    const cancelBtn = e.target.closest('[data-action="cancel"]');
-    if (cancelBtn) {
-      selected = cancelBtn.closest("[data-id]").dataset.id;
-      cancelModal.querySelector("#cancelMotivo").value = "";
-      cancelModal.querySelector("#cancelTexto").value = "";
+    if (e.target.closest('[data-action="cancel"]')) {
+      e.stopPropagation();
+      selected = lotId;
+      $("#cancelMotivo").value = "";
+      $("#cancelTexto").value = "";
       cancelModal.showModal();
+      return;
     }
+
+    if (e.target.closest("a")) return;
+
+    itemEl.classList.toggle("is-open");
   });
 
-  confirm.addEventListener("click", async (e) => {
+  confirm?.addEventListener("click", async (e) => {
     if (!selected) return;
     e.preventDefault();
     try {
@@ -118,16 +303,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       lots = await api.listarMeusLotesDesigner(designer.id);
       modal.close();
       render();
+      showToast("Recebimento confirmado! Projeto criado em Meus Projetos.");
     } catch (err) {
       alert(err.message);
     }
   });
 
-  cancelModal.querySelector("#cancelForm").addEventListener("submit", async (e) => {
+  $("#cancelCloseBtn")?.addEventListener("click", () => cancelModal.close());
+  cancelModal?.addEventListener("click", (e) => {
+    if (e.target === cancelModal) cancelModal.close();
+  });
+
+  cancelForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!selected) return;
-    const motivo = cancelModal.querySelector("#cancelMotivo").value;
-    const texto = cancelModal.querySelector("#cancelTexto").value.trim();
+    const motivo = $("#cancelMotivo").value;
+    const texto = $("#cancelTexto").value.trim();
     if (!motivo || !texto) return;
 
     try {
@@ -141,4 +332,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   render();
+  window.requestAnimationFrame(moveIndicator);
 });

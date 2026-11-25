@@ -971,3 +971,282 @@ h2,
 .delay-3 {
   animation-delay: 0.3s;
 }
+
+/* ==========================================================================
+   CONTINUUM DYNAMIC LOADER (Paleta Craft: Vinho, Areia & Carvão)
+   ========================================================================== */
+.btn--loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.96;
+  gap: 0.65rem !important;
+}
+
+.continuum-btn-spinner {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  display: inline-block;
+  animation: continuumSpin 0.85s linear infinite;
+}
+
+.continuum-btn-spinner__track {
+  stroke: rgba(245, 242, 235, 0.28);
+}
+
+.continuum-btn-spinner__arc {
+  stroke: var(--color-sand-offwhite, #f5f2eb);
+  stroke-linecap: round;
+  stroke-dasharray: 44 100;
+  animation: continuumDashBtn 1.35s ease-in-out infinite;
+}
+
+.continuum-loader-host {
+  position: relative !important;
+}
+
+.continuum-loader-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.75rem;
+  text-align: center;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(253, 242, 244, 0.95) 0%,
+    rgba(245, 242, 235, 0.93) 65%,
+    rgba(236, 231, 220, 0.95) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.continuum-loader-overlay.is-visible {
+  opacity: 1;
+}
+
+.continuum-loader-ring {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1.15rem;
+}
+
+.continuum-loader-ring::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(120, 39, 54, 0.14) 0%,
+    rgba(253, 242, 244, 0) 72%
+  );
+  animation: continuumHaloPulse 1.8s ease-in-out infinite;
+}
+
+.continuum-loader-ring__svg {
+  width: 82px;
+  height: 82px;
+  transform: rotate(-90deg);
+}
+
+.continuum-loader-ring__bg {
+  fill: var(--color-white, #ffffff);
+  stroke: #e4dfd3;
+  stroke-width: 4;
+}
+
+.continuum-loader-ring__stitch {
+  fill: none;
+  stroke: var(--color-charcoal-text, #2d3748);
+  stroke-opacity: 0.26;
+  stroke-width: 1.6;
+  stroke-dasharray: 3.5 4.5;
+  transform-origin: 41px 41px;
+  animation: continuumSpinReverse 6s linear infinite;
+}
+
+.continuum-loader-ring__arc {
+  fill: none;
+  stroke: url(#continuumWineGrad);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-dasharray: 60 220;
+  transform-origin: 41px 41px;
+  animation:
+    continuumSpin 1.15s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    continuumArcSweep 1.6s ease-in-out infinite;
+}
+
+.continuum-loader-ring__core {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary-light, #fdf2f4);
+  border: 1px solid rgba(120, 39, 54, 0.22);
+  color: var(--color-primary, #782736);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-detail);
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(120, 39, 54, 0.12);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.continuum-loader-overlay.is-success .continuum-loader-ring__arc {
+  stroke-dasharray: 220 220;
+  animation: none;
+  stroke: var(--color-primary, #782736);
+}
+
+.continuum-loader-overlay.is-success .continuum-loader-ring__core {
+  background: var(--color-primary, #782736);
+  color: var(--color-white, #ffffff);
+  transform: scale(1.08);
+}
+
+.continuum-loader__kicker {
+  font-family: var(--font-detail);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary, #782736);
+  margin-bottom: 0.3rem;
+}
+
+.continuum-loader__title {
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-charcoal-text, #2d3748);
+  margin: 0 0 0.25rem;
+}
+
+.continuum-loader__step {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--color-muted-text, #718096);
+  min-height: 1.25rem;
+  margin: 0 0 0.9rem;
+}
+
+.continuum-loader__bar {
+  width: min(100%, 210px);
+  height: 4px;
+  border-radius: 999px;
+  background: #e2ddd0;
+  overflow: hidden;
+}
+
+.continuum-loader__bar-fill {
+  height: 100%;
+  width: 35%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary, #782736),
+    var(--color-primary-hover, #5e1e2a)
+  );
+  transition: width 0.32s ease;
+}
+
+/* Mini-spinner inline para inputs com auto-busca (CEP / CNPJ) */
+.input-lookup-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-lookup-wrap input {
+  padding-right: 2.35rem !important;
+}
+
+.input-lookup-spinner {
+  position: absolute;
+  right: 0.65rem;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(120, 39, 54, 0.2);
+  border-top-color: var(--color-primary, #782736);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  animation: continuumSpin 0.75s linear infinite;
+}
+
+.input-lookup-wrap.is-loading .input-lookup-spinner {
+  opacity: 1;
+}
+
+@keyframes continuumSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes continuumSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes continuumArcSweep {
+  0% {
+    stroke-dasharray: 28 220;
+  }
+  50% {
+    stroke-dasharray: 145 220;
+  }
+  100% {
+    stroke-dasharray: 28 220;
+  }
+}
+
+@keyframes continuumDashBtn {
+  0%,
+  100% {
+    stroke-dasharray: 18 100;
+  }
+  50% {
+    stroke-dasharray: 62 100;
+  }
+}
+
+@keyframes continuumHaloPulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .continuum-btn-spinner,
+  .continuum-loader-ring__arc,
+  .continuum-loader-ring__stitch,
+  .continuum-loader-ring::before,
+  .input-lookup-spinner {
+    animation-duration: 3s !important;
+  }
+}

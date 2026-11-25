@@ -98,6 +98,12 @@
           href: "pages/empresa/painel/index.html",
         },
         {
+          key: "doacoes",
+          label: "Doações",
+          icon: "scissors",
+          href: "pages/empresa/doacoes/index.html",
+        },
+        {
           key: "lotes",
           label: "Lotes",
           icon: "spool",
@@ -114,13 +120,14 @@
           label: "Perfil da empresa",
           icon: "mannequin",
           href: "pages/empresa/perfil/index.html",
+          managerOnly: true,
         },
         {
           key: "usuarios",
-          label: "Gestão de Usuários / Equipe",
+          label: "Equipe & Acessos",
           icon: "pattern",
           href: "pages/empresa/usuarios/index.html",
-          adminOnly: true,
+          managerOnly: true,
         },
       ],
     },
@@ -154,9 +161,24 @@
     return link;
   };
 
+  const normalizeEmpRole = (r) => {
+    const v = String(r || "").toUpperCase();
+    if (v === "DIRETOR") return "DIRETOR";
+    if (v === "GERENCIADOR" || v === "ADMIN") return "GERENCIADOR";
+    if (v === "REGISTRADOR" || v === "OPERADOR") return "REGISTRADOR";
+    return v;
+  };
+
+  const ROLE_SUBLOGOS = {
+    DIRETOR: "Corporativo · Diretor",
+    GERENCIADOR: "Corporativo · Gerenciador",
+    REGISTRADOR: "Corporativo · Registrador",
+  };
+
   const buildNav = (nav) => {
+    const empRole = normalizeEmpRole(session?.perfilEmpresa);
     config.links.forEach((item) => {
-      if (item.adminOnly && session?.perfilEmpresa !== "ADMIN") return;
+      if (item.managerOnly && empRole === "REGISTRADOR") return;
       nav.appendChild(createNavLink(item));
     });
   };
@@ -213,7 +235,13 @@
     setupLogo();
 
     const sublogo = host.querySelector("[data-header-sublogo]");
-    if (sublogo) sublogo.textContent = config.sublogo;
+    if (sublogo) {
+      const empRole = normalizeEmpRole(session?.perfilEmpresa);
+      sublogo.textContent =
+        role === "empresa" && ROLE_SUBLOGOS[empRole]
+          ? ROLE_SUBLOGOS[empRole]
+          : config.sublogo;
+    }
 
     const user = host.querySelector("[data-header-user]");
     if (user && session?.nome) user.textContent = session.nome;

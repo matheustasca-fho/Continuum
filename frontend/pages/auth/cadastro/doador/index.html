@@ -1,109 +1,500 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#eff0e8" />
-  <title>Cadastrar-se | CONTINUUM</title>
-  <link rel="stylesheet" href="../../../../css/global.css" />
-  <link rel="stylesheet" href="../../../../css/responsive.css" />
-  <link rel="stylesheet" href="cadastro-formulario.css" />
-</head>
-<body class="signup-page">
-  <main class="signup-page__main">
-    <a class="signup-page__back" href="../index.html"><span aria-hidden="true">←</span> Voltar à escolha de perfil</a>
-
-    <section class="signup-card" aria-labelledby="signup-card-title">
-      <header class="signup-card__header">
-        <a class="signup-card__brand" href="../../../../index.html" aria-label="CONTINUUM — página inicial">
-          <span class="signup-card__brand-name">CONTINUUM</span>
-          <span class="signup-card__brand-tagline">ECONOMIA CIRCULAR · UPCYCLING · MODA</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f2eb" />
+    <title>Cadastro Doador | CONTINUUM</title>
+    <link rel="stylesheet" href="../../../../css/global.css" />
+    <link rel="stylesheet" href="../../../../css/responsive.css" />
+    <link rel="stylesheet" href="../../../../css/cadastro-unificado.css" />
+    <link rel="stylesheet" href="cadastro-formulario.css" />
+  </head>
+  <body class="c-signup-body">
+    <main class="c-signup-shell">
+      <nav class="c-signup-topbar" aria-label="Navegação de retorno">
+        <a class="c-signup-back" href="../index.html">
+          <span aria-hidden="true">←</span> Voltar à escolha de perfil
         </a>
-        <h1 id="signup-card-title" class="signup-card__title">Cadastro Doador</h1>
-        <p class="signup-card__description">Crie sua conta e dê um novo destino aos materiais.</p>
-      </header>
+        <p class="c-signup-login-prompt">
+          Já tem uma conta?
+          <a href="../../login/index.html?perfil=doador">Entrar ↗</a>
+        </p>
+      </nav>
 
-      <form id="formCadastroConta" class="signup-form" novalidate>
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="cpfDoador">CPF <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="cpfDoador" name="CPF" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" maxlength="14" aria-describedby="cpfAjuda" required />
-          <p id="cpfAjuda" class="signup-form__hint" aria-live="polite" style="display:none;"></p>
+      <section
+        class="c-signup-card"
+        id="doadorSignupCard"
+        aria-labelledby="signup-card-title"
+      >
+        <header class="c-signup-masthead">
+          <a
+            class="c-signup-brand"
+            href="../../../../lp.html"
+            aria-label="CONTINUUM — página inicial"
+          >
+            <span class="c-signup-brand__name">CONTINUUM</span>
+            <span class="c-signup-brand__tag">
+              ECONOMIA CIRCULAR · PERFIL DOADOR
+            </span>
+          </a>
+          <span class="c-field-badge is-warn">5 doações = Cupom OFF</span>
+        </header>
+
+        <div class="c-signup-heading">
+          <h1 id="signup-card-title" class="c-signup-title">Cadastro Doador</h1>
+          <p class="c-signup-subtitle">
+            Dê um novo destino aos tecidos e acumule benefícios circulares.
+          </p>
         </div>
 
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="cepDoador">CEP <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="cepDoador" name="CEP" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" maxlength="9" aria-describedby="cepAjuda" required />
-          <p id="cepAjuda" class="signup-form__hint" style="display:none;"></p>
+        <div
+          class="c-stepper"
+          id="doadorStepper"
+          role="group"
+          aria-label="Etapas do cadastro de doador"
+        >
+          <button
+            type="button"
+            class="c-stepper__btn is-active"
+            data-step-btn="1"
+          >
+            <span class="c-stepper__num">01</span>
+            <span>Conta &amp; Acesso</span>
+          </button>
+          <button
+            type="button"
+            class="c-stepper__btn"
+            data-step-btn="2"
+            disabled
+          >
+            <span class="c-stepper__num">02</span>
+            <span>Endereço</span>
+          </button>
+          <button
+            type="button"
+            class="c-stepper__btn"
+            data-step-btn="3"
+            disabled
+          >
+            <span class="c-stepper__num">03</span>
+            <span>Perfil &amp; Termos</span>
+          </button>
         </div>
 
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="senhaUsuario">Senha <span class="signup-form__required">*</span></label>
-          <div class="signup-form__password-wrap">
-          <input class="form-input signup-form__input" type="password" id="senhaUsuario" name="SENHA_DOADOR" placeholder="Senha" autocomplete="new-password" minlength="8" aria-describedby="senhaAjuda" required />
-            <button class="signup-form__password-toggle" type="button" aria-controls="senhaUsuario" aria-pressed="false" aria-label="Mostrar ou ocultar senha">
-              <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-              <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="1" x2="23" y2="23"/>
-              </svg>
-            </button>
+        <form id="formCadastroConta" novalidate>
+          <!-- ==========================================================
+               ETAPA 1 — IDENTIFICAÇÃO, CONTATO E CREDENCIAIS
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="1">
+            <div class="c-grid">
+              <div class="c-field c-field--7">
+                <div class="c-label-row">
+                  <label class="c-label" for="nomeDoador">
+                    Nome completo <span class="c-req">*</span>
+                  </label>
+                </div>
+                <input
+                  class="c-input"
+                  type="text"
+                  id="nomeDoador"
+                  name="NM_DOADOR"
+                  placeholder="Ex.: Mariana Alves"
+                  autocomplete="name"
+                  maxlength="120"
+                  required
+                />
+                <p
+                  id="nomeAjuda"
+                  class="c-hint"
+                  aria-live="polite"
+                  style="display: none"
+                ></p>
+              </div>
+
+              <div class="c-field c-field--5">
+                <div class="c-label-row">
+                  <label class="c-label" for="cpfDoador">
+                    CPF <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="cpfBadge">Cupom</span>
+                </div>
+                <input
+                  class="c-input"
+                  type="text"
+                  id="cpfDoador"
+                  name="CPF"
+                  placeholder="000.000.000-00"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  maxlength="14"
+                  aria-describedby="cpfAjuda"
+                  required
+                />
+                <p
+                  id="cpfAjuda"
+                  class="c-hint"
+                  aria-live="polite"
+                  style="display: none"
+                ></p>
+              </div>
+
+              <div class="c-field c-field--7">
+                <div class="c-label-row">
+                  <label class="c-label" for="emailDoador">
+                    E-mail <span class="c-req">*</span>
+                  </label>
+                </div>
+                <input
+                  class="c-input"
+                  type="email"
+                  id="emailDoador"
+                  name="EMAIL"
+                  placeholder="voce@exemplo.com"
+                  autocomplete="email"
+                  aria-describedby="emailAjuda"
+                  required
+                />
+                <p
+                  id="emailAjuda"
+                  class="c-hint"
+                  aria-live="polite"
+                  style="display: none"
+                ></p>
+              </div>
+
+              <div class="c-field c-field--5">
+                <div class="c-label-row">
+                  <label class="c-label" for="telefoneDoador">
+                    Telefone / WhatsApp <span class="c-req">*</span>
+                  </label>
+                </div>
+                <input
+                  class="c-input"
+                  type="tel"
+                  id="telefoneDoador"
+                  name="TELEFONE"
+                  placeholder="(11) 98765-4321"
+                  inputmode="numeric"
+                  autocomplete="tel"
+                  maxlength="15"
+                  aria-describedby="telefoneAjuda"
+                  required
+                />
+                <p
+                  id="telefoneAjuda"
+                  class="c-hint"
+                  aria-live="polite"
+                  style="display: none"
+                ></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-label-row">
+                  <label class="c-label" for="senhaUsuario">
+                    Senha <span class="c-req">*</span>
+                  </label>
+                </div>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    type="password"
+                    id="senhaUsuario"
+                    name="SENHA_DOADOR"
+                    placeholder="Mín. 8 caracteres"
+                    autocomplete="new-password"
+                    minlength="8"
+                    aria-describedby="senhaAjuda"
+                    required
+                  />
+                  <button
+                    class="c-pass-toggle signup-form__password-toggle"
+                    type="button"
+                    data-toggle-pass="senhaUsuario"
+                    aria-label="Mostrar ou ocultar senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="c-strength" id="doadorPassStrength" data-tone="idle">
+                  <div class="c-strength__bars" aria-hidden="true">
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                  </div>
+                  <span class="c-strength__label" id="doadorPassStrengthLabel">Mín. 8 caracteres</span>
+                </div>
+                <p id="senhaAjuda" class="c-hint" style="display: none"></p>
+              </div>
+
+              <div class="c-field">
+                <div class="c-label-row">
+                  <label class="c-label" for="confirmarSenhaDoador">
+                    Confirmar senha <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="doadorMatchBadge" hidden>Coincidem</span>
+                </div>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    type="password"
+                    id="confirmarSenhaDoador"
+                    name="CONFIRMAR_SENHA"
+                    placeholder="Repita a senha"
+                    autocomplete="new-password"
+                    aria-describedby="confirmarSenhaAjuda"
+                    required
+                  />
+                  <button
+                    class="c-pass-toggle"
+                    type="button"
+                    data-toggle-pass="confirmarSenhaDoador"
+                    aria-label="Mostrar ou ocultar confirmação de senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="confirmarSenhaAjuda" class="c-hint" style="display: none"></p>
+              </div>
+            </div>
           </div>
-          <p id="senhaAjuda" class="signup-form__hint" style="display:none;"></p>
+
+          <!-- ==========================================================
+               ETAPA 2 — ENDEREÇO DINÂMICO POR CEP
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="2" hidden>
+            <div class="c-grid">
+              <div class="c-field c-field--4">
+                <div class="c-label-row">
+                  <label class="c-label" for="cepDoador">
+                    CEP <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="cepDoadorBadge">Auto</span>
+                </div>
+                <div class="input-lookup-wrap">
+                  <input
+                    class="c-input"
+                    type="text"
+                    id="cepDoador"
+                    name="CEP"
+                    placeholder="00000-000"
+                    inputmode="numeric"
+                    autocomplete="postal-code"
+                    maxlength="9"
+                    aria-describedby="cepAjuda"
+                    required
+                  />
+                  <span class="input-lookup-spinner" aria-hidden="true"></span>
+                </div>
+                <p id="cepAjuda" class="c-hint" style="display: none"></p>
+              </div>
+
+              <div class="c-field c-field--5">
+                <label class="c-label" for="cidadeDoador">
+                  Cidade <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="cidadeDoador"
+                  name="cidade"
+                  placeholder="Ex.: São Paulo"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--3">
+                <label class="c-label" for="ufDoador">
+                  UF <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="ufDoador"
+                  name="uf"
+                  placeholder="SP"
+                  maxlength="2"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--8">
+                <label class="c-label" for="logradouroDoador">
+                  Rua / Logradouro <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="logradouroDoador"
+                  name="logradouro"
+                  placeholder="Rua, avenida, alameda..."
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="numeroDoador">
+                  Número <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="numeroDoador"
+                  name="numero"
+                  placeholder="Nº"
+                  required
+                />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="bairroDoador">
+                  Bairro <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="bairroDoador"
+                  name="bairro"
+                  placeholder="Bairro"
+                  required
+                />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="complementoDoador">
+                  Complemento <span style="font-weight: 400; color: var(--color-muted-text)">(opcional)</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="complementoDoador"
+                  name="complemento"
+                  placeholder="Apto, bloco, casa..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- ==========================================================
+               ETAPA 3 — PERFIL OPCIONAL, RESUMO E TERMOS
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="3" hidden>
+            <div class="c-summary-box">
+              <div class="c-summary-box__main">
+                <span class="c-summary-box__name" id="doadorSummaryName">Novo Doador</span>
+                <span class="c-summary-box__meta" id="doadorSummaryMeta">CPF · E-mail · Cidade/UF</span>
+              </div>
+              <button type="button" class="c-summary-box__edit" id="doadorEditStep1">
+                Revisar dados
+              </button>
+            </div>
+
+            <div class="c-grid">
+              <div class="c-field">
+                <label class="c-label" for="faixaEtariaDoador">
+                  Faixa etária (opcional)
+                </label>
+                <select class="c-input" id="faixaEtariaDoador" name="faixaEtaria">
+                  <option value="">Selecione — opcional</option>
+                  <option>18 a 24 anos</option>
+                  <option>25 a 34 anos</option>
+                  <option>35 a 44 anos</option>
+                  <option>45 a 54 anos</option>
+                  <option>55 anos ou mais</option>
+                  <option>Prefiro não informar</option>
+                </select>
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="comoConheceuDoador">
+                  Como conheceu o CONTINUUM? (opcional)
+                </label>
+                <select class="c-input" id="comoConheceuDoador" name="comoConheceu">
+                  <option value="">Selecione — opcional</option>
+                  <option>Loja física participante</option>
+                  <option>Instagram / Redes Sociais</option>
+                  <option>Indicação de amigos</option>
+                  <option>Pesquisa Google</option>
+                  <option>Eventos de moda/sustentabilidade</option>
+                  <option>Outros</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="c-checks">
+              <label class="c-check-card" for="aceiteTermosDoador">
+                <input
+                  type="checkbox"
+                  id="aceiteTermosDoador"
+                  name="ACEITE_TERMOS"
+                  required
+                  aria-describedby="termosAjuda"
+                />
+                <span>
+                  Li e aceito os <strong>Termos de Uso</strong> e a
+                  <strong>Política de Privacidade</strong> do ecossistema
+                  CONTINUUM <span class="c-req">*</span>
+                </span>
+              </label>
+              <p id="termosAjuda" class="c-hint" style="display: none"></p>
+            </div>
+          </div>
+
+          <p
+            class="c-status"
+            id="cadastroStatus"
+            role="status"
+            aria-live="polite"
+          ></p>
+
+          <footer class="c-footer">
+            <span class="c-footer__step-count" id="doadorStepCounter">
+              Etapa 1 de 3
+            </span>
+            <div class="c-footer__actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                id="doadorBtnPrev"
+                hidden
+              >
+                ← Anterior
+              </button>
+              <button type="button" class="btn btn--primary" id="doadorBtnNext">
+                Continuar →
+              </button>
+              <button
+                class="btn btn--primary signup-form__submit"
+                type="submit"
+                id="doadorBtnSubmit"
+                hidden
+              >
+                Cadastrar-se <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </footer>
+        </form>
+
+        <!-- Estado de Conclusão Dinâmica -->
+        <div class="c-done-view" id="doadorDoneView" hidden>
+          <div class="c-done-view__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 class="c-signup-title">Conta criada!</h2>
+          <p class="c-signup-subtitle">
+            Seu CPF já está apto a acumular doações e cupons nas lojas parceiras.
+            Redirecionando ao seu painel…
+          </p>
         </div>
+      </section>
 
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="nomeDoador">Nome completo <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="text" id="nomeDoador" name="NM_DOADOR" placeholder="Nome completo" autocomplete="name" maxlength="120" required />
-        </div>
-
-        <div class="signup-form__field"><label class="signup-form__label" for="ufDoador">Estado (UF) *</label><input class="form-input signup-form__input" id="ufDoador" name="uf" maxlength="2" required /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="cidadeDoador">Cidade *</label><input class="form-input signup-form__input" id="cidadeDoador" name="cidade" required /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="bairroDoador">Bairro *</label><input class="form-input signup-form__input" id="bairroDoador" name="bairro" required /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="logradouroDoador">Rua (Logradouro) *</label><input class="form-input signup-form__input" id="logradouroDoador" name="logradouro" required /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="numeroDoador">Número *</label><input class="form-input signup-form__input" id="numeroDoador" name="numero" required /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="complementoDoador">Complemento</label><input class="form-input signup-form__input" id="complementoDoador" name="complemento" /></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="faixaEtariaDoador">Faixa etária (opcional)</label><select class="form-input signup-form__input" id="faixaEtariaDoador" name="faixaEtaria"><option value="">Selecione — opcional</option><option>18 a 24 anos</option><option>25 a 34 anos</option><option>35 a 44 anos</option><option>45 a 54 anos</option><option>55 anos ou mais</option><option>Prefiro não informar</option></select></div>
-        <div class="signup-form__field"><label class="signup-form__label" for="comoConheceuDoador">Como conheceu o CONTINUUM? (opcional)</label><select class="form-input signup-form__input" id="comoConheceuDoador" name="comoConheceu"><option value="">Selecione — opcional</option><option>Loja física participante</option><option>Instagram / Redes Sociais</option><option>Indicação de amigos</option><option>Pesquisa Google</option><option>Eventos de moda/sustentabilidade</option><option>Outros</option></select></div>
-
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="emailDoador">E-mail <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="email" id="emailDoador" name="EMAIL" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="emailAjuda" required />
-          <p id="emailAjuda" class="signup-form__hint" style="display:none;"></p>
-        </div>
-
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="confirmarSenhaDoador">Confirmar senha <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="password" id="confirmarSenhaDoador" name="CONFIRMAR_SENHA" placeholder="Repita a senha" autocomplete="new-password" aria-describedby="confirmarSenhaAjuda" required />
-          <p id="confirmarSenhaAjuda" class="signup-form__hint" style="display:none;"></p>
-        </div>
-
-        <div class="signup-form__field">
-          <label class="signup-form__label" for="telefoneDoador">Telefone <span class="signup-form__required">*</span></label>
-          <input class="form-input signup-form__input" type="tel" id="telefoneDoador" name="TELEFONE" placeholder="(XX) XXXXX-XXXX" autocomplete="tel" maxlength="15" aria-describedby="telefoneAjuda" required />
-          <p id="telefoneAjuda" class="signup-form__hint">Informe o DDD entre parênteses, com até 11 dígitos. Ex: (11) 98765-4321</p>
-        </div>
-
-        <div class="signup-form__field signup-form__terms">
-          <label class="signup-form__check-label" for="aceiteTermosDoador">
-            <input type="checkbox" id="aceiteTermosDoador" name="ACEITE_TERMOS" required aria-describedby="termosAjuda" />
-            <span>Li e aceito os termos de uso <span class="signup-form__required">*</span></span>
-          </label>
-          <p id="termosAjuda" class="signup-form__hint" style="display:none;"></p>
-        </div>
-
-        <button class="btn btn--primary btn--full signup-form__submit" type="submit">Cadastrar-se <span aria-hidden="true">↗</span></button>
-        <div class="signup-card__footer-centered">
-          <p>Já tem uma conta? <a href="../../login/index.html" class="signup-card__login-link">Entrar</a></p>
-        </div>
-        <p class="signup-form__status" id="cadastroStatus" role="status" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <p class="signup-page__signature"><span aria-hidden="true">✳</span> CADA PEÇA PODE CONTINUAR DE UM JEITO DIFERENTE</p>
-  </main>
-  <script type="module" src="cadastro-formulario.js"></script>
-</body>
+      <p class="c-signature">
+        <span aria-hidden="true">✳</span> CADA PEÇA PODE CONTINUAR DE UM JEITO DIFERENTE
+      </p>
+    </main>
+    <script type="module" src="cadastro-formulario.js"></script>
+  </body>
 </html>

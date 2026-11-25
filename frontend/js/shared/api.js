@@ -145,6 +145,7 @@ const apiMethods = {
     writeSession(null);
   },
 
+
   getSessaoAtual() {
     return readSession();
   },
@@ -164,6 +165,7 @@ const apiMethods = {
       ].includes(acao)
     );
   },
+
 
   verificarPermissaoEmpresa(acao) {
     if (!this.podeExecutar(acao)) {

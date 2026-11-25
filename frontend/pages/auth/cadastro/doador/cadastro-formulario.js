@@ -7,6 +7,11 @@ import {
   mascaraTelefone,
 } from "../../../../js/shared/validators.js";
 import { conectarBuscaCep } from "../../../../js/shared/cep.js";
+import {
+  runWithDynamicLoading,
+  evaluatePasswordStrength,
+} from "../../../../js/shared/loader.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const $ = (id) => document.getElementById(id),
     form = $("formCadastroConta"),
@@ -33,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logradouro: f.street,
   };
   const hints = {
+    name: $("nomeAjuda"),
     cpf: $("cpfAjuda"),
     cep: $("cepAjuda"),
     pass: $("senhaAjuda"),
@@ -41,17 +47,25 @@ document.addEventListener("DOMContentLoaded", () => {
     phone: $("telefoneAjuda"),
     terms: $("termosAjuda"),
   };
+
+  const setStatus = (msg, isSuccess = false) => {
+    status.textContent = msg || "";
+    status.classList.toggle("is-success", Boolean(msg && isSuccess));
+  };
+
   const check = (key, msg) => {
-    const el = f[key],
-      hint = hints[key];
+    const el = f[key];
+    const hint = hints[key];
+    if (!el) return true;
     el.setCustomValidity(msg);
-    el.setAttribute("aria-invalid", String(!!msg));
+    el.setAttribute("aria-invalid", String(Boolean(msg)));
     if (hint) {
       hint.textContent = msg;
       hint.style.display = msg ? "block" : "none";
     }
     return !msg;
   };
+
   const v = {
     name: () =>
       check(
@@ -59,25 +73,23 @@ document.addEventListener("DOMContentLoaded", () => {
         f.name.value.trim().split(/\s+/).length >= 2 &&
           f.name.value.trim().length >= 3
           ? ""
-          : "Informe nome e sobrenome (mínimo 3 caracteres).",
+          : "Informe nome e sobrenome.",
       ),
     cpf: () =>
       check("cpf", validarCPF(f.cpf.value) ? "" : "Informe um CPF válido."),
     email: () =>
-      check("email", f.email.validity.valid ? "" : "Informe um e-mail válido."),
+      check(
+        "email",
+        f.email.value.trim() && f.email.validity.valid
+          ? ""
+          : "Informe um e-mail válido.",
+      ),
     phone: () =>
       check(
         "phone",
         onlyDigits(f.phone.value).length >= 10
           ? ""
           : "Informe telefone com DDD.",
-      ),
-    cep: () =>
-      check(
-        "cep",
-        onlyDigits(f.cep.value).length === 8
-          ? ""
-          : "O CEP deve conter 8 dígitos.",
       ),
     pass: () =>
       check(
@@ -91,40 +103,146 @@ document.addEventListener("DOMContentLoaded", () => {
         "confirm",
         f.confirm.value && f.confirm.value === f.pass.value
           ? ""
-          : "As senhas precisam ser iguais.",
+          : "As senhas precisam coincidir.",
       ),
-    terms: () =>
-      check("terms", f.terms.checked ? "" : "Você precisa aceitar os termos."),
+    cep: () =>
+      check(
+        "cep",
+        onlyDigits(f.cep.value).length === 8
+          ? ""
+          : "O CEP deve conter 8 dígitos.",
+      ),
     uf: () =>
-      check("uf", f.uf.value.trim() ? "" : "Informe a UF. Consulte o CEP."),
-    city: () =>
-      check(
-        "city",
-        f.city.value.trim() ? "" : "Informe a cidade. Consulte o CEP.",
-      ),
+      check("uf", f.uf.value.trim().length === 2 ? "" : "Informe a UF."),
+    city: () => check("city", f.city.value.trim() ? "" : "Informe a cidade."),
     bairro: () =>
-      check(
-        "bairro",
-        f.bairro.value.trim() ? "" : "Informe o bairro. Consulte o CEP.",
-      ),
+      check("bairro", f.bairro.value.trim() ? "" : "Informe o bairro."),
     street: () =>
-      check(
-        "street",
-        f.street.value.trim() ? "" : "Informe o logradouro. Consulte o CEP.",
-      ),
+      check("street", f.street.value.trim() ? "" : "Informe a rua/logradouro."),
     number: () =>
+      check("number", f.number.value.trim() ? "" : "Informe o número."),
+    terms: () =>
       check(
-        "number",
-        f.number.value.trim() ? "" : "Informe o número do endereço.",
+        "terms",
+        f.terms.checked ? "" : "Aceite os termos de uso para concluir.",
       ),
   };
+
+  const stepValidators = {
+    1: ["name", "cpf", "email", "phone", "pass", "confirm"],
+    2: ["cep", "city", "uf", "street", "number", "bairro"],
+    3: ["terms"],
+  };
+
+  const updateSummary = () => {
+    const nameEl = $("doadorSummaryName");
+    const metaEl = $("doadorSummaryMeta");
+    if (nameEl) nameEl.textContent = f.name.value.trim() || "Novo Doador";
+    if (metaEl) {
+      const parts = [
+        f.cpf.value || "CPF pendente",
+        f.email.value.trim() || "E-mail",
+        f.city.value.trim()
+          ? `${f.city.value.trim()}/${f.uf.value.trim().toUpperCase()}`
+          : "Endereço",
+      ];
+      metaEl.textContent = parts.join(" · ");
+    }
+  };
+
+  const goToStep = (step) => {
+    currentStep = Math.max(1, Math.min(3, Number(step)));
+    maxUnlockedStep = Math.max(maxUnlockedStep, currentStep);
+    setStatus("");
+
+    document.querySelectorAll("[data-step-pane]").forEach((pane) => {
+      pane.hidden = Number(pane.dataset.stepPane) !== currentStep;
+    });
+
+    document.querySelectorAll("[data-step-btn]").forEach((btn) => {
+      const idx = Number(btn.dataset.stepBtn);
+      btn.classList.toggle("is-active", idx === currentStep);
+      btn.classList.toggle("is-done", idx < currentStep);
+      btn.disabled = idx > maxUnlockedStep;
+    });
+
+    if (stepCounter) stepCounter.textContent = `Etapa ${currentStep} de 3`;
+    if (btnPrev) btnPrev.hidden = currentStep === 1;
+    if (btnNext) btnNext.hidden = currentStep === 3;
+    if (btnSubmit) btnSubmit.hidden = currentStep !== 3;
+
+    if (currentStep === 3) updateSummary();
+  };
+
+  const validateStep = (step) => {
+    const keys = stepValidators[step] || [];
+    const results = keys.map((k) => v[k]());
+    const ok = results.every(Boolean);
+    if (!ok) {
+      setStatus("Confira os campos destacados antes de avançar.");
+      const firstInvalidKey = keys.find((_, i) => !results[i]);
+      f[firstInvalidKey]?.focus();
+    }
+    return ok;
+  };
+
+  btnNext?.addEventListener("click", () => {
+    if (validateStep(currentStep)) goToStep(currentStep + 1);
+  });
+
+  btnPrev?.addEventListener("click", () => goToStep(currentStep - 1));
+  $("doadorEditStep1")?.addEventListener("click", () => goToStep(1));
+
+  document.querySelectorAll("[data-step-btn]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = Number(btn.dataset.stepBtn);
+      if (target < currentStep || validateStep(currentStep)) {
+        goToStep(target);
+      }
+    });
+  });
+
+  // CEP dinâmico com feedback visual
+  conectarBuscaCep(
+    f.cep,
+    { uf: f.uf, cidade: f.city, bairro: f.bairro, logradouro: f.street },
+    {
+      aoEncontrar: (dados) => {
+        const cepBadge = $("cepDoadorBadge");
+        if (cepBadge) {
+          cepBadge.textContent = `${dados.uf} ✓`;
+          cepBadge.classList.add("is-ok");
+        }
+        v.uf();
+        v.city();
+        v.bairro();
+        v.street();
+        f.number.focus();
+      },
+    },
+  );
+
+  // Máscaras e indicadores em tempo real
   f.cpf.addEventListener("input", () => {
     f.cpf.value = mascaraCPF(f.cpf.value);
-    v.cpf();
+    const digits = onlyDigits(f.cpf.value);
+    const badge = $("cpfBadge");
+    if (digits.length === 11) {
+      const ok = v.cpf();
+      if (badge) {
+        badge.textContent = ok ? "Válido ✓" : "Inválido";
+        badge.classList.toggle("is-ok", ok);
+        badge.classList.toggle("is-warn", !ok);
+      }
+    } else if (badge) {
+      badge.textContent = "Cupom";
+      badge.classList.remove("is-ok", "is-warn");
+    }
   });
+
   f.cep.addEventListener("input", () => {
     f.cep.value = mascaraCEP(f.cep.value);
-    v.cep();
+    if (onlyDigits(f.cep.value).length === 8) v.cep();
   });
   conectarBuscaCep(f.cep, fields, {
     aoEncontrar: () => {
@@ -138,31 +256,73 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   f.phone.addEventListener("input", () => {
     f.phone.value = mascaraTelefone(f.phone.value);
-    v.phone();
+    if (onlyDigits(f.phone.value).length >= 10) v.phone();
   });
-  Object.entries(v).forEach(([k, fn]) =>
-    f[k].addEventListener(k === "terms" ? "change" : "blur", fn),
-  );
+
+  f.uf.addEventListener("input", () => {
+    f.uf.value = f.uf.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
+  });
+
+  const syncPasswordFeedback = () => {
+    const info = evaluatePasswordStrength(f.pass.value);
+    const meter = $("doadorPassStrength");
+    const label = $("doadorPassStrengthLabel");
+    if (meter) meter.dataset.tone = info.tone;
+    if (label) label.textContent = info.label;
+
+    const matchBadge = $("doadorMatchBadge");
+    if (matchBadge) {
+      const matched =
+        f.confirm.value.length >= 8 && f.confirm.value === f.pass.value;
+      matchBadge.hidden = !matched;
+      matchBadge.classList.toggle("is-ok", matched);
+    }
+  };
+
   f.pass.addEventListener("input", () => {
-    v.pass();
+    syncPasswordFeedback();
+    if (f.pass.value.length >= 8) v.pass();
+    if (f.confirm.value) v.confirm();
+  });
+
+  f.confirm.addEventListener("input", () => {
+    syncPasswordFeedback();
     v.confirm();
   });
-  f.confirm.addEventListener("input", v.confirm);
-  document
-    .querySelector(".signup-form__password-toggle")
-    ?.addEventListener(
-      "click",
-      () => (f.pass.type = f.pass.type === "password" ? "text" : "password"),
-    );
+
+  Object.entries(v).forEach(([k, fn]) => {
+    f[k]?.addEventListener(k === "terms" ? "change" : "blur", fn);
+  });
+
+  document.querySelectorAll("[data-toggle-pass]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = $(btn.dataset.togglePass);
+      if (!input) return;
+      input.type = input.type === "password" ? "text" : "password";
+    });
+  });
+
+  // Navegação por Enter nas etapas 1 e 2 avança em vez de submeter prematuramente
+  form.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && currentStep < 3 && e.target.tagName === "INPUT") {
+      e.preventDefault();
+      if (validateStep(currentStep)) goToStep(currentStep + 1);
+    }
+  });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const valid = Object.values(v)
-      .map((fn) => fn())
-      .every(Boolean);
-    if (!valid) {
-      status.textContent = "Revise os campos destacados.";
-      return;
+    for (const step of [1, 2, 3]) {
+      const keys = stepValidators[step];
+      const stepOk = keys.map((k) => v[k]()).every(Boolean);
+      if (!stepOk) {
+        goToStep(step);
+        setStatus("Revise os campos destacados.");
+        return;
+      }
     }
+
+    setStatus("");
     try {
       await api.registrarDoador({
         nome: f.name.value.trim(),
@@ -184,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
       status.textContent = "Cadastro realizado com sucesso!";
       form.reset();
     } catch (err) {
-      status.textContent = err.message;
+      setStatus(err.message || "Não foi possível concluir o cadastro.");
     }
   });
 });

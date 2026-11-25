@@ -814,3 +814,228 @@
   opacity: 0.1;
   z-index: 9999;
 }
+
+
+/* ==========================================================================
+   CORREÇÕES DE PROPORÇÃO, CHIPS DE LOJAS E DETALHES DE LOTE
+   ========================================================================== */
+
+.main-content--lotes.main-content--lotes {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 36px) clamp(18px, 3.2vw, 44px) 48px;
+}
+
+.projects-page__header.u-mt-lg {
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding: 22px 26px;
+}
+
+.board-container {
+  padding: clamp(20px, 2.5vw, 30px);
+  border-radius: 18px;
+}
+
+/* Chips da Faixa de Lojas */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #dcd9cf;
+  background: var(--color-white);
+  color: var(--color-charcoal-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.filter-chip-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  border: 1px solid rgba(120, 39, 54, 0.28);
+  color: var(--color-primary);
+  font-family: var(--font-detail);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Menu de Filtro de Material */
+.filter-menu.filter-menu {
+  padding: 6px;
+  min-width: 215px;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(45, 55, 72, 0.14);
+}
+
+.filter-menu .dropdown-item {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--color-charcoal-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.filter-menu .dropdown-item:hover,
+.filter-menu .dropdown-item--active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.filter-menu .dropdown-item--separated {
+  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+}
+
+/* Proporções do Card de Lote */
+.lote-card__header {
+  height: 145px;
+  background-size: cover;
+  background-position: center;
+}
+
+.lote-card__header:not(.lote-card__header--photo) {
+  background-size: 140px 140px;
+}
+
+.lote-card__body {
+  padding: 18px;
+}
+
+.lote-card__meta-row {
+  font-size: 11px;
+  color: var(--color-muted-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.lote-card__footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.lote-card__footer .btn {
+  padding: 9px 12px;
+  font-size: 12.5px;
+  border-radius: 8px;
+}
+
+/* Modal de Detalhe do Lote */
+#drawer-lote.modal-form,
+#drawer-loja.modal-form {
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dl-photo {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.dl-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.dl-spec-box {
+  background: var(--color-sand-offwhite);
+  border: 1px solid #e4e1d8;
+  border-radius: 9px;
+  padding: 10px 12px;
+}
+
+.dl-spec-box__label {
+  display: block;
+  font-family: var(--font-detail);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+  margin-bottom: 3px;
+}
+
+.dl-spec-box__val {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-charcoal-text);
+}
+
+.dl-briefing-card {
+  background: #fbfaf7;
+  border: 1px dashed rgba(120, 39, 54, 0.32);
+  border-radius: 11px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.dl-briefing-card h4 {
+  font-family: var(--font-detail);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.dl-briefing-list {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-charcoal-text);
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 24px 24px;
+}
+
+.radio-card {
+  justify-content: flex-start;
+  text-align: left;
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+.radio-card input[type="radio"] {
+  position: static;
+  opacity: 1;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}

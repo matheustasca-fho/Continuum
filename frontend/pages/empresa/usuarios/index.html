@@ -3,77 +3,308 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Equipe | CONTINUUM</title>
+    <title>Equipe & Acessos | CONTINUUM</title>
     <link rel="stylesheet" href="../../../css/global.css" />
     <link rel="stylesheet" href="../../../css/responsive.css" />
+    <link rel="stylesheet" href="usuarios.css" />
     <link rel="stylesheet" href="../../../components/header/header.css" />
-    <style>
-      .users {
-        max-width: 900px;
-        margin: 2rem auto;
-        padding: 1rem;
-      }
-      .users table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .users td,
-      .users th {
-        padding: 0.75rem;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
-      }
-      .users form {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.8rem;
-        margin: 2rem 0;
-      }
-      .users input,
-      .users select {
-        padding: 0.7rem;
-      }
-    </style>
   </head>
   <body>
+    <div class="toast" id="teamToast" role="status" aria-live="polite">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      <span id="teamToastMsg">Equipe atualizada!</span>
+    </div>
+
     <div class="app-layout">
       <div id="appHeader" data-role="empresa" data-active="usuarios"></div>
-      <main class="main-content users">
-        <h1>Gestão de Usuários / Equipe</h1>
-        <p id="message" role="status"></p>
-        <form id="userForm">
-          <label>Nome<input id="name" required /></label
-          ><label>E-mail<input id="email" type="email" required /></label
-          ><label>Telefone<input id="phone" /></label
-          ><label
-            >Perfil<select id="role">
-              <option>OPERADOR</option>
-              <option>ADMIN</option>
-            </select></label
-          ><label
-            >Senha inicial<input
-              id="password"
-              type="password"
-              minlength="8"
-              required /></label
-          ><button class="btn btn--primary">Adicionar usuário</button>
-        </form>
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>E-mail</th>
-              <th>Telefone</th>
-              <th>Perfil</th>
-              <th>Status</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
+
+      <main class="main-content">
+        <header class="team-header animate-slide-up">
+          <div>
+            <p class="team-header__eyebrow">GESTÃO CORPORATIVA · ACESSOS</p>
+            <h1 class="team-header__title">EQUIPE & ACESSOS</h1>
+            <p class="team-header__subtitle">
+              Gerencie os perfis da loja entre <strong>Diretor</strong>,
+              <strong>Gerenciador</strong> e <strong>Registrador</strong> com
+              hierarquia segura de permissões.
+            </p>
+          </div>
+          <button type="button" class="btn btn--primary" id="btnFocusNewUser">
+            + Novo Membro
+          </button>
+        </header>
+
+        <!-- Indicadores da Equipe -->
+        <section class="team-kpis" aria-label="Resumo da equipe">
+          <article class="team-kpi">
+            <div>
+              <div class="team-kpi__num" id="kpiTotalUsers">0</div>
+              <div class="team-kpi__label">Membros na loja</div>
+            </div>
+            <div class="team-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+          </article>
+
+          <article class="team-kpi">
+            <div>
+              <div class="team-kpi__num" id="kpiManagers">0</div>
+              <div class="team-kpi__label">Diretor & Gerenciadores</div>
+            </div>
+            <div class="team-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+          </article>
+
+          <article class="team-kpi">
+            <div>
+              <div class="team-kpi__num" id="kpiRegistradores">0</div>
+              <div class="team-kpi__label">Registradores ativos</div>
+            </div>
+            <div class="team-kpi__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="3" width="14" height="3" rx="1" />
+                <rect x="5" y="18" width="14" height="3" rx="1" />
+                <path d="M7 6v12M17 6v12M7 12h10" />
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <p id="message" class="team-feedback" role="status"></p>
+
+        <div class="team-workspace">
+          <!-- Coluna Esquerda: Lista de Membros -->
+          <section class="team-card" aria-labelledby="teamListTitle">
+            <header class="team-card__header">
+              <div>
+                <h2 class="team-card__title" id="teamListTitle">
+                  Membros da Loja
+                </h2>
+                <p class="team-card__subtitle">
+                  Apenas o Diretor pode cadastrar ou gerenciar contas de Gerenciador.
+                </p>
+              </div>
+            </header>
+
+            <div class="team-toolbar">
+              <div class="team-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="search"
+                  id="searchUsers"
+                  placeholder="Buscar por nome ou e-mail..."
+                  aria-label="Buscar membros da equipe"
+                />
+              </div>
+
+              <div class="role-pills" role="group" aria-label="Filtrar por cargo">
+                <button type="button" class="role-pill is-active" data-role-filter="ALL">
+                  Todos
+                </button>
+                <button type="button" class="role-pill" data-role-filter="DIRETOR">
+                  Diretor
+                </button>
+                <button type="button" class="role-pill" data-role-filter="GERENCIADOR">
+                  Gerenciador
+                </button>
+                <button type="button" class="role-pill" data-role-filter="REGISTRADOR">
+                  Registrador
+                </button>
+              </div>
+            </div>
+
+            <div class="team-table-wrap">
+              <table class="team-table">
+                <thead>
+                  <tr>
+                    <th>Membro</th>
+                    <th>Telefone</th>
+                    <th>Cargo</th>
+                    <th>Status</th>
+                    <th style="text-align: right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Coluna Direita: Novo Usuário -->
+          <aside class="team-card team-card--form" aria-labelledby="newMemberTitle">
+            <header class="team-card__header">
+              <div>
+                <h2 class="team-card__title" id="newMemberTitle">
+                  Adicionar Membro
+                </h2>
+                <p class="team-card__subtitle" id="newMemberSubtitle">
+                  Crie credenciais individuais para sua equipe.
+                </p>
+              </div>
+            </header>
+
+            <form id="userForm" class="user-form user-form--compact" novalidate>
+              <label class="user-field user-field--half" for="name">
+                <span class="user-field__label">Nome completo *</span>
+                <input id="name" placeholder="Ex.: Camila Souza" required />
+              </label>
+
+              <label class="user-field user-field--half" for="phone">
+                <span class="user-field__label">Telefone / WhatsApp</span>
+                <input id="phone" type="tel" placeholder="(11) 90000-0000" />
+              </label>
+
+              <label class="user-field user-field--full" for="email">
+                <span class="user-field__label">E-mail corporativo *</span>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="camila@suaempresa.com.br"
+                  required
+                />
+              </label>
+
+              <label class="user-field user-field--full" for="role">
+                <span class="user-field__label">Cargo de acesso *</span>
+                <select id="role">
+                  <option value="REGISTRADOR">Registrador — Balcão & Doações</option>
+                  <option value="GERENCIADOR" id="optRoleGerenciador">
+                    Gerenciador — Lotes, Projetos & Perfil
+                  </option>
+                </select>
+              </label>
+
+              <div class="role-guide-box user-field--full" id="roleGuideBox">
+                <strong>REGISTRADOR:</strong> registra doações recebidas com
+                vínculo de CPF ao cupom e consulta lotes e projetos (sem criar
+                lotes nem alterar fotos).
+              </div>
+
+              <div class="user-field user-field--full">
+                <label class="user-field__label" for="password">
+                  Senha inicial (mín. 8 caracteres) *
+                </label>
+                <div class="pass-input-wrap">
+                  <input
+                    id="password"
+                    type="password"
+                    minlength="8"
+                    placeholder="Mínimo de 8 caracteres"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="pass-toggle-btn"
+                    data-pass-target="password"
+                  >
+                    Exibir
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn--primary btn--full user-field--full" id="userSubmitBtn">
+                Cadastrar na Equipe
+              </button>
+            </form>
+          </aside>
+        </div>
       </main>
     </div>
-    <script type="module" src="usuarios.js"></script>
+
+    <!-- Modal de Edição / Redefinição de Senha -->
+    <dialog class="edit-user-dialog" id="editUserDialog" aria-labelledby="editDialogTitle">
+      <div class="edit-user-dialog__header">
+        <h2 class="edit-user-dialog__title" id="editDialogTitle">
+          Editar Membro
+        </h2>
+        <button
+          type="button"
+          class="edit-user-dialog__close"
+          id="editDialogClose"
+          aria-label="Fechar"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form id="editUserForm" class="user-form" novalidate>
+        <input type="hidden" id="editUserId" />
+
+        <label class="user-field" for="editUserName">
+          <span class="user-field__label">Nome completo *</span>
+          <input id="editUserName" required />
+        </label>
+
+        <label class="user-field" for="editUserEmail">
+          <span class="user-field__label">E-mail corporativo *</span>
+          <input id="editUserEmail" type="email" required />
+        </label>
+
+        <label class="user-field" for="editUserPhone">
+          <span class="user-field__label">Telefone / WhatsApp</span>
+          <input id="editUserPhone" type="tel" placeholder="(11) 90000-0000" />
+        </label>
+
+        <label class="user-field" for="editUserRole" id="editUserRoleField">
+          <span class="user-field__label">Cargo de acesso *</span>
+          <select id="editUserRole">
+            <option value="REGISTRADOR">Registrador — Balcão & Doações</option>
+            <option value="GERENCIADOR">Gerenciador — Lotes, Projetos & Perfil</option>
+          </select>
+        </label>
+
+        <div class="user-field">
+          <label class="user-field__label" for="editUserPassword">
+            Nova senha (opcional)
+          </label>
+          <div class="pass-input-wrap">
+            <input
+              id="editUserPassword"
+              type="password"
+              minlength="8"
+              placeholder="Deixe em branco para manter a atual"
+            />
+            <button
+              type="button"
+              class="pass-toggle-btn"
+              data-pass-target="editUserPassword"
+            >
+              Exibir
+            </button>
+          </div>
+        </div>
+
+        <div class="edit-user-dialog__actions">
+          <button type="button" class="btn btn--ghost" id="editDialogCancel">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn--primary">
+            Salvar Alterações
+          </button>
+        </div>
+      </form>
+    </dialog>
+
     <script src="../../../components/header/header.js"></script>
+    <script type="module" src="usuarios.js"></script>
   </body>
 </html>
