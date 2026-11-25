@@ -995,7 +995,7 @@ body::before {
   height: 6px;
   border-radius: var(--radius-full);
   background-color: var(--color-primary);
-  opacity: 1;
+  opacity: 0;
   transition: opacity 0.15s;
 }
 
@@ -1018,8 +1018,9 @@ body::before {
   align-items: center;
   gap: 10px;
   z-index: 10000;
-  transform: translateY(0);
-  opacity: 1;
+  transform: translateY(24px);
+  opacity: 0;
+  pointer-events: none;
   transition: all 0.4s var(--transition-spring);
   border-left: 4px solid var(--color-success);
 }
@@ -1559,4 +1560,98 @@ body::before {
 
 .btn--roomy.btn--roomy {
   padding: 12px 24px;
+}
+
+
+/* ==========================================================
+   REFINAMENTO DE PROPORÇÕES E SEÇÕES DO PAINEL DESIGNER
+   ========================================================== */
+.main-content {
+  padding: clamp(24px, 3.2vw, 44px) clamp(20px, 3.5vw, 52px);
+}
+
+.page-header {
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.header-tag-container {
+  height: 210px;
+}
+
+.clothing-tag {
+  height: 185px;
+}
+
+.impact-banner {
+  padding: clamp(24px, 3vw, 38px);
+  margin-bottom: 24px;
+}
+
+.impact-number {
+  font-size: clamp(36px, 3.5vw, 48px);
+}
+
+.dash-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 28px;
+}
+
+.dash-card {
+  padding: 22px 24px;
+}
+
+.dash-card__number {
+  font-size: 38px;
+}
+
+.designer-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 24px;
+  margin-top: 28px;
+  align-items: stretch;
+}
+
+.panel-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.quick-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reputation-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-family: var(--font-detail);
+  font-size: 11px;
+}
+
+@media (max-width: 960px) {
+  .dash-cards,
+  .designer-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-tag-container {
+    display: none;
+  }
 }

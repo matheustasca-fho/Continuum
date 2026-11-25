@@ -1,380 +1,519 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#eff0e8" />
-    <title>Cadastro | CONTINUUM</title>
+    <meta name="theme-color" content="#f5f2eb" />
+    <title>Cadastro Designer | CONTINUUM</title>
     <link rel="stylesheet" href="../../../../css/global.css" />
     <link rel="stylesheet" href="../../../../css/responsive.css" />
+    <link rel="stylesheet" href="../../../../css/cadastro-unificado.css" />
     <link rel="stylesheet" href="cadastro-pessoa.css" />
   </head>
-  <body class="person-signup">
-    <main class="person-signup__main">
-      <a class="person-signup__back" href="../index.html"
-        ><span aria-hidden="true">←</span> Voltar à escolha de perfil</a
-      >
+  <body class="c-signup-body">
+    <main class="c-signup-shell">
+      <nav class="c-signup-topbar" aria-label="Navegação de retorno">
+        <a class="c-signup-back" href="../index.html">
+          <span aria-hidden="true">←</span> Voltar à escolha de perfil
+        </a>
+        <p class="c-signup-login-prompt">
+          Já tem uma conta?
+          <a href="../../login/index.html?perfil=designer">Entrar ↗</a>
+        </p>
+      </nav>
 
-      <section class="person-card" aria-labelledby="person-card-title">
-        <header class="person-card__header">
+      <section
+        class="c-signup-card"
+        id="designerSignupCard"
+        aria-labelledby="person-card-title"
+      >
+        <header class="c-signup-masthead">
           <a
-            class="person-card__brand"
-            href="../../../../index.html"
+            class="c-signup-brand"
+            href="../../../../lp.html"
             aria-label="CONTINUUM — página inicial"
           >
-            <span class="person-card__brand-name">CONTINUUM</span>
-            <span class="person-card__brand-tagline"
-              >ECONOMIA CIRCULAR · UPCYCLING · MODA</span
-            >
+            <span class="c-signup-brand__name">CONTINUUM</span>
+            <span class="c-signup-brand__tag">
+              UPCYCLING AUTORAL · PERFIL DESIGNER
+            </span>
           </a>
-          <h1 class="person-card__title" id="person-card-title">
-            Cadastro Designer
-          </h1>
-          <p class="person-card__description">
-            Crie sua conta para confeccionar e dar vida aos materiais.
-          </p>
+          <span class="c-field-badge is-warn" id="designerTypePill">PF · CPF</span>
         </header>
 
-        <div class="person-switch" role="group" aria-label="Tipo de pessoa">
+        <div class="c-signup-heading">
+          <h1 class="c-signup-title" id="person-card-title">
+            Cadastro Designer
+          </h1>
+          <p class="c-signup-subtitle">
+            Resgate lotes têxteis e dê nova vida aos materiais com autoria.
+          </p>
+        </div>
+
+        <div
+          class="c-stepper"
+          id="designerStepper"
+          role="group"
+          aria-label="Etapas do cadastro de designer"
+        >
           <button
-            class="person-switch__option"
             type="button"
-            value="fisica"
-            aria-pressed="true"
+            class="c-stepper__btn is-active"
+            data-step-btn="1"
           >
-            Pessoa Física
+            <span class="c-stepper__num">01</span>
+            <span>Conta &amp; Doc</span>
           </button>
           <button
-            class="person-switch__option"
             type="button"
-            value="juridica"
-            aria-pressed="false"
+            class="c-stepper__btn"
+            data-step-btn="2"
+            disabled
           >
-            Pessoa Jurídica
+            <span class="c-stepper__num">02</span>
+            <span>Ateliê</span>
+          </button>
+          <button
+            type="button"
+            class="c-stepper__btn"
+            data-step-btn="3"
+            disabled
+          >
+            <span class="c-stepper__num">03</span>
+            <span>Termos</span>
           </button>
         </div>
 
         <form class="person-form" id="formCadastroPessoa" novalidate>
-          <div class="person-form__grid">
-            <div class="person-form__field">
-              <label class="person-form__label" for="documentoPessoa"
-                ><span id="documentoTipo">CPF</span>
-                <span class="person-form__required">*</span></label
+          <!-- ==========================================================
+               ETAPA 1 — TIPO DE PESSOA, DOCUMENTO E CREDENCIAIS
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="1">
+            <div class="c-segmented" role="group" aria-label="Tipo de pessoa">
+              <button
+                class="c-segmented__btn person-switch__option"
+                type="button"
+                value="fisica"
+                aria-pressed="true"
               >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="documentoPessoa"
-                name="CPF"
-                placeholder="CPF"
-                inputmode="numeric"
-                autocomplete="off"
-                maxlength="14"
-                aria-describedby="docAjuda"
-                required
-              />
-              <p
-                id="docAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
+                Pessoa Física (CPF)
+              </button>
+              <button
+                class="c-segmented__btn person-switch__option"
+                type="button"
+                value="juridica"
+                aria-pressed="false"
+              >
+                Pessoa Jurídica (CNPJ)
+              </button>
             </div>
 
-            <div class="person-form__field">
-              <label class="person-form__label" for="senhaPessoa"
-                >Senha <span class="person-form__required">*</span></label
-              >
-              <div class="person-form__password-wrap">
+            <div class="c-grid">
+              <div class="c-field c-field--7">
+                <div class="c-label-row">
+                  <label class="c-label" for="nomeConfeccionista">
+                    <span id="nomePessoaLabel">Nome completo</span>
+                    <span class="c-req">*</span>
+                  </label>
+                </div>
                 <input
-                  class="form-input person-form__input"
-                  type="password"
-                  id="senhaPessoa"
-                  name="SENHA_CONFECCIONISTA"
-                  placeholder="Senha"
-                  autocomplete="new-password"
-                  aria-describedby="senhaPessoaAjuda"
+                  class="c-input"
+                  type="text"
+                  id="nomeConfeccionista"
+                  name="NM_CONFECCIONISTA"
+                  placeholder="Nome completo"
+                  autocomplete="name"
+                  maxlength="150"
                   required
                 />
-                <button
-                  class="person-form__password-toggle"
-                  type="button"
-                  aria-controls="senhaPessoa"
-                  aria-pressed="false"
-                  aria-label="Mostrar ou ocultar senha"
-                >
-                  <svg
-                    class="icon-eye-open"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                  <svg
-                    class="icon-eye-closed"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                    style="display: none"
-                  >
-                    <path
-                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
-                    />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                </button>
+                <p id="nomePessoaAjuda" class="c-hint" style="display: none"></p>
               </div>
-              <p
-                id="senhaPessoaAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
-            </div>
 
-            <div class="person-form__field person-form__confirm-field">
-              <label class="person-form__label" for="confirmarSenhaPessoa">Confirmar senha *</label>
-              <input class="form-input person-form__input" type="password" id="confirmarSenhaPessoa" minlength="8" autocomplete="new-password" required />
-            </div>
+              <div class="c-field c-field--5">
+                <div class="c-label-row">
+                  <label class="c-label" for="documentoPessoa">
+                    <span id="documentoTipo">CPF</span>
+                    <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="docStatusBadge">Obrigatório</span>
+                </div>
+                <div class="input-lookup-wrap" id="docLookupWrap">
+                  <input
+                    class="c-input"
+                    type="text"
+                    id="documentoPessoa"
+                    name="CPF"
+                    placeholder="000.000.000-00"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    maxlength="14"
+                    aria-describedby="docAjuda"
+                    required
+                  />
+                  <span class="input-lookup-spinner" aria-hidden="true"></span>
+                </div>
+                <p id="docAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
-            <div class="person-form__field person-form__field--wide">
-              <label class="person-form__label" for="nomeConfeccionista"
-                ><span id="nomePessoaLabel">Nome completo</span>
-                <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="nomeConfeccionista"
-                name="NM_CONFECCIONISTA"
-                placeholder="Nome completo"
-                autocomplete="name"
-                maxlength="150"
-                required
-              />
-            </div>
-            <div
-              class="person-form__field person-form__field--wide"
-              id="razaoSocialField"
-              hidden
-            >
-              <label class="person-form__label" for="razaoSocialDesigner"
-                >Razão Social *</label
-              ><input
-                class="form-input person-form__input"
-                id="razaoSocialDesigner"
-                name="razaoSocial"
-              />
-            </div>
+              <div class="c-field c-field--12" id="razaoSocialField" hidden>
+                <div class="c-label-row">
+                  <label class="c-label" for="razaoSocialDesigner">
+                    Razão Social do Ateliê / Empresa <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge">PJ</span>
+                </div>
+                <input
+                  class="c-input"
+                  id="razaoSocialDesigner"
+                  name="razaoSocial"
+                  placeholder="Ex.: Ateliê Trama Viva Confecções Ltda"
+                />
+                <p id="razaoAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
-            <div class="person-form__field">
-              <label class="person-form__label" for="emailConfeccionista"
-                >E-mail <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="email"
-                id="emailConfeccionista"
-                name="EMAIL"
-                placeholder="voce@exemplo.com"
-                autocomplete="email"
-                aria-describedby="emailPessoaAjuda"
-                required
-              />
-              <p
-                id="emailPessoaAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
-            </div>
-            <div class="person-form__field">
-              <label class="person-form__label" for="ufPessoa"
-                >Estado (UF) *</label
-              ><input
-                class="form-input person-form__input"
-                id="ufPessoa"
-                maxlength="2"
-                required
-              />
-            </div>
-            <div class="person-form__field">
-              <label class="person-form__label" for="cidadePessoa"
-                >Cidade *</label
-              ><input
-                class="form-input person-form__input"
-                id="cidadePessoa"
-                required
-              />
-            </div>
-            <div class="person-form__field">
-              <label class="person-form__label" for="bairroPessoa"
-                >Bairro *</label
-              ><input
-                class="form-input person-form__input"
-                id="bairroPessoa"
-                required
-              />
-            </div>
+              <div class="c-field c-field--7">
+                <label class="c-label" for="emailConfeccionista">
+                  E-mail profissional <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  type="email"
+                  id="emailConfeccionista"
+                  name="EMAIL"
+                  placeholder="voce@atelie.com.br"
+                  autocomplete="email"
+                  aria-describedby="emailPessoaAjuda"
+                  required
+                />
+                <p id="emailPessoaAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
-            <div class="person-form__field">
-              <label class="person-form__label" for="telefoneConfeccionista"
-                >Telefone <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="tel"
-                id="telefoneConfeccionista"
-                name="TELEFONE"
-                placeholder="(11) 98765-4321"
-                autocomplete="tel"
-                inputmode="numeric"
-                maxlength="15"
-                aria-describedby="telefonePessoaAjuda"
-                required
-              />
-              <p
-                id="telefonePessoaAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
-            </div>
+              <div class="c-field c-field--5">
+                <label class="c-label" for="telefoneConfeccionista">
+                  Telefone / WhatsApp <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  type="tel"
+                  id="telefoneConfeccionista"
+                  name="TELEFONE"
+                  placeholder="(11) 98765-4321"
+                  autocomplete="tel"
+                  inputmode="numeric"
+                  maxlength="15"
+                  aria-describedby="telefonePessoaAjuda"
+                  required
+                />
+                <p id="telefonePessoaAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
-            <div class="person-form__field">
-              <label class="person-form__label" for="cepPessoa"
-                >CEP <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="cepPessoa"
-                name="CEP"
-                placeholder="CEP"
-                inputmode="numeric"
-                autocomplete="postal-code"
-                maxlength="9"
-                aria-describedby="cepPessoaAjuda"
-                required
-              />
-              <p
-                id="cepPessoaAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
-            </div>
+              <div class="c-field">
+                <label class="c-label" for="senhaPessoa">
+                  Senha <span class="c-req">*</span>
+                </label>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    type="password"
+                    id="senhaPessoa"
+                    name="SENHA_CONFECCIONISTA"
+                    placeholder="Mín. 8 caracteres"
+                    autocomplete="new-password"
+                    minlength="8"
+                    aria-describedby="senhaPessoaAjuda"
+                    required
+                  />
+                  <button
+                    class="c-pass-toggle person-form__password-toggle"
+                    type="button"
+                    data-toggle-pass="senhaPessoa"
+                    aria-label="Mostrar ou ocultar senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="c-strength" id="designerPassStrength" data-tone="idle">
+                  <div class="c-strength__bars" aria-hidden="true">
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                    <span class="c-strength__bar"></span>
+                  </div>
+                  <span class="c-strength__label" id="designerPassStrengthLabel">Mín. 8 caracteres</span>
+                </div>
+                <p id="senhaPessoaAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
-            <div class="person-form__field person-form__field--wide">
-              <label class="person-form__label" for="logradouroPessoa"
-                >Logradouro <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="logradouroPessoa"
-                name="LOGRADOURO"
-                placeholder="Rua, avenida, travessa..."
-                autocomplete="street-address"
-                aria-describedby="logradouroAjuda"
-                required
-              />
-              <p
-                id="logradouroAjuda"
-                class="person-form__hint"
-                style="display: none"
-              ></p>
-            </div>
-
-            <div class="person-form__field">
-              <label class="person-form__label" for="numeroEndereco"
-                >Número do endereço
-                <span class="person-form__required">*</span></label
-              >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="numeroEndereco"
-                name="NR_ENDERECO"
-                placeholder="Número"
-                inputmode="numeric"
-                maxlength="6"
-                required
-              />
-            </div>
-
-            <div class="person-form__field">
-              <label class="person-form__label" for="complementoPessoa"
-                >Complemento</label
-              >
-              <input
-                class="form-input person-form__input"
-                type="text"
-                id="complementoPessoa"
-                name="COMPLEMENTO"
-                placeholder="Apto., bloco, sala..."
-                autocomplete="address-line2"
-                maxlength="100"
-              />
+              <div class="c-field">
+                <div class="c-label-row">
+                  <label class="c-label" for="confirmarSenhaPessoa">
+                    Confirmar senha <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="designerMatchBadge" hidden>Coincidem</span>
+                </div>
+                <div class="c-pass-wrap">
+                  <input
+                    class="c-input"
+                    type="password"
+                    id="confirmarSenhaPessoa"
+                    minlength="8"
+                    placeholder="Repita a senha"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button
+                    class="c-pass-toggle"
+                    type="button"
+                    data-toggle-pass="confirmarSenhaPessoa"
+                    aria-label="Mostrar ou ocultar confirmação de senha"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="confirmarPessoaAjuda" class="c-hint" style="display: none"></p>
+              </div>
             </div>
           </div>
 
-          <div class="person-form__field">
-            <label class="person-form__label" for="canalDesigner"
-              >Como conheceu o CONTINUUM?</label
-            ><select class="form-input person-form__input" id="canalDesigner">
-              <option value="">Selecione</option>
-              <option>Loja física participante</option>
-              <option>Instagram / Redes Sociais</option>
-              <option>Indicação de amigos</option>
-              <option>Pesquisa Google</option>
-              <option>Eventos de moda/sustentabilidade</option>
-              <option>Outros</option>
-            </select>
-          </div>
-          <div class="person-form__confirmations">
-          <label class="person-form__check"
-            ><input id="maioridadeDesigner" type="checkbox" required /> Confirmo
-            que sou maior de 18 anos *</label
-          >
-          <label class="person-form__check"
-            ><input id="termosDesigner" type="checkbox" required /> Aceito os
-            Termos de Uso e a Política de Privacidade, incluindo regras de nota
-            e restrição por cancelamento *</label
-          >
-          <label class="person-form__check"
-            ><input id="consentimentoPublicoDesigner" type="checkbox" />
-            Autorizo o uso da minha imagem e a exibição pública do perfil e portfólio na página do QR Code das peças</label>
-          >
+          <!-- ==========================================================
+               ETAPA 2 — ENDEREÇO DO ATELIÊ (DINÂMICO POR CEP)
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="2" hidden>
+            <div class="c-grid">
+              <div class="c-field c-field--4">
+                <div class="c-label-row">
+                  <label class="c-label" for="cepPessoa">
+                    CEP <span class="c-req">*</span>
+                  </label>
+                  <span class="c-field-badge" id="cepPessoaBadge">Auto</span>
+                </div>
+                <div class="input-lookup-wrap">
+                  <input
+                    class="c-input"
+                    type="text"
+                    id="cepPessoa"
+                    name="CEP"
+                    placeholder="00000-000"
+                    inputmode="numeric"
+                    autocomplete="postal-code"
+                    maxlength="9"
+                    aria-describedby="cepPessoaAjuda"
+                    required
+                  />
+                  <span class="input-lookup-spinner" aria-hidden="true"></span>
+                </div>
+                <p id="cepPessoaAjuda" class="c-hint" style="display: none"></p>
+              </div>
 
+              <div class="c-field c-field--5">
+                <label class="c-label" for="cidadePessoa">
+                  Cidade <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="cidadePessoa"
+                  placeholder="Ex.: São Paulo"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--3">
+                <label class="c-label" for="ufPessoa">
+                  UF <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="ufPessoa"
+                  maxlength="2"
+                  placeholder="SP"
+                  required
+                />
+              </div>
+
+              <div class="c-field c-field--8">
+                <label class="c-label" for="logradouroPessoa">
+                  Logradouro <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  type="text"
+                  id="logradouroPessoa"
+                  name="LOGRADOURO"
+                  placeholder="Rua, avenida, travessa..."
+                  autocomplete="street-address"
+                  aria-describedby="logradouroAjuda"
+                  required
+                />
+                <p id="logradouroAjuda" class="c-hint" style="display: none"></p>
+              </div>
+
+              <div class="c-field c-field--4">
+                <label class="c-label" for="numeroEndereco">
+                  Número <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  type="text"
+                  id="numeroEndereco"
+                  name="NR_ENDERECO"
+                  placeholder="Nº"
+                  inputmode="numeric"
+                  maxlength="6"
+                  required
+                />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="bairroPessoa">
+                  Bairro <span class="c-req">*</span>
+                </label>
+                <input
+                  class="c-input"
+                  id="bairroPessoa"
+                  placeholder="Bairro"
+                  required
+                />
+              </div>
+
+              <div class="c-field">
+                <label class="c-label" for="complementoPessoa">
+                  Complemento <span style="font-weight: 400; color: var(--color-muted-text)">(opcional)</span>
+                </label>
+                <input
+                  class="c-input"
+                  type="text"
+                  id="complementoPessoa"
+                  name="COMPLEMENTO"
+                  placeholder="Estúdio, sala, bloco..."
+                  autocomplete="address-line2"
+                  maxlength="100"
+                />
+              </div>
+            </div>
           </div>
-          <button
-            class="btn btn--primary btn--full person-form__submit"
-            type="submit"
-          >
-            Cadastrar-se <span aria-hidden="true">↗</span>
-          </button>
-          <div class="person-card__footer-centered">
-            <p>
-              Já tem uma conta?
-              <a href="../../login/index.html" class="person-card__login-link"
-                >Entrar</a
-              >
-            </p>
+
+          <!-- ==========================================================
+               ETAPA 3 — RESUMO, CANAL E CONSENTIMENTOS
+               ========================================================== -->
+          <div class="c-step-pane" data-step-pane="3" hidden>
+            <div class="c-summary-box">
+              <div class="c-summary-box__main">
+                <span class="c-summary-box__name" id="designerSummaryName">Novo Designer</span>
+                <span class="c-summary-box__meta" id="designerSummaryMeta">PF · Documento · Cidade/UF</span>
+              </div>
+              <button type="button" class="c-summary-box__edit" id="designerEditStep1">
+                Revisar dados
+              </button>
+            </div>
+
+            <div class="c-grid">
+              <div class="c-field c-field--12">
+                <label class="c-label" for="canalDesigner">
+                  Como conheceu o CONTINUUM? (opcional)
+                </label>
+                <select class="c-input" id="canalDesigner">
+                  <option value="">Selecione — opcional</option>
+                  <option>Loja física participante</option>
+                  <option>Instagram / Redes Sociais</option>
+                  <option>Indicação de amigos</option>
+                  <option>Pesquisa Google</option>
+                  <option>Eventos de moda/sustentabilidade</option>
+                  <option>Outros</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="c-checks">
+              <label class="c-check-card" for="maioridadeDesigner">
+                <input id="maioridadeDesigner" type="checkbox" required />
+                <span>
+                  Confirmo que sou <strong>maior de 18 anos</strong>
+                  <span class="c-req">*</span>
+                </span>
+              </label>
+
+              <label class="c-check-card" for="termosDesigner">
+                <input id="termosDesigner" type="checkbox" required />
+                <span>
+                  Aceito os <strong>Termos de Uso</strong> e a
+                  <strong>Política de Privacidade</strong>, incluindo regras de
+                  nota e restrição por cancelamento <span class="c-req">*</span>
+                </span>
+              </label>
+
+              <label class="c-check-card" for="consentimentoPublicoDesigner">
+                <input id="consentimentoPublicoDesigner" type="checkbox" />
+                <span>
+                  Autorizo o uso da minha imagem e a exibição pública do perfil e
+                  portfólio na página do QR Code das peças (opcional)
+                </span>
+              </label>
+            </div>
           </div>
+
           <p
-            class="person-form__status"
+            class="c-status"
             id="personFormStatus"
             role="status"
             aria-live="polite"
           ></p>
+
+          <footer class="c-footer">
+            <span class="c-footer__step-count" id="designerStepCounter">
+              Etapa 1 de 3
+            </span>
+            <div class="c-footer__actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                id="designerBtnPrev"
+                hidden
+              >
+                ← Anterior
+              </button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                id="designerBtnNext"
+              >
+                Continuar →
+              </button>
+              <button
+                class="btn btn--primary person-form__submit"
+                type="submit"
+                id="designerBtnSubmit"
+                hidden
+              >
+                Cadastrar-se <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </footer>
         </form>
+
+        <!-- Estado de Conclusão Dinâmica -->
+        <div class="c-done-view" id="designerDoneView" hidden>
+          <div class="c-done-view__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 class="c-signup-title">Ateliê credenciado!</h2>
+          <p class="c-signup-subtitle">
+            Sua conta de Designer está ativa. Redirecionando ao painel para
+            explorar os lotes disponíveis…
+          </p>
+        </div>
       </section>
+
+      <p class="c-signature">
+        <span aria-hidden="true">✳</span> UPCYCLING COM RASTREABILIDADE · CONTINUUM
+      </p>
     </main>
     <script type="module" src="cadastro-pessoa.js"></script>
   </body>

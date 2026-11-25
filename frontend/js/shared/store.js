@@ -190,24 +190,37 @@ const seed = () => {
     usuariosEmpresa: [
       {
         id: "UE-01",
-        usuario: "empresa",
+        usuario: "administrador",
         empresaId: empresa.id,
-        nome: "Admin Loja",
+        nome: "Diretor da Loja",
         email: "admin@loja.com",
         telefone: "11999999999",
         senhaHash: "empresa123",
-        perfil: "ADMIN",
+        perfil: "DIRETOR",
         ativo: true,
         criadoEm: new Date().toISOString(),
       },
       {
         id: "UE-02",
+        usuario: "gerenciador",
         empresaId: empresa.id,
-        nome: "Operador Loja",
+        nome: "Gerenciador da Loja",
+        email: "gerenciador@loja.com",
+        telefone: "11997776666",
+        senhaHash: "gerenciador123",
+        perfil: "GERENCIADOR",
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      },
+      {
+        id: "UE-03",
+        usuario: "registrador",
+        empresaId: empresa.id,
+        nome: "Registrador da Loja",
         email: "operador@loja.com",
         telefone: "11988888888",
         senhaHash: "operador123",
-        perfil: "OPERADOR",
+        perfil: "REGISTRADOR",
         ativo: true,
         criadoEm: new Date().toISOString(),
       },
@@ -261,7 +274,47 @@ export function initDB() {
     const designer = d.confeccionistas.find((x) => x.id === "DSG-01");
     if (designer && !designer.usuario) designer.usuario = "designer";
     const companyAdmin = d.usuariosEmpresa.find((x) => x.id === "UE-01");
-    if (companyAdmin && !companyAdmin.usuario) companyAdmin.usuario = "empresa";
+    if (companyAdmin) {
+      companyAdmin.usuario = "administrador";
+      companyAdmin.perfil = "DIRETOR";
+      if (companyAdmin.nome === "Admin Loja") {
+        companyAdmin.nome = "Diretor da Loja";
+      }
+    }
+    d.usuariosEmpresa.forEach((u) => {
+      if (u.id !== "UE-01" && u.perfil === "ADMIN") {
+        u.perfil = "GERENCIADOR";
+        if (u.nome === "Admin Loja") u.nome = "Gerenciador da Loja";
+      }
+      if (u.perfil === "OPERADOR") {
+        u.perfil = "REGISTRADOR";
+        if (u.nome === "Operador Loja") u.nome = "Registrador da Loja";
+        if (!u.usuario) u.usuario = "registrador";
+      }
+    });
+    if (!d.usuariosEmpresa.some((u) => u.perfil === "GERENCIADOR")) {
+      d.usuariosEmpresa.push({
+        id: "UE-02-MGR",
+        usuario: "gerenciador",
+        empresaId: d.empresas?.[0]?.id || "EMP-01",
+        nome: "Gerenciador da Loja",
+        email: "gerenciador@loja.com",
+        telefone: "11997776666",
+        senhaHash: "gerenciador123",
+        perfil: "GERENCIADOR",
+        ativo: true,
+        criadoEm: new Date().toISOString(),
+      });
+    }
+    if (d.sessaoAtual?.perfil === "empresa" && d.sessaoAtual.usuarioEmpresa) {
+      const fresh = d.usuariosEmpresa.find(
+        (u) => u.id === d.sessaoAtual.usuarioEmpresa.id,
+      );
+      if (fresh) {
+        d.sessaoAtual.usuarioEmpresa = fresh;
+        d.sessaoAtual.usuario = fresh;
+      }
+    }
     localStorage.setItem(STORE_KEY, JSON.stringify(d));
   }
 }

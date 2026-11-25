@@ -1449,3 +1449,84 @@ body::before {
     transition-delay: 0s !important;
   }
 }
+
+
+/* ==========================================================
+   CORREÇÕES DE ESTADO VAZIO, PROPORÇÕES E MODAL DE CANCELAMENTO
+   ========================================================== */
+.page {
+  max-width: 1120px;
+}
+
+.lote {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 8px;
+}
+
+.lote::before {
+  display: none;
+}
+
+.empty[hidden] {
+  display: none !important;
+}
+
+.empty:not([hidden]) {
+  display: flex;
+  animation: slideUp 0.45s var(--ease-out) both;
+}
+
+.btn-pill--danger {
+  background-color: #fdecec;
+  border-color: rgba(192, 40, 58, 0.25);
+  color: var(--status-fail-text);
+}
+
+.btn-pill--danger:hover {
+  background-color: var(--status-fail-text);
+  border-color: var(--status-fail-text);
+  color: var(--color-white);
+}
+
+.cancel-warning-box {
+  background: var(--status-fail-bg);
+  border: 1px solid rgba(192, 40, 58, 0.28);
+  color: var(--status-fail-text);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 14px 0;
+}
+
+.cancel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.cancel-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-charcoal-text);
+}
+
+.cancel-field select,
+.cancel-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--color-charcoal-text);
+  outline: none;
+}
+
+.cancel-field select:focus,
+.cancel-field textarea:focus {
+  border-color: var(--color-primary);
+}

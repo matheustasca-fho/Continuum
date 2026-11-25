@@ -35,6 +35,12 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedCard?.classList.add("auth-card__option--confirming");
     profilePanel?.classList.add("profile-panel--confirming");
 
+    const arrowEl = selectedCard?.querySelector(".auth-card__arrow");
+    if (arrowEl) {
+      arrowEl.innerHTML =
+        '<svg class="continuum-btn-spinner" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:1rem;height:1rem;"><circle cx="12" cy="12" r="9" stroke="rgba(120,39,54,0.22)" stroke-width="2.6"></circle><circle cx="12" cy="12" r="9" stroke="#782736" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="42 100"></circle></svg>';
+    }
+
     let targetUrl;
 
     switch (perfil) {
@@ -51,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
       window.location.href = targetUrl;
-    }, 200);
+    }, 320);
   };
 
   // Escuta mudanças nos inputs de rádio

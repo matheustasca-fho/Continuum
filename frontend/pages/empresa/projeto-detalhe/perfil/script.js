@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const $ = (id) => document.getElementById(id),
     session = api.getSessaoAtual();
   const form = $("profileForm");
-  if (session?.usuarioEmpresa?.perfil !== "ADMIN") {
+  if (!["DIRETOR", "GERENCIADOR"].includes(session?.usuarioEmpresa?.perfil)) {
     form.hidden = true;
     $("accessMessage").textContent =
       "Acesso restrito ao administrador da loja.";
