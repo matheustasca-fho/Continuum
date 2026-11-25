@@ -61,10 +61,11 @@ function showFeedback(message, type = "success") {
 }
 
 function getInitials(name) {
-  const parts = String(name || "Empresa")
+  const parts = String(name || "")
     .trim()
     .split(/\s+/)
     .filter(Boolean);
+  if (!parts.length) return "";
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
@@ -79,7 +80,7 @@ function updateCounters() {
 }
 
 function updateHeaderSummary(emp) {
-  const fantasy = emp.nomeFantasia || emp.razaoSocial || "Loja Parceira";
+  const fantasy = emp.nomeFantasia || emp.razaoSocial || "";
   if ($("empresaInitials")) $("empresaInitials").textContent = getInitials(fantasy);
   if ($("headerFantasyName")) $("headerFantasyName").textContent = fantasy;
   if ($("displayCnpj")) {
@@ -88,14 +89,14 @@ function updateHeaderSummary(emp) {
       : "CNPJ não informado";
   }
   if ($("displayLocation")) {
-    const loc = [emp.bairro, emp.cidade || "São Paulo", emp.uf || "SP"]
+    const loc = [emp.bairro, emp.cidade, emp.uf]
       .filter(Boolean)
       .join(" · ");
     $("displayLocation").textContent = loc;
   }
   if ($("displayPlanBadge")) {
-    const plano = emp.assinatura?.plano || "Parceiro Circular";
-    const status = emp.assinatura?.status || "ATIVA";
+    const plano = emp.assinatura?.plano || "";
+    const status = emp.assinatura?.status || "";
     $("displayPlanBadge").innerHTML = `<span class="plan-pill__dot"></span> ${plano} · ${status}`;
   }
 }
@@ -120,7 +121,7 @@ function populateForm(emp) {
 
   if (cepEl) cepEl.value = emp.cep ? mascaraCEP(emp.cep) : "";
   if (cidadeEl) cidadeEl.value = emp.cidade || "";
-  if (ufEl) ufEl.value = emp.uf || "SP";
+  if (ufEl) ufEl.value = emp.uf || "";
   if (logradouroEl) logradouroEl.value = emp.logradouro || "";
   if (numeroEl) numeroEl.value = emp.numero || "";
   if (bairroEl) bairroEl.value = emp.bairro || "";
@@ -128,7 +129,7 @@ function populateForm(emp) {
 
   aceitaRetiradaEl.checked = Boolean(emp.aceitaRetirada);
   horarioRetiradaEl.value = emp.horarioRetirada || "";
-  freteEl.value = emp.frete || "Envio custeado na rede CONTINUUM em SP";
+  freteEl.value = emp.frete || "";
 
   if (cupomPercentualEl) {
     cupomPercentualEl.value = emp.politicaCupom?.percentual ?? 15;
@@ -138,7 +139,7 @@ function populateForm(emp) {
   }
 
   cartilhaConteudoEl.value = emp.cartilhaPadrao?.conteudo || "";
-  cartilhaVersaoEl.textContent = emp.cartilhaPadrao?.versao || "v1.0";
+  cartilhaVersaoEl.textContent = emp.cartilhaPadrao?.versao || "—";
 
   if (emp.cartilhaPadrao?.atualizadoEm) {
     const dt = new Date(emp.cartilhaPadrao.atualizadoEm);
@@ -219,8 +220,8 @@ form.addEventListener("submit", async (e) => {
       razaoSocial: razaoSocialEl?.value.trim() || empresaAtual.razaoSocial || "",
       perfilLoja: perfilLojaEl.value.trim(),
       cep: onlyDigits(cepEl?.value || empresaAtual.cep || ""),
-      cidade: cidadeEl?.value.trim() || empresaAtual.cidade || "São Paulo",
-      uf: (ufEl?.value.trim() || empresaAtual.uf || "SP").toUpperCase(),
+      cidade: cidadeEl?.value.trim() || empresaAtual.cidade || "",
+      uf: (ufEl?.value.trim() || empresaAtual.uf || "").toUpperCase(),
       logradouro: logradouroEl?.value.trim() || "",
       numero: numeroEl?.value.trim() || "",
       bairro: bairroEl?.value.trim() || "",

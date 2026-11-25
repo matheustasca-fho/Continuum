@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       data.projetos.length,
       data.kg,
       data.pecas,
-      imp.toneladasRedirecionadas ?? Math.round((data.kg || 0) / 1000),
-      imp.aguaEconomizadaLitros ?? Math.round((data.kg || 0) * 80),
-      imp.co2EvitadoKg ?? Math.round((data.kg || 0) * 2.5),
-      imp.marcasFomentadas ?? Math.max(1, data.designers || 1),
+      imp.toneladasRedirecionadas ?? 0,
+      imp.aguaEconomizadaLitros ?? 0,
+      imp.co2EvitadoKg ?? 0,
+      imp.marcasFomentadas ?? 0,
     ];
 
   counters.forEach((counter, index) => {
@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   const title = document.querySelector(".page-header__title");
-  if (title)
-    title.textContent = `OLÁ, ${data.empresa?.nomeFantasia || "PONTO DE COLETA"}`;
+  if (title && data.empresa?.nomeFantasia)
+    title.textContent = `OLÁ, ${data.empresa.nomeFantasia}`;
 
   const list = document.querySelector(".status-list");
   if (list) {
